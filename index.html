@@ -319,15 +319,6 @@ input:focus { border-color: #3CFFA0; }
   font-size: 11px; font-family: 'Silkscreen', monospace; padding: 8px 16px; border-radius: 0; z-index: 30; display: none;
 }
 
-#muteBtn {
-  position: fixed; top: 14px; right: 14px; z-index: 40;
-  width: 40px; height: 40px;
-  background: rgba(0,0,0,0.5); border: 1.5px solid #3CFFA0; color: #3CFFA0;
-  font-size: 16px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-}
-#muteBtn.muted { border-color: #666; color: #666; }
-
 </style>
 </head>
 <body>
@@ -338,7 +329,6 @@ input:focus { border-color: #3CFFA0; }
 <audio id="bgmLobby" src="assets/lobby.m4a" loop preload="auto"></audio>
 <audio id="bgmGame" src="assets/game.m4a" loop preload="auto"></audio>
 <audio id="sfxClick" src="assets/click.wav" preload="auto"></audio>
-<button id="muteBtn" title="Mute/Unmute musik">🔊</button>
 
 <!-- AUTH SCREEN -->
 <div class="screen visible" id="authScreen">
@@ -443,13 +433,11 @@ input:focus { border-color: #3CFFA0; }
   // ================= AUDIO / BACKSOUND =================
   const bgmLobby = document.getElementById('bgmLobby');
   const bgmGame = document.getElementById('bgmGame');
-  const muteBtn = document.getElementById('muteBtn');
   bgmLobby.volume = 0.5;
   bgmGame.volume = 0.5;
 
   let audioUnlocked = false;
-  let musicMuted = false;
-  let currentTrack = null; // 'lobby' | 'game' | null
+  let currentTrack = 'lobby'; // 'lobby' | 'game' | null
 
   function fadeTo(audio, targetVol, ms = 400) {
     const startVol = audio.volume;
@@ -465,7 +453,6 @@ input:focus { border-color: #3CFFA0; }
 
   function playTrack(name) {
     currentTrack = name;
-    if (musicMuted) return;
     const target = name === 'lobby' ? bgmLobby : name === 'game' ? bgmGame : null;
     [bgmLobby, bgmGame].forEach(a => {
       if (a !== target && !a.paused) fadeTo(a, 0, 300);
@@ -484,19 +471,16 @@ input:focus { border-color: #3CFFA0; }
     audioUnlocked = true;
     if (currentTrack) playTrack(currentTrack);
   }
-  ['pointerdown', 'touchstart', 'keydown'].forEach(evt => {
-    document.addEventListener(evt, unlockAudio, { once: true, passive: true });
+  // Coba langsung autoplay (berhasil di sebagian browser desktop)
+  unlockAudio();
+  // Fallback: aktif begitu ada interaksi pertama apa pun (wajib di kebanyakan browser mobile)
+  ['pointerdown', 'touchstart', 'mousedown', 'click', 'keydown'].forEach(evt => {
+    document.addEventListener(evt, unlockAudio, { passive: true });
   });
-
-  muteBtn.addEventListener('click', () => {
-    musicMuted = !musicMuted;
-    muteBtn.textContent = musicMuted ? '🔇' : '🔊';
-    muteBtn.classList.toggle('muted', musicMuted);
-    if (musicMuted) {
-      fadeTo(bgmLobby, 0, 250);
-      fadeTo(bgmGame, 0, 250);
-    } else if (currentTrack) {
-      playTrack(currentTrack);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && audioUnlocked && currentTrack) {
+      const target = currentTrack === 'lobby' ? bgmLobby : bgmGame;
+      if (target.paused) target.play().catch(() => {});
     }
   });
 
@@ -504,15 +488,17 @@ input:focus { border-color: #3CFFA0; }
   const sfxClick = document.getElementById('sfxClick');
   sfxClick.volume = 0.6;
   function playClick() {
-    if (musicMuted) return;
     sfxClick.currentTime = 0;
     sfxClick.play().catch(() => {});
   }
   // Delegasi: setiap klik pada <button> atau elemen ber-class tombol akan bunyi
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('button, .joinBtn, .btnPrimary, .btnGhost, .tabBtn, .screenBackBtn, .logoutLink, .forgotLink');
-    if (btn && btn.id !== 'muteBtn') playClick();
+    if (btn) playClick();
   });
+
+  // Musik lobby mulai dari layar login/auth
+  playTrack('lobby');
 
   // Musik lobby baru mulai saat masuk layar lobby (lihat enterLobby())
 
