@@ -338,7 +338,7 @@ input:focus { border-color: #3CFFA0; }
 
 /* Halaman player tidak boleh digulir — semua elemen mengecil otomatis
    mengikuti tinggi layar (pakai satuan vh) supaya selalu muat. */
-#playerScreen { overflow: hidden !important; padding-top: clamp(4px, 1.2vh, 12px); padding-bottom: clamp(4px, 1.2vh, 12px); }
+#playerScreen { overflow-y: auto !important; overflow-x: hidden !important; padding-top: clamp(4px, 1.2vh, 12px); padding-bottom: 24px; -webkit-overflow-scrolling: touch; }
 #playerScreen .screenTopBar { padding: clamp(6px, 1.4vh, 14px) 0 clamp(4px, 1vh, 8px); }
 #playerScreen .screenDivider { margin-bottom: clamp(6px, 1.2vh, 14px); }
 #playerScreen .logo { font-size: clamp(15px, 4vh, 30px); }
