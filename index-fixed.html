@@ -1,0 +1,2822 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>RetroSnake.io</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  max-width: 100vw;
+  background: #000;
+  font-family: 'Silkscreen', 'Courier New', monospace;
+  -webkit-font-smoothing: none;
+  overscroll-behavior: none;
+}
+#game { display: block; background: #000; cursor: crosshair; image-rendering: pixelated; }
+
+#rotateOverlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: #000;
+  display: none;
+  flex-direction: column; align-items: center; justify-content: center;
+  color: #3CFFA0; text-align: center; padding: 20px;
+}
+.rotateIcon { font-size: 44px; margin-bottom: 18px; color: #3CFFA0; animation: spin 1.8s steps(4) infinite; }
+.rotateText { font-size: 13px; color: #aaa; line-height: 1.9; }
+@keyframes spin {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-90deg); }
+}
+
+/* overlay paksa landscape dinonaktifkan - game sekarang mendukung mode potret */
+
+.screen {
+  position: fixed; inset: 0;
+  display: none;
+  flex-direction: column; align-items: center; justify-content: flex-start;
+  background: #050505;
+  background-image:
+    radial-gradient(1px 1px at 8% 10%, #a86bff 100%, transparent),
+    radial-gradient(1px 1px at 20% 24%, #3CFFA0 100%, transparent),
+    radial-gradient(2px 2px at 68% 8%, #3CFFA0 100%, transparent),
+    radial-gradient(1px 1px at 92% 14%, #FFD23C 100%, transparent),
+    radial-gradient(2px 2px at 10% 40%, #3CFFA0 100%, transparent),
+    radial-gradient(1px 1px at 88% 40%, #ccc 100%, transparent),
+    radial-gradient(1px 1px at 6% 65%, #FFD23C 100%, transparent),
+    radial-gradient(1px 1px at 94% 66%, #FF5C7A 100%, transparent),
+    radial-gradient(2px 2px at 78% 84%, #a86bff 100%, transparent),
+    radial-gradient(1px 1px at 30% 90%, #3CFFA0 100%, transparent),
+    radial-gradient(1px 1px at 55% 96%, #FFD23C 100%, transparent),
+    radial-gradient(1px 1px at 96% 92%, #7fd6c8 100%, transparent),
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 26px 26px, 26px 26px;
+  z-index: 20;
+  padding: clamp(8px, 3vh, 20px) 20px;
+  overflow-y: auto; overflow-x: hidden;
+  overscroll-behavior: contain;
+  color: #3CFFA0;
+}
+.screen.visible { display: flex; }
+
+.screenTopBar {
+  width: 100%; max-width: 640px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px;
+  padding: 18px 0 10px;
+}
+.screenBrand { font-size: 13px; letter-spacing: 2px; color: #3CFFA0; font-weight: 700; white-space: nowrap; }
+.screenBrand .ver { color: #666; font-size: 10px; letter-spacing: 1px; margin-left: 8px; font-weight: 400; }
+.screenBackBtn {
+  display: flex; align-items: center; gap: 6px;
+  border: 2px solid #FF5C7A; color: #FF5C7A;
+  background: rgba(255,92,122,0.06);
+  padding: 8px 10px; font-size: 10px; letter-spacing: 1px; font-weight: 700;
+  cursor: pointer; font-family: 'Silkscreen', monospace;
+  white-space: nowrap; flex-shrink: 0;
+}
+.screenDivider {
+  width: 100%; max-width: 640px; height: 1px;
+  background: rgba(255,255,255,0.15); margin-bottom: clamp(14px, 3vh, 30px);
+}
+
+.logo {
+  font-family: 'Silkscreen', monospace;
+  font-weight: 700;
+  font-size: clamp(20px, 6.5vw, 46px);
+  letter-spacing: 2px;
+  color: #fff;
+  margin-bottom: 4px;
+  text-align: center;
+  line-height: 1.3;
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+.logo .accent { color: #3CFFA0; }
+.logoWorm { margin-bottom: clamp(10px, 3vh, 20px); line-height: 0; text-align: center; }
+.logoWorm span {
+  display: inline-block; width: 13px; height: 13px; margin: 0 1px;
+  background: #3CFFA0; vertical-align: middle;
+}
+.logoWorm span.head { position: relative; width: 17px; height: 17px; }
+.logoWorm span.head::before, .logoWorm span.head::after {
+  content: ''; position: absolute; top: 4px; width: 3px; height: 3px; background: #06110c;
+}
+.logoWorm span.head::before { left: 4px; }
+.logoWorm span.head::after { right: 4px; }
+.logoWorm span.dot { background: transparent; width: 6px; }
+.tagline {
+  color: #aaa; font-size: 12px; letter-spacing: 1px;
+  margin-bottom: clamp(10px, 3vh, 22px); text-align: center;
+  line-height: 1.9; max-width: 420px;
+}
+
+.card {
+  width: 100%; max-width: 380px;
+  background: rgba(0,0,0,0.4);
+  border: 1.5px solid #3CFFA0;
+  padding: clamp(18px, 3vh, 28px) 24px;
+}
+
+.cardHead { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.15); }
+.cardHead .icon { color: #3CFFA0; font-size: 18px; }
+.cardHead .title { color: #fff; font-size: 15px; letter-spacing: 1px; font-weight: 700; }
+
+.tabs { display: flex; gap: 4px; margin-bottom: clamp(10px, 2vh, 18px); }
+.tabBtn {
+  flex: 1; padding: clamp(8px, 1.8vh, 12px) 4px; text-align: center;
+  cursor: pointer;
+  color: #aaa; font-size: 12px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 1px;
+  border: 1.5px solid #333; background: rgba(255,255,255,0.02);
+  transition: all .1s;
+}
+.tabBtn.active {
+  color: #000; background: #3CFFA0;
+  border-color: #3CFFA0;
+}
+
+.fieldLabel { font-size: 10px; letter-spacing: 2px; color: #3CFFA0; margin-bottom: 6px; display: block; }
+
+input {
+  width: 100%; padding: clamp(10px, 1.8vh, 13px) 12px; font-size: 14px;
+  font-family: 'Silkscreen', monospace;
+  border: 1.5px solid #2a2a2a;
+  background: rgba(255,255,255,0.02); color: #eafff2; outline: none;
+  margin-bottom: clamp(10px, 1.8vh, 14px); transition: border-color .15s;
+}
+input::placeholder { color: #555; }
+input:focus { border-color: #3CFFA0; }
+
+.btnPrimary {
+  width: 100%; padding: 16px; font-size: 15px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 2px;
+  border: 1.5px solid #3CFFA0; cursor: pointer;
+  background: transparent; color: #3CFFA0;
+  transition: all .12s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.btnPrimary::before { content: '\25B6'; font-size: 12px; }
+.btnPrimary:hover { background: rgba(60,255,160,0.08); }
+.btnPrimary:active { transform: translate(1px, 1px); }
+.btnPrimary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.btnGhost {
+  width: 100%; padding: 14px; font-size: 12px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 1px;
+  border: 1.5px solid #444; cursor: pointer;
+  background: transparent; color: #ccc; margin-top: 0;
+}
+.btnGhost:hover { border-color: #3CFFA0; color: #3CFFA0; }
+
+.btnWhite {
+  width: 100%; padding: 16px; font-size: 15px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 2px;
+  border: 1.5px solid #fff; cursor: pointer;
+  background: transparent; color: #fff;
+  transition: all .12s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin-top: 10px;
+}
+.btnWhite::before { content: '\25B6'; font-size: 12px; }
+.btnWhite:hover { background: rgba(255,255,255,0.08); }
+.btnWhite:active { transform: translate(1px, 1px); }
+
+/* ---------- Skin picker modal ---------- */
+.skinOverlay {
+  position: fixed; inset: 0; z-index: 40;
+  background: rgba(0,0,0,0.75);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.skinOverlay.visible { display: flex; }
+.skinModal {
+  width: 100%; max-width: 380px;
+  background: #050505; border: 1.5px solid #3CFFA0;
+  padding: clamp(18px, 3vh, 26px) 22px;
+}
+.skinModalHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.15); }
+.skinModalHead .title { color: #fff; font-size: 15px; letter-spacing: 1px; font-weight: 700; font-family: 'Silkscreen', monospace; }
+.skinCloseBtn {
+  border: 1.5px solid #FF5C7A; color: #FF5C7A; background: rgba(255,92,122,0.06);
+  padding: 6px 10px; font-size: 10px; font-family: 'Silkscreen', monospace; font-weight: 700; cursor: pointer;
+}
+.skinPreviewWrap { display: flex; justify-content: center; margin-bottom: 18px; }
+.skinPreview {
+  width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.02);
+}
+.skinPreview .body { width: 40px; height: 40px; }
+.skinPreview .body.twoTone { background-image: linear-gradient(135deg, var(--sc) 50%, var(--scB) 50%) !important; }
+.skinPreview .body.multiTone { background-image: var(--grad) !important; }
+.skinGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+.skinSwatch {
+  width: 100%; aspect-ratio: 1; cursor: pointer;
+  border: 2px solid rgba(255,255,255,0.15);
+  position: relative;
+}
+.skinSwatch.selected { border-color: #fff; box-shadow: 0 0 0 2px #000, 0 0 0 4px #fff; }
+.skinSwatch::after {
+  content: ''; position: absolute; inset: 0;
+  background-color: var(--sc);
+}
+.skinSwatch.twoTone::after {
+  background-image: linear-gradient(135deg, var(--sc) 50%, var(--scB) 50%);
+}
+.skinSwatch.multiTone::after {
+  background-image: var(--grad);
+}
+.skinConfirmBtn {
+  width: 100%; padding: 14px; font-size: 13px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 2px;
+  border: 1.5px solid #3CFFA0; cursor: pointer;
+  background: transparent; color: #3CFFA0;
+}
+.skinConfirmBtn:hover { background: rgba(60,255,160,0.08); }
+
+.orDivider { display: flex; align-items: center; gap: 12px; margin: clamp(12px, 2.5vh, 18px) 0; color: #555; font-size: 10px; letter-spacing: 2px; }
+.orDivider::before, .orDivider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.15); }
+
+/* ---------- Shop button (border ijo sama kayak Play Online) ---------- */
+.btnShop {
+  width: 100%; padding: 16px; font-size: 15px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 2px;
+  border: 1.5px solid #3CFFA0; cursor: pointer;
+  background: transparent; color: #3CFFA0; margin-top: 10px;
+  transition: all .12s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.btnShop::before { content: '\25B6'; font-size: 12px; }
+.btnShop:hover { background: rgba(60,255,160,0.08); }
+.btnShop:active { transform: translate(1px, 1px); }
+
+/* ---------- Shop screen ---------- */
+.shopCoinBadge {
+  border: 1.5px solid #3CFFA0; background: rgba(0,0,0,0.4);
+  padding: 8px 16px; text-align: center;
+}
+.shopCoinBadge .lbl { font-size: 10px; letter-spacing: 2px; color: #3CFFA0; margin-bottom: 4px; }
+.shopCoinBadge .val { font-size: 18px; color: #FFD23C; font-weight: 700; }
+
+.sectionLabel {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  color: #3CFFA0; font-size: 14px; font-weight: 700; letter-spacing: 3px;
+  margin-bottom: clamp(4px, 0.8vh, 8px);
+}
+.sectionLabel .sq { width: 6px; height: 6px; border: 1.5px solid #3CFFA0; }
+.sectionSubLabel {
+  color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 3px;
+  text-align: center; flex-shrink: 0;
+  margin-bottom: clamp(10px, 2vh, 20px);
+}
+
+#shopScreen { overflow: hidden; }
+#shopScreen .screenTopBar { flex-shrink: 0; padding: clamp(6px, 1.6vh, 14px) 0 clamp(3px, 1.2vh, 8px); }
+#shopScreen .screenDivider { flex-shrink: 0; margin-bottom: clamp(6px, 1.6vh, 16px); }
+#shopScreen .logo { flex-shrink: 0; font-size: clamp(16px, 4.2vh, 38px); margin-bottom: 2px; }
+#shopScreen .sectionLabel { flex-shrink: 0; }
+
+.skinShopGridWrap {
+  position: relative;
+  width: 100%; max-width: 640px;
+  flex: 1 1 auto; min-height: 0;
+}
+.skinShopGridWrap .skinShopGrid { width: 100%; height: 100%; }
+.skinShopGrid {
+  display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); grid-template-rows: repeat(2, minmax(0,1fr));
+  gap: clamp(6px, 1.4vh, 12px);
+}
+.skinPageArrow {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
+  border: 1.5px solid #3CFFA0; background: #050505; color: #3CFFA0;
+  width: 24px; height: 24px;
+  font-size: 13px; cursor: pointer; font-family: 'Silkscreen', monospace;
+  display: flex; align-items: center; justify-content: center;
+}
+.skinPageArrow.left { left: -8px; }
+.skinPageArrow.right { right: -8px; }
+.skinPageArrow:hover { background: rgba(60,255,160,0.15); }
+.skinPageArrow:disabled { opacity: 0.25; cursor: not-allowed; }
+.skinPageArrow.hidden { visibility: hidden; }
+
+@media (max-width: 340px) { .skinShopGrid { grid-template-columns: minmax(0,1fr); grid-template-rows: repeat(4, minmax(0,1fr)); } }
+.skinShopCard {
+  border: 1.5px solid #3CFFA0; background: rgba(0,0,0,0.4);
+  padding: clamp(10px, 2vh, 18px) clamp(12px, 3.4vw, 18px); text-align: center;
+  min-width: 0; min-height: 0; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.skinShopSwatches {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%;
+  gap: clamp(7px, 2.2vw, 10px); margin-bottom: clamp(6px, 1.5vh, 14px); flex-shrink: 0;
+}
+.skinShopSwatches .sw {
+  width: clamp(22px, min(5.6vh, 11.5vw), 52px); height: clamp(22px, min(5.6vh, 11.5vw), 52px);
+  flex-shrink: 0; position: relative;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
+}
+.skinShopSwatches .sw.eyes::before, .skinShopSwatches .sw.eyes::after {
+  content: ''; position: absolute; top: 35%; width: 13%; height: 13%; background: #06110c;
+}
+.skinShopSwatches .sw.eyes::before { left: 24%; }
+.skinShopSwatches .sw.eyes::after { right: 24%; }
+.skinShopPrice { font-size: clamp(6px, 1.2vh, 9px); letter-spacing: 2px; color: #3CFFA0; margin-bottom: clamp(2px, 0.5vh, 3px); flex-shrink: 0; }
+.skinShopPriceVal { font-size: clamp(11px, 2.2vh, 17px); color: #fff; font-weight: 700; margin-bottom: clamp(4px, 1.3vh, 13px); flex-shrink: 0; }
+.skinShopPriceVal .coinWord { font-size: clamp(8px, 1.5vh, 11px); color: #FFD23C; margin-left: 4px; }
+.skinShopBuyBtn {
+  width: 100%; padding: clamp(5px, 1.2vh, 11px); font-size: clamp(8px, 1.5vh, 12px); font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 1px;
+  border: 1.5px solid #3CFFA0; cursor: pointer;
+  background: transparent; color: #3CFFA0;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: all .12s;
+  flex-shrink: 0;
+}
+.skinShopBuyBtn::before { content: '\25B6'; font-size: 10px; }
+.skinShopBuyBtn:hover { background: rgba(60,255,160,0.08); }
+.skinShopBuyBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+.skinShopBuyBtn.owned { border-color: #777; color: #999; cursor: default; }
+.skinShopBuyBtn.owned::before { content: '\2713'; }
+.skinShopBuyBtn.owned:hover { background: transparent; }
+.skinShopMsg {
+  color: #FF5C7A; font-size: clamp(7px, 1.3vh, 10px); text-align: center; min-height: clamp(8px, 1.4vh, 14px); margin-bottom: clamp(2px, 0.8vh, 8px);
+  font-family: 'Silkscreen', monospace; letter-spacing: 1px; flex-shrink: 0;
+}
+
+.skinShopSwatches.multi { gap: clamp(2px, 1vw, 6px); }
+.skinShopSwatches.multi .sw {
+  width: clamp(11px, min(3.2vh, 6vw), 34px); height: clamp(11px, min(3.2vh, 6vw), 34px);
+}
+
+.shopTierNav {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  flex-shrink: 0; margin-bottom: clamp(10px, 2vh, 20px);
+}
+.shopTierNav .sectionSubLabel { margin-bottom: 0; min-width: 100px; }
+.tierArrowBtn {
+  border: 1.5px solid #3CFFA0; background: transparent; color: #3CFFA0;
+  width: 30px; height: 30px; font-size: 16px; cursor: pointer;
+  font-family: 'Silkscreen', monospace; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.tierArrowBtn:hover { background: rgba(60,255,160,0.08); }
+.tierArrowBtn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.errMsg {
+  color: #FF5C7A; font-size: 11px; margin: -2px 0 12px 2px; min-height: 12px;
+  font-family: 'Silkscreen', monospace;
+}
+
+/* ---------- Player button (sama gaya kayak Shop) ---------- */
+.btnPlayer {
+  width: 100%; padding: 16px; font-size: 15px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 2px;
+  border: 1.5px solid #3CFFA0; cursor: pointer;
+  background: transparent; color: #3CFFA0;
+  transition: all .12s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin-top: 10px;
+}
+.btnPlayer::before { content: '\25B6'; font-size: 12px; }
+.btnPlayer:hover { background: rgba(60,255,160,0.08); }
+.btnPlayer:active { transform: translate(1px, 1px); }
+
+/* ---------- Friend list screen ---------- */
+#playerScreen .logo { margin-bottom: 2px; }
+
+/* Halaman player tidak boleh digulir — semua elemen mengecil otomatis
+   mengikuti tinggi layar (pakai satuan vh) supaya selalu muat. */
+#playerScreen { overflow-y: auto !important; overflow-x: hidden !important; padding-top: clamp(4px, 1vh, 10px); padding-bottom: 24px; -webkit-overflow-scrolling: touch; }
+#playerScreen .screenTopBar { padding: clamp(4px, 1.2vh, 12px) 0 clamp(3px, 0.8vh, 6px); }
+#playerScreen .screenDivider { margin-bottom: clamp(4px, 1vh, 10px); }
+#playerScreen .logo { font-size: clamp(13px, 3.4vh, 26px); }
+#playerScreen .logoWorm { margin-bottom: clamp(3px, 0.8vh, 8px); transform: scale(0.6); transform-origin: center; }
+#playerScreen #playerListRows { flex: 1 1 auto; min-height: 0; justify-content: center; }
+#playerScreen .friendCard { padding: clamp(4px, 0.9vh, 10px) clamp(8px, 2vw, 14px); margin-bottom: clamp(3px, 0.7vh, 8px); gap: clamp(2px, 0.5vh, 6px); }
+#playerScreen .friendAvatar { width: clamp(24px, 3.6vh, 36px); height: clamp(24px, 3.6vh, 36px); font-size: clamp(11px, 1.6vh, 16px); }
+#playerScreen .friendInfo .fname { font-size: clamp(9px, 1.3vh, 12px); margin-bottom: clamp(1px, 0.3vh, 4px); }
+#playerScreen .friendInfo .flevelRow { margin-bottom: clamp(1px, 0.3vh, 4px); }
+#playerScreen .friendInfo .flevelRow .k, #playerScreen .friendStatus { font-size: 8px; }
+#playerScreen .friendInfo .flevelRow .v { font-size: clamp(8px, 1.1vh, 10px); }
+#playerScreen .friendViewBtn { padding: clamp(3px, 0.7vh, 6px) clamp(9px, 1.8vw, 12px); font-size: 8px; }
+#playerScreen .playerPagerRow { margin-top: clamp(10px, 2.2vh, 16px); }
+#playerScreen .pagerBtn { padding: clamp(6px, 1.2vh, 9px) clamp(8px, 1.8vw, 11px); font-size: 9px; }
+#playerScreen .pagerInfo { font-size: 10px; }
+#playerScreen .footNote { display: none; }
+.friendCard {
+  width: 100%; max-width: 380px;
+  background: rgba(0,0,0,0.4); border: 1.5px solid #3CFFA0;
+  padding: clamp(10px, 2.2vh, 16px) 14px; margin-bottom: clamp(10px, 2vh, 14px);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.friendTop { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.friendAvatar {
+  width: 48px; height: 48px; flex-shrink: 0;
+  background: rgba(60,255,160,0.08); border: 1.5px solid #3CFFA0;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: #3CFFA0; font-size: 20px; font-family: 'Silkscreen', monospace;
+}
+.friendInfo { flex: 1; min-width: 0; }
+.friendInfo .fname { font-size: 14px; color: #fff; font-family: 'Silkscreen', monospace; margin-bottom: 6px; letter-spacing: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.friendInfo .flevelRow { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 6px; }
+.friendInfo .flevelRow .k { font-size: 9px; letter-spacing: 1px; color: #3CFFA0; margin-right: 4px; }
+.friendInfo .flevelRow .v { font-size: 11px; color: #fff; font-weight: 700; }
+.friendStatus { display: flex; align-items: center; gap: 6px; font-size: 9px; letter-spacing: 1px; font-weight: 700; white-space: nowrap; }
+.friendStatus .dot { width: 7px; height: 7px; flex-shrink: 0; }
+.friendStatus.online { color: #3CFFA0; } .friendStatus.online .dot { background: #3CFFA0; }
+.friendStatus.offline { color: #888; } .friendStatus.offline .dot { background: transparent; border: 1.5px solid #888; width: 5px; height: 5px; }
+.friendStatus.ingame { color: #FFD23C; } .friendStatus.ingame .dot { background: #FFD23C; }
+.friendBtnRow { display: flex; justify-content: flex-end; gap: 8px; }
+.friendViewBtn {
+  padding: 8px 16px; border: 1.5px solid #3CFFA0; background: transparent; color: #3CFFA0;
+  font-size: 10px; font-family: 'Silkscreen', monospace; font-weight: 700; cursor: pointer; letter-spacing: 1px;
+}
+.friendViewBtn:hover { background: rgba(60,255,160,0.08); }
+.friendRemoveBtn {
+  width: 34px; height: 34px; flex-shrink: 0; border: 1.5px solid #FF5C7A; background: transparent; color: #FF5C7A;
+  font-size: 14px; font-family: 'Silkscreen', monospace; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.friendRemoveBtn:hover { background: rgba(255,92,122,0.1); }
+.friendEmpty { color: #666; font-size: 11px; letter-spacing: 1px; text-align: center; padding: 20px 0 6px; width: 100%; max-width: 380px; line-height: 1.9; }
+
+.playerPagerRow {
+  width: 100%; max-width: 380px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-top: clamp(6px, 1.5vh, 12px);
+}
+.pagerBtn {
+  flex-shrink: 0;
+  padding: 10px 12px; font-size: 10px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 1px;
+  border: 1.5px solid #3CFFA0; cursor: pointer; background: transparent; color: #3CFFA0;
+}
+.pagerBtn:hover:not(:disabled) { background: rgba(60,255,160,0.08); }
+.pagerBtn:disabled { opacity: 0.35; cursor: not-allowed; border-color: #444; color: #666; }
+.pagerInfo { font-size: 11px; letter-spacing: 1px; color: #aaa; white-space: nowrap; }
+
+/* ---------- Player profile screen ---------- */
+#profileScreen { overflow: hidden; }
+#profileScreen .screenTopBar { flex-shrink: 0; padding: clamp(8px, 2vh, 18px) 0 clamp(4px, 1.5vh, 10px); }
+#profileScreen .screenDivider { flex-shrink: 0; margin-bottom: clamp(8px, 2vh, 18px); }
+.profileHeading {
+  display: flex; align-items: center; justify-content: center; gap: 10px; flex-shrink: 0;
+  color: #fff; font-size: clamp(12px, 3.2vw, 18px); letter-spacing: 2px; font-weight: 700;
+  margin-bottom: clamp(8px, 1.8vh, 16px); font-family: 'Silkscreen', monospace;
+}
+.profileHeading .bracket { color: #3CFFA0; font-size: clamp(14px, 3.6vw, 20px); }
+.profileCard {
+  width: 100%; max-width: 420px; flex-shrink: 0;
+  display: flex; align-items: center; gap: 14px;
+  background: rgba(0,0,0,0.4); border: 1.5px solid #3CFFA0;
+  padding: clamp(10px, 2vh, 16px) 16px; margin-bottom: clamp(8px, 1.6vh, 14px);
+}
+.profileAvatar {
+  width: 50px; height: 50px; flex-shrink: 0;
+  background: rgba(60,255,160,0.08); border: 1.5px solid #3CFFA0;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: #3CFFA0; font-size: 20px; font-family: 'Silkscreen', monospace;
+}
+.profileInfo { flex: 1; min-width: 0; }
+.profileInfo .pname { font-size: 15px; color: #fff; font-family: 'Silkscreen', monospace; margin-bottom: 4px; letter-spacing: 1px; }
+.profileInfo .flevelRow { display: flex; gap: 18px; margin: 6px 0; }
+.profileInfo .flevelRow .k { font-size: 9px; letter-spacing: 1px; color: #3CFFA0; margin-bottom: 2px; }
+.profileInfo .flevelRow .v { font-size: 13px; color: #fff; font-weight: 700; }
+
+.profileTabs { width: 100%; max-width: 420px; flex-shrink: 0; margin-bottom: clamp(6px, 1.4vh, 10px); }
+.profileBody { width: 100%; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+.profilePanel {
+  width: 100%; max-width: 420px;
+  background: rgba(0,0,0,0.4); border: 1.5px solid #3CFFA0;
+  padding: clamp(10px, 2vh, 16px) 16px; margin-bottom: clamp(8px, 1.6vh, 14px);
+}
+.profilePanel .panelLabel { color: #3CFFA0; font-size: 11px; letter-spacing: 2px; font-weight: 700; margin-bottom: clamp(6px, 1.4vh, 12px); }
+.statRow {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: clamp(6px, 1.3vh, 10px) 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.18);
+}
+.statRow:last-child { border-bottom: none; }
+.statRow .sLeft { display: flex; align-items: center; gap: 10px; color: #3CFFA0; font-size: 10px; letter-spacing: 1px; }
+.statRow .sLeft .icon { font-size: 14px; }
+.statRow .sVal { color: #fff; font-size: 13px; font-weight: 700; letter-spacing: 1px; }
+.profileEmpty { color: #666; font-size: 11px; letter-spacing: 1px; text-align: center; padding: 10px 0; line-height: 1.9; }
+#profileScreen .footNote { flex-shrink: 0; margin-top: clamp(4px, 1vh, 10px); padding: clamp(8px, 1.6vh, 14px) 0 6px; }
+
+.profSkinGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.profSkinItem { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.profSkinSwatch { width: 100%; aspect-ratio: 1; border: 1.5px solid #333; position: relative; overflow: hidden; }
+.profSkinSwatch::before { content: ''; position: absolute; inset: 0; background-color: var(--sc); }
+.profSkinSwatch.twoTone::before { background-color: transparent; background-image: linear-gradient(135deg, var(--sc) 50%, var(--scB) 50%); }
+.profSkinSwatch.multiTone::before { background-color: transparent; background-image: var(--grad); }
+.profSkinSwatch.locked { filter: grayscale(1) brightness(0.4); }
+.profSkinSwatch.locked::after {
+  content: '\1F512'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; filter: none; z-index: 2;
+}
+.profSkinLabel { font-size: 7px; color: #888; letter-spacing: 1px; }
+
+.achRow { display: flex; align-items: center; gap: 10px; padding: clamp(6px, 1.3vh, 10px) 0; border-bottom: 1px dashed rgba(255,255,255,0.18); }
+.achRow:last-child { border-bottom: none; }
+.achRow .achIcon { width: 26px; height: 26px; flex-shrink: 0; border: 1.5px solid #3CFFA0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #3CFFA0; }
+.achRow.locked .achIcon { border-color: #444; color: #444; }
+.achRow .achText .achName { font-size: 11px; color: #fff; letter-spacing: 1px; margin-bottom: 2px; }
+.achRow.locked .achText .achName { color: #666; }
+.achRow .achText .achDesc { font-size: 8px; color: #888; letter-spacing: 1px; }
+
+.forgotLink {
+  margin-top: clamp(16px, 3vh, 26px); color: #3CFFA0; font-size: 11px; letter-spacing: 1px;
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+}
+.forgotLink::before, .forgotLink::after { content: ''; width: 60px; height: 1px; background: rgba(255,255,255,0.15); }
+
+/* ---------- Lobby ---------- */
+.userBadge {
+  width: 100%; max-width: 380px;
+  display: flex; flex-direction: column; gap: clamp(10px, 2vh, 14px);
+  background: rgba(0,0,0,0.4); border: 1.5px solid #3CFFA0;
+  padding: clamp(14px, 2.5vh, 20px) 18px; margin-bottom: clamp(16px, 3vh, 26px);
+}
+.userBadgeTop { display: flex; align-items: center; gap: 12px; }
+.userAvatar {
+  width: 46px; height: 46px; flex-shrink: 0;
+  background: rgba(60,255,160,0.08); border: 1.5px solid #3CFFA0;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: #3CFFA0; font-size: 18px; font-family: 'Silkscreen', monospace;
+}
+.userNameWrap { flex: 1; min-width: 0; }
+.userInfo { flex: 1; min-width: 0; }
+.userInfo .plabel, .userNameWrap .plabel { font-size: 10px; letter-spacing: 2px; color: #3CFFA0; margin-bottom: 4px; }
+.userInfo .uname, .userNameWrap .uname {
+  font-size: 16px; color: #fff; font-family: 'Silkscreen', monospace;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.userInfo .ulevelRow, .ulevelRow {
+  display: flex; gap: 8px;
+}
+.userInfo .ulevelRow .stat, .ulevelRow .stat { flex: 1; min-width: 0; }
+.userInfo .ulevelRow .stat:first-child, .ulevelRow .stat:first-child { text-align: left; }
+.userInfo .ulevelRow .stat:nth-child(2), .ulevelRow .stat:nth-child(2) { text-align: center; }
+.userInfo .ulevelRow .stat:last-child, .ulevelRow .stat:last-child { text-align: right; }
+.userInfo .ulevelRow .stat .k, .ulevelRow .stat .k {
+  font-size: 9px; letter-spacing: 1px; color: #3CFFA0; margin-bottom: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.userInfo .ulevelRow .stat .v, .ulevelRow .stat .v {
+  font-size: clamp(11px, 3.4vw, 14px); color: #fff; font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.userInfo .ulevelRow .stat.coinStat .k, .ulevelRow .stat.coinStat .k { color: #FFD23C; }
+.userInfo .ulevelRow .stat.coinStat .v, .ulevelRow .stat.coinStat .v { color: #FFD23C; }
+.expBar { width: 100%; height: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); overflow: hidden; }
+.expBar .fill { height: 100%; background: #3CFFA0; }
+
+.serverCard {
+  width: 100%; max-width: 380px;
+  background: rgba(0,0,0,0.4); border: 1.5px solid #3CFFA0;
+  padding: clamp(12px, 2.5vh, 18px) 16px; margin-bottom: clamp(10px, 2vh, 14px);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.serverCard .sName { font-size: 13px; color: #fff; font-family: 'Silkscreen', monospace; font-weight: 700; }
+.serverCard .sSlot { font-size: 10px; color: #aaa; margin-top: 8px; font-family: 'Silkscreen', monospace; }
+.serverCard .sSlot.full { color: #FF5C7A; }
+.joinBtn {
+  padding: 10px 18px; border: 1.5px solid #3CFFA0;
+  background: transparent;
+  color: #3CFFA0; font-size: 11px; font-family: 'Silkscreen', monospace; font-weight: 700; cursor: pointer;
+  letter-spacing: 1px;
+}
+.joinBtn:disabled { background: transparent; border-color: #333; color: #555; cursor: not-allowed; }
+
+.logoutLink {
+  margin-top: 18px; color: #666; font-size: 10px; cursor: pointer; text-decoration: underline;
+  font-family: 'Silkscreen', monospace;
+}
+
+.footNote {
+  margin-top: auto; padding: clamp(16px, 3vh, 30px) 0 10px;
+  width: 100%; max-width: 640px;
+  display: flex; align-items: center; gap: 14px;
+  color: #888; font-size: 11px; letter-spacing: 1px; text-align: center; justify-content: center;
+}
+.footNote::before, .footNote::after { content: ''; flex: 1; max-width: 200px; height: 1px; background: rgba(255,255,255,0.15); }
+
+
+
+/* ---------- HUD ---------- */
+#hud {
+  position: fixed; top: 14px; left: 14px; color: #3CFFA0; z-index: 5; font-size: 20px; display: none;
+  font-family: 'Silkscreen', monospace; font-weight: 700;
+  text-shadow: 2px 2px 0 #003318; letter-spacing: 1px; line-height: 1.6;
+}
+#hud .score { font-family: 'Silkscreen', monospace; font-size: 20px; color: #3CFFA0; }
+#hud .coinRow { font-size: 15px; color: #FFD23C; display: none; }
+@media (max-width: 640px) { #hud .coinRow { font-size: 12px; } }
+
+#topRightPanel {
+  position: fixed; top: 14px; right: 14px; z-index: 5;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+}
+#leaderboard {
+  width: 160px;
+  background: rgba(0,0,0,0.55); border: 2px solid #fff; border-radius: 0;
+  padding: 6px 10px; color: #fff; font-size: 11px; display: none;
+  font-family: 'Silkscreen', monospace; line-height: 1.6;
+}
+#leaderboard h3 {
+  text-align: center; font-size: 12px; font-weight: 700;
+  border-bottom: 2px solid #fff; padding-bottom: 4px; margin-bottom: 4px; letter-spacing: 1px; color: #fff;
+}
+#leaderboard div.row { display: flex; justify-content: space-between; padding: 2px 0; white-space: nowrap; color: #fff; }
+#leaderboard div.row.me { color: #3CFFA0; }
+
+#minimapWrap {
+  position: fixed; top: 56px; left: 14px; z-index: 5;
+  width: 100px; height: 100px;
+  border-radius: 0; border: 2px solid rgba(255,255,255,0.4); background: rgba(0,0,0,0.5); display: none;
+}
+#minimap { display: block; width: 100%; height: 100%; }
+
+#boostBar {
+  position: fixed; bottom: calc(14px + env(safe-area-inset-bottom)); left: 14px; width: 100px; height: 8px;
+  border-radius: 0; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.4);
+  z-index: 5; display: none; overflow: hidden;
+}
+#boostFill { height: 100%; width: 100%; background: #3CFFA0; }
+
+#boostBtn {
+  position: fixed; right: 30px; bottom: calc(30px + env(safe-area-inset-bottom)); width: 88px; height: 88px; border-radius: 0;
+  background: rgba(255,92,122,0.18);
+  border: 3px solid #FF5C7A; color: #FF5C7A; font-weight: 700; font-size: 13px;
+  font-family: 'Silkscreen', monospace;
+  letter-spacing: 1px; z-index: 6; display: none; align-items: center; justify-content: center;
+  user-select: none; -webkit-user-select: none; touch-action: none;
+}
+#boostBtn.active { background: rgba(255,92,122,0.5); box-shadow: 0 0 16px rgba(255,92,122,0.8); }
+#joystickZone { position: fixed; inset: 0; z-index: 5; touch-action: none; display: none; }
+#joyBase, #joyStick { position: fixed; display: none; border-radius: 0; pointer-events: none; z-index: 14; }
+#joyBase { width: 120px; height: 120px; background: rgba(255,255,255,0.06); border: 3px solid rgba(255,255,255,0.35); margin-left: -60px; margin-top: -60px; }
+#joyStick { width: 52px; height: 52px; background: #3CFFA0; box-shadow: 0 0 12px rgba(60,255,160,0.7); border: none; margin-left: -26px; margin-top: -26px; }
+
+/* ---------- Chat ---------- */
+#chatToggleBtn {
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 8;
+  width: 44px; height: 40px; display: none; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.55); border: 2px solid #3CFFA0; color: #3CFFA0;
+  cursor: pointer; padding: 0;
+}
+#chatToggleBtn:active { background: rgba(60,255,160,0.15); }
+#chatToggleBtn svg { image-rendering: pixelated; }
+#chatBadge {
+  position: absolute; top: -7px; right: -7px; min-width: 16px; height: 16px; padding: 0 3px;
+  background: #FF5C7A; color: #000; border: 1.5px solid #050505;
+  font-family: 'Silkscreen', monospace; font-size: 9px; font-weight: 700;
+  display: none; align-items: center; justify-content: center;
+}
+
+#chatPanel {
+  position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 8;
+  width: min(280px, calc(100vw - 24px)); max-height: 46vh;
+  background: rgba(0,0,0,0.8); border: 2px solid #3CFFA0;
+  display: none; flex-direction: column;
+  font-family: 'Silkscreen', monospace;
+}
+#chatPanel.visible { display: flex; }
+#chatPanelHead {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.2);
+  color: #3CFFA0; font-size: 10px; letter-spacing: 1px; font-weight: 700;
+}
+#chatCloseBtn {
+  background: transparent; border: none; color: #FF5C7A; font-size: 16px; line-height: 1;
+  cursor: pointer; padding: 0 4px; font-family: 'Silkscreen', monospace;
+}
+#chatMessages {
+  flex: 1 1 auto; min-height: 60px; max-height: 32vh; overflow-y: auto; overscroll-behavior: contain;
+  padding: 6px 8px; display: flex; flex-direction: column; gap: 3px;
+}
+.chatMsgRow { font-size: 11px; line-height: 1.5; color: #ddd; word-break: break-word; }
+.chatMsgRow.me .chatMsgName { color: #3CFFA0; }
+.chatMsgName { color: #FFD23C; font-weight: 700; }
+.chatMsgText { color: #eee; }
+#chatInputRow {
+  display: flex; border-top: 1px solid rgba(255,255,255,0.2);
+}
+#chatInput {
+  flex: 1 1 auto; min-width: 0; background: transparent; border: none; outline: none;
+  color: #eafff2; font-family: 'Silkscreen', monospace; font-size: 11px; padding: 8px;
+}
+#chatInput::placeholder { color: #555; }
+#chatSendBtn {
+  flex-shrink: 0; width: 38px; background: transparent; border: none; border-left: 1px solid rgba(255,255,255,0.2);
+  color: #3CFFA0; font-size: 13px; cursor: pointer;
+}
+#chatSendBtn:active { background: rgba(60,255,160,0.15); }
+
+@media (max-width: 640px) {
+  #chatToggleBtn { top: 10px; width: 38px; height: 34px; }
+  #chatPanel { top: 50px; }
+}
+
+
+@media (max-width: 640px) {
+  #leaderboard { font-size: 9px; width: 100px; padding: 5px 8px; }
+  #leaderboard h3 { font-size: 10px; }
+  #hud { font-size: 15px; }
+  #hud .score { font-size: 15px; }
+  #minimapWrap { width: 72px; height: 72px; top: 46px; left: 10px; }
+  #boostBar { width: 72px; bottom: calc(10px + env(safe-area-inset-bottom)); left: 10px; }
+  #boostBtn { width: 72px; height: 72px; right: 20px; bottom: calc(20px + env(safe-area-inset-bottom)); font-size: 11px; }
+  #joyBase { width: 100px; height: 100px; margin-left: -50px; margin-top: -50px; }
+  #joyStick { width: 44px; height: 44px; margin-left: -22px; margin-top: -22px; }
+}
+
+#deathScreen h2 {
+  font-family: 'Silkscreen', monospace; font-size: 26px; color: #3CFFA0; margin-bottom: 14px; text-align: center;
+  text-shadow: 3px 3px 0 #003318; letter-spacing: 2px;
+}
+#deathScreen .expGain { color: #3CFFA0; font-size: 13px; margin-bottom: 10px; font-family: 'Silkscreen', monospace; }
+#deathScreen p { color: #FF5C7A; margin-bottom: 22px; font-size: 13px; text-align: center; font-family: 'Silkscreen', monospace; line-height: 1.9; }
+#deathScreen .btnRow { display: flex; gap: 10px; width: 100%; max-width: 320px; }
+
+.connMsg {
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.7); border: 2px solid #fff; color: #fff;
+  font-size: 11px; font-family: 'Silkscreen', monospace; padding: 8px 16px; border-radius: 0; z-index: 30; display: none;
+}
+
+</style>
+</head>
+<body>
+
+<canvas id="game"></canvas>
+<div class="connMsg" id="connMsg">Menyambung ke server...</div>
+
+<audio id="bgmLobby" src="assets/lobby.m4a" loop preload="auto"></audio>
+<audio id="bgmGame" src="assets/game.m4a" loop preload="auto"></audio>
+<audio id="sfxClick" src="assets/click.wav" preload="auto"></audio>
+<audio id="sfxCoin" src="assets/coin.wav" preload="auto"></audio>
+
+<!-- AUTH SCREEN -->
+<div class="screen visible" id="authScreen">
+  <div class="screenTopBar">
+    <div class="screenBrand">RETROSNAKE <span class="ver">v2.0.0</span></div>
+  </div>
+  <div class="screenDivider"></div>
+
+  <div class="logo">RETRO<span class="accent">SNAKE</span></div>
+  <div class="logoWorm">
+    <span></span><span></span><span></span><span></span><span></span><span class="head"></span><span class="dot"></span><span class="dot"></span>
+  </div>
+
+  <div class="card">
+    <div class="cardHead"><span class="icon">&#128274;</span><span class="title" id="authCardTitle">LOGIN KE AKUN</span></div>
+    <div class="tabs">
+      <div class="tabBtn active" id="tabLogin">MASUK</div>
+      <div class="tabBtn" id="tabRegister">DAFTAR</div>
+    </div>
+    <span class="fieldLabel">USERNAME</span>
+    <input id="authName" maxlength="14" placeholder="Masukkan username">
+    <span class="fieldLabel">PASSWORD</span>
+    <input id="authPass" type="password" maxlength="32" placeholder="Masukkan password">
+    <div class="errMsg" id="authErr"></div>
+    <button class="btnPrimary" id="authSubmit">MASUK</button>
+  </div>
+  <div class="forgotLink">HAVE FUN!!</div>
+</div>
+
+<!-- LOBBY SCREEN -->
+<div class="screen" id="lobbyScreen">
+  <div class="screenTopBar">
+    <div class="screenBrand">RETROSNAKE <span class="ver">v1.0.0</span></div>
+    <button class="screenBackBtn" id="logoutLink">&#8618; KELUAR AKUN</button>
+  </div>
+  <div class="screenDivider"></div>
+
+  <div class="logo">RETRO<span class="accent">SNAKE</span></div>
+  <div class="logoWorm">
+    <span></span><span></span><span></span><span></span><span></span><span class="head"></span><span class="dot"></span><span class="dot"></span>
+  </div>
+
+  <div class="userBadge">
+    <div class="userBadgeTop">
+      <div class="userAvatar" id="lobbyAvatar">?</div>
+      <div class="userNameWrap">
+        <div class="plabel">PLAYER</div>
+        <div class="uname" id="lobbyName">-</div>
+      </div>
+      <button class="friendViewBtn" id="lobbyViewBtn" style="flex-shrink:0;">VIEW</button>
+    </div>
+    <div class="ulevelRow">
+      <div class="stat"><div class="k">LEVEL</div><div class="v" id="lobbyLevelNum">1</div></div>
+      <div class="stat"><div class="k">EXP</div><div class="v" id="lobbyExpNum">0 / 100</div></div>
+      <div class="stat coinStat"><div class="k">COIN</div><div class="v" id="lobbyCoinNum">0</div></div>
+    </div>
+    <div class="expBar"><div class="fill" id="lobbyExpFill" style="width:0%"></div></div>
+    <div class="ulevel" id="lobbyLevel" style="display:none;">Level 1 • 0 EXP</div>
+  </div>
+
+  <div id="lobbyMenu" style="width:100%;max-width:380px;">
+    <button class="btnPrimary" id="playMenuBtn">PLAY ONLINE</button>
+    <button class="btnWhite" id="changeSkinBtn">CHANGE SKIN</button>
+    <button class="btnShop" id="shopMenuBtn">SHOP</button>
+    <button class="btnPlayer" id="playerMenuBtn">PLAYER</button>
+  </div>
+
+  <div id="serverListSection" style="width:100%;max-width:380px;display:none;">
+    <div class="serverCard">
+      <div>
+        <div class="sName">Server 1</div>
+        <div class="sSlot" style="color:#3CFFA0;font-size:9px;letter-spacing:1px;margin-top:2px;">PLAYER ONLY &middot; EXP &middot; NO COIN</div>
+        <div class="sSlot" id="server1Slot">.../20</div>
+      </div>
+      <button class="joinBtn" id="joinServer1">MAIN</button>
+    </div>
+    <div class="serverCard">
+      <div>
+        <div class="sName">Server 2</div>
+        <div class="sSlot" style="color:#FFD23C;font-size:9px;letter-spacing:1px;margin-top:2px;">PLAYER + BOT &middot; NO EXP &middot; COIN</div>
+        <div class="sSlot" id="server2Slot">.../20</div>
+      </div>
+      <button class="joinBtn" id="joinServer2">MAIN</button>
+    </div>
+    <div class="logoutLink" id="backToMenuLink" style="text-align:center;">&larr; Kembali</div>
+  </div>
+
+  <div class="footNote">HAVE FUN &amp; GOOD LUCK!</div>
+</div>
+
+<!-- SHOP SCREEN -->
+<div class="screen" id="shopScreen">
+  <div class="screenTopBar">
+    <button class="screenBackBtn" id="shopBackBtn">&#8618; BACK</button>
+    <div class="shopCoinBadge">
+      <div class="lbl">COIN</div>
+      <div class="val" id="shopCoinNum">0</div>
+    </div>
+  </div>
+  <div class="screenDivider"></div>
+
+  <div class="logo">SHO<span class="accent">P</span></div>
+
+  <div class="screenDivider" style="margin-top: clamp(14px, 3vh, 30px);"></div>
+
+  <div class="sectionLabel"><span class="sq"></span><span class="sq"></span> SKINS <span class="sq"></span><span class="sq"></span></div>
+  <div class="shopTierNav">
+    <button class="tierArrowBtn" id="shopTierPrev">&#8249;</button>
+    <div class="sectionSubLabel" id="shopTierLabel">COMMON</div>
+    <button class="tierArrowBtn" id="shopTierNext">&#8250;</button>
+  </div>
+
+  <div class="skinShopGridWrap">
+    <button class="skinPageArrow left" id="skinPagePrev">&#8249;</button>
+    <div class="skinShopGrid" id="skinShopGrid"></div>
+    <button class="skinPageArrow right" id="skinPageNext">&#8250;</button>
+  </div>
+
+  <div class="footNote">HAVE FUN &amp; GOOD LUCK!</div>
+</div>
+
+<!-- PLAYER SCREEN -->
+<div class="screen" id="playerScreen">
+  <div class="screenTopBar">
+    <div class="screenBrand">RETROSNAKE <span class="ver">v1.0.0</span></div>
+    <button class="screenBackBtn" id="playerBackBtn">&#8618; KEMBALI</button>
+  </div>
+  <div class="screenDivider"></div>
+
+  <div class="logo">PLAYE<span class="accent">R</span></div>
+  <div class="logoWorm">
+    <span></span><span></span><span></span><span></span><span></span><span class="head"></span><span class="dot"></span><span class="dot"></span>
+  </div>
+
+  <div id="playerListRows" style="width:100%;display:flex;flex-direction:column;align-items:center;"></div>
+
+  <div class="playerPagerRow" id="playerPagerRow">
+    <button class="pagerBtn" id="playerPrevBtn">&#8592; SEBELUMNYA</button>
+    <div class="pagerInfo" id="playerPagerInfo">1 / 1</div>
+    <button class="pagerBtn" id="playerNextBtn">NEXT &#8594;</button>
+  </div>
+
+  <div class="footNote">HAVE FUN &amp; GOOD LUCK!</div>
+</div>
+
+<!-- PLAYER PROFILE SCREEN -->
+<div class="screen" id="profileScreen">
+  <div class="screenTopBar">
+    <div class="screenBrand">RETROSNAKE <span class="ver">v1.0.0</span></div>
+    <button class="screenBackBtn" id="profileBackBtn">&#8618; KEMBALI</button>
+  </div>
+  <div class="screenDivider"></div>
+
+  <div class="profileHeading"><span class="bracket">[</span> PLAYER PROFILE <span class="bracket">]</span></div>
+
+  <div class="profileCard">
+    <div class="profileAvatar" id="profAvatar">?</div>
+    <div class="profileInfo">
+      <div class="pname" id="profName">-</div>
+      <div class="friendStatus online" id="profStatus"><span class="dot"></span><span id="profStatusText">ONLINE</span></div>
+      <div class="flevelRow">
+        <div class="stat"><div class="k">LEVEL</div><div class="v" id="profLevel">1</div></div>
+        <div class="stat"><div class="k">EXP</div><div class="v" id="profExp">0 / 100</div></div>
+      </div>
+      <div class="expBar"><div class="fill" id="profExpFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="tabs profileTabs">
+    <div class="tabBtn active" id="profTabStat">STATISTIK</div>
+    <div class="tabBtn" id="profTabSkin">SKIN</div>
+    <div class="tabBtn" id="profTabAch">ACHIEVEMENT</div>
+  </div>
+
+  <div class="profileBody" id="profileBody">
+  <div class="profilePanel" id="profPanelStat">
+    <div class="panelLabel">STATISTIK</div>
+    <div class="statRow"><div class="sLeft"><span class="icon">&#127942;</span>TOTAL MATCH</div><div class="sVal" id="statMatch">0</div></div>
+    <div class="statRow"><div class="sLeft"><span class="icon">&#128207;</span>LONGEST LENGTH</div><div class="sVal" id="statLength">0</div></div>
+    <div class="statRow"><div class="sLeft"><span class="icon">&#9201;&#65039;</span>TOTAL PLAY TIME</div><div class="sVal" id="statTime">0H 0M</div></div>
+    <div class="statRow"><div class="sLeft"><span class="icon">&#129689;</span>TOTAL COIN</div><div class="sVal" id="statCoin">0</div></div>
+    <div class="statRow"><div class="sLeft"><span class="icon">&#128128;</span>TOTAL KILL</div><div class="sVal" id="statKill">0</div></div>
+  </div>
+
+  <div class="profilePanel" id="profPanelSkin" style="display:none;">
+    <div class="panelLabel">SKIN</div>
+    <div class="profSkinGrid" id="profSkinGrid"></div>
+  </div>
+
+  <div class="profilePanel" id="profPanelAch" style="display:none;">
+    <div class="panelLabel">ACHIEVEMENT</div>
+    <div id="profAchList"></div>
+  </div>
+  </div>
+
+  <div class="footNote">HAVE FUN &amp; GOOD LUCK!</div>
+</div>
+
+<div id="hud">
+  Length: <span class="score">0</span>
+  <div class="coinRow" id="hudCoinRow">Coin: <span id="hudCoinNum">0</span></div>
+</div>
+<div id="topRightPanel">
+  <div id="leaderboard"><h3>Papan Skor</h3><div id="lbRows"></div></div>
+</div>
+<div id="minimapWrap"><canvas id="minimap" width="100" height="100"></canvas></div>
+<div id="boostBar"><div id="boostFill"></div></div>
+<div id="joystickZone"></div>
+<div id="joyBase"></div>
+<div id="joyStick"></div>
+<div id="boostBtn">BOOST</div>
+
+<button id="chatToggleBtn" aria-label="Chat">
+  <svg viewBox="0 0 21 18" width="22" height="18" shape-rendering="crispEdges">
+    <rect x="3" y="0" width="3" height="3" fill="currentColor"/><rect x="6" y="0" width="3" height="3" fill="currentColor"/><rect x="9" y="0" width="3" height="3" fill="currentColor"/><rect x="12" y="0" width="3" height="3" fill="currentColor"/><rect x="15" y="0" width="3" height="3" fill="currentColor"/>
+    <rect x="0" y="3" width="3" height="3" fill="currentColor"/><rect x="3" y="3" width="3" height="3" fill="currentColor"/><rect x="6" y="3" width="3" height="3" fill="currentColor"/><rect x="9" y="3" width="3" height="3" fill="currentColor"/><rect x="12" y="3" width="3" height="3" fill="currentColor"/><rect x="15" y="3" width="3" height="3" fill="currentColor"/><rect x="18" y="3" width="3" height="3" fill="currentColor"/>
+    <rect x="0" y="6" width="3" height="3" fill="currentColor"/><rect x="3" y="6" width="3" height="3" fill="#050505"/><rect x="6" y="6" width="3" height="3" fill="#050505"/><rect x="9" y="6" width="3" height="3" fill="currentColor"/><rect x="12" y="6" width="3" height="3" fill="#050505"/><rect x="15" y="6" width="3" height="3" fill="#050505"/><rect x="18" y="6" width="3" height="3" fill="currentColor"/>
+    <rect x="0" y="9" width="3" height="3" fill="currentColor"/><rect x="3" y="9" width="3" height="3" fill="currentColor"/><rect x="6" y="9" width="3" height="3" fill="currentColor"/><rect x="9" y="9" width="3" height="3" fill="currentColor"/><rect x="12" y="9" width="3" height="3" fill="currentColor"/><rect x="15" y="9" width="3" height="3" fill="currentColor"/><rect x="18" y="9" width="3" height="3" fill="currentColor"/>
+    <rect x="3" y="12" width="3" height="3" fill="currentColor"/><rect x="6" y="12" width="3" height="3" fill="currentColor"/><rect x="9" y="12" width="3" height="3" fill="currentColor"/><rect x="12" y="12" width="3" height="3" fill="currentColor"/><rect x="15" y="12" width="3" height="3" fill="currentColor"/>
+    <rect x="6" y="15" width="3" height="3" fill="currentColor"/>
+  </svg>
+  <span id="chatBadge"></span>
+</button>
+
+<div id="chatPanel">
+  <div id="chatPanelHead">
+    <span>CHAT SERVER</span>
+    <button id="chatCloseBtn">&times;</button>
+  </div>
+  <div id="chatMessages"></div>
+  <div id="chatInputRow">
+    <input id="chatInput" type="text" placeholder="Ketik pesan..." maxlength="140" autocomplete="off" />
+    <button id="chatSendBtn">&#9658;</button>
+  </div>
+</div>
+
+
+<!-- SKIN PICKER MODAL -->
+<div class="skinOverlay" id="skinOverlay">
+  <div class="skinModal">
+    <div class="skinModalHead">
+      <span class="title">PILIH SKIN</span>
+      <button class="skinCloseBtn" id="skinCloseBtn">TUTUP</button>
+    </div>
+    <div class="skinPreviewWrap">
+      <div class="skinPreview"><div class="body" id="skinPreviewBody" style="background:#3CFFA0;"></div></div>
+    </div>
+    <div class="skinGrid" id="skinGrid"></div>
+    <button class="skinConfirmBtn" id="skinConfirmBtn">SIMPAN SKIN</button>
+  </div>
+</div>
+
+<!-- DEATH SCREEN -->
+<div class="screen" id="deathScreen">
+  <h2>KAMU MATI</h2>
+  <div class="expGain" id="expGain">+0 EXP</div>
+  <p id="deathStats">Panjang akhir: 0 • Peringkat: -</p>
+  <div class="btnRow">
+    <button class="btnPrimary" id="respawnBtn">MAIN LAGI</button>
+    <button class="btnGhost" id="toLobbyBtn">KE LOBBY</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  // ================= AUDIO / BACKSOUND =================
+  const bgmLobby = document.getElementById('bgmLobby');
+  const bgmGame = document.getElementById('bgmGame');
+  bgmLobby.volume = 0.5;
+  bgmGame.volume = 0.5;
+
+  let audioUnlocked = false;
+  let currentTrack = 'lobby'; // 'lobby' | 'game' | null
+
+  function fadeTo(audio, targetVol, ms = 400) {
+    const startVol = audio.volume;
+    const startTime = performance.now();
+    function step(t) {
+      const p = Math.min(1, (t - startTime) / ms);
+      audio.volume = startVol + (targetVol - startVol) * p;
+      if (p < 1) requestAnimationFrame(step);
+      else if (targetVol === 0) audio.pause();
+    }
+    requestAnimationFrame(step);
+  }
+
+  function playTrack(name) {
+    currentTrack = name;
+    const target = name === 'lobby' ? bgmLobby : name === 'game' ? bgmGame : null;
+    [bgmLobby, bgmGame].forEach(a => {
+      if (a !== target && !a.paused) fadeTo(a, 0, 300);
+    });
+    if (target && audioUnlocked) {
+      if (target.paused) {
+        target.volume = 0;
+        target.play().then(() => {
+          fadeTo(target, 0.5, 400);
+        }).catch(err => {
+          console.error('Gagal memutar audio (' + target.src + '):', err.name, err.message);
+        });
+      } else {
+        fadeTo(target, 0.5, 400);
+      }
+    }
+  }
+
+  function unlockAudio() {
+    if (audioUnlocked) return;
+    const target = currentTrack === 'lobby' ? bgmLobby : currentTrack === 'game' ? bgmGame : null;
+    if (!target) return;
+    target.volume = 0;
+    target.play().then(() => {
+      audioUnlocked = true;
+      fadeTo(target, 0.5, 400);
+    }).catch(err => {
+      // gagal (misal belum ada gesture user, atau file audio tidak ditemukan) — coba lagi di interaksi berikutnya
+      console.error('unlockAudio gagal (' + target.src + '):', err.name, err.message);
+    });
+  }
+  // Coba langsung autoplay (berhasil di sebagian browser desktop)
+  unlockAudio();
+  // Fallback: aktif begitu ada interaksi pertama apa pun (wajib di kebanyakan browser mobile)
+  ['pointerdown', 'touchstart', 'mousedown', 'click', 'keydown'].forEach(evt => {
+    document.addEventListener(evt, unlockAudio, { passive: true });
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && audioUnlocked && currentTrack) {
+      const target = currentTrack === 'lobby' ? bgmLobby : bgmGame;
+      if (target.paused) target.play().catch(() => {});
+    }
+  });
+
+  // Beritahu di console kalau file audio gagal dimuat sama sekali (404, path salah, dll)
+  [bgmLobby, bgmGame].forEach(a => {
+    a.addEventListener('error', () => {
+      console.error('File audio tidak bisa dimuat:', a.src, '- cek apakah path/nama file sudah benar di server.');
+    });
+  });
+
+  // ---- SFX klik tombol ----
+  const sfxClick = document.getElementById('sfxClick');
+  sfxClick.volume = 0.6;
+  sfxClick.addEventListener('error', () => {
+    console.error('File audio tidak bisa dimuat:', sfxClick.src, '- cek apakah path/nama file sudah benar di server.');
+  });
+  function playClick() {
+    sfxClick.currentTime = 0;
+    sfxClick.play().catch(err => console.error('Gagal memutar sfxClick:', err.name, err.message));
+  }
+  // Delegasi: setiap klik pada <button> atau elemen ber-class tombol akan bunyi
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('button, .joinBtn, .btnPrimary, .btnGhost, .tabBtn, .screenBackBtn, .logoutLink, .forgotLink');
+    if (btn) playClick();
+  });
+
+  // ---- SFX ambil coin ----
+  const sfxCoin = document.getElementById('sfxCoin');
+  sfxCoin.volume = 0.7;
+  sfxCoin.addEventListener('error', () => {
+    console.error('File audio tidak bisa dimuat:', sfxCoin.src, '- cek apakah path/nama file sudah benar di server.');
+  });
+  function playCoinSfx() {
+    sfxCoin.currentTime = 0;
+    sfxCoin.play().catch(err => console.error('Gagal memutar sfxCoin:', err.name, err.message));
+  }
+
+  // Musik lobby mulai dari layar login/auth
+  playTrack('lobby');
+
+  // Musik lobby baru mulai saat masuk layar lobby (lihat enterLobby())
+
+  // ================= FIREBASE SETUP =================
+  const firebaseConfig = {
+    apiKey: "AIzaSyCJxJtA7ga5_FGOLdts2ULxNoEO7cp-JrA",
+    authDomain: "cacing-661f1.firebaseapp.com",
+    databaseURL: "https://cacing-661f1-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "cacing-661f1",
+    storageBucket: "cacing-661f1.firebasestorage.app",
+    messagingSenderId: "579218724882",
+    appId: "1:579218724882:web:12bd8ee9f52090a0f860cb"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  function showConnMsg(show, text) {
+    const el = document.getElementById('connMsg');
+    el.style.display = show ? 'block' : 'none';
+    if (text) el.textContent = text;
+  }
+
+  // simple non-cryptographic hash - fine for a casual hobby project only
+  function simpleHash(str) {
+    let h = 5381;
+    for (let i = 0; i < str.length; i++) h = ((h << 5) + h) + str.charCodeAt(i);
+    return (h >>> 0).toString(36);
+  }
+  function sanitizeKey(name) {
+    return name.trim().toLowerCase().replace(/[.#$\[\]\/\s]/g, '_').slice(0, 24);
+  }
+
+  // ================= AUTH LOGIC =================
+  let currentUser = null; // { uid, name, exp, level }
+  let authMode = 'login';
+
+  const tabLogin = document.getElementById('tabLogin');
+  const tabRegister = document.getElementById('tabRegister');
+  const authSubmit = document.getElementById('authSubmit');
+  const authErr = document.getElementById('authErr');
+
+  tabLogin.addEventListener('click', () => setAuthMode('login'));
+  tabRegister.addEventListener('click', () => setAuthMode('register'));
+
+  function setAuthMode(mode) {
+    authMode = mode;
+    tabLogin.classList.toggle('active', mode === 'login');
+    tabRegister.classList.toggle('active', mode === 'register');
+    authSubmit.textContent = mode === 'login' ? 'MASUK' : 'DAFTAR';
+    const cardTitle = document.getElementById('authCardTitle');
+    if (cardTitle) cardTitle.textContent = mode === 'login' ? 'LOGIN KE AKUN' : 'BUAT AKUN BARU';
+    authErr.textContent = '';
+  }
+
+  authSubmit.addEventListener('click', async () => {
+    const nameRaw = document.getElementById('authName').value;
+    const pass = document.getElementById('authPass').value;
+    authErr.textContent = '';
+
+    if (!nameRaw.trim() || nameRaw.trim().length < 3) { authErr.textContent = 'Nama minimal 3 karakter'; return; }
+    if (!pass || pass.length < 4) { authErr.textContent = 'Password minimal 4 karakter'; return; }
+
+    const uid = sanitizeKey(nameRaw);
+    authSubmit.disabled = true;
+    authSubmit.textContent = 'Memproses...';
+
+    try {
+      const snap = await db.ref('users/' + uid).once('value');
+      const existing = snap.val();
+
+      if (authMode === 'register') {
+        if (existing) { authErr.textContent = 'Nama sudah dipakai, pilih nama lain'; resetSubmitBtn(); return; }
+        const userData = {
+          name: nameRaw.trim(),
+          passHash: simpleHash(pass),
+          exp: 0,
+          level: 1,
+          coin: 0,
+          ownedSkins: {},
+          friends: {},
+          stats: { totalMatch: 0, longestLength: 0, totalPlayTimeSec: 0, totalKill: 0 },
+          createdAt: Date.now()
+        };
+        await db.ref('users/' + uid).set(userData);
+        currentUser = { uid, ...userData };
+        resetSubmitBtn();
+        enterLobby();
+      } else {
+        if (!existing) { authErr.textContent = 'Akun tidak ditemukan, coba daftar'; resetSubmitBtn(); return; }
+        if (existing.passHash !== simpleHash(pass)) { authErr.textContent = 'Password salah'; resetSubmitBtn(); return; }
+        currentUser = { uid, ...existing };
+        resetSubmitBtn();
+        enterLobby();
+      }
+    } catch (e) {
+      authErr.textContent = 'Gagal menyambung ke server. Coba lagi.';
+      resetSubmitBtn();
+    }
+  });
+
+  function resetSubmitBtn() {
+    authSubmit.disabled = false;
+    authSubmit.textContent = authMode === 'login' ? 'MASUK' : 'DAFTAR';
+  }
+
+  // ================= LOBBY LOGIC =================
+  const SERVERS = {
+    server1: { maxPlayers: 20, hasBots: false, givesXp: true, hasCoin: false },
+    server2: { maxPlayers: 20, hasBots: true, givesXp: false, botCount: 10, hasCoin: true }
+  };
+  const COIN_CHANCE = 0.10;
+  let SERVER_ID = 'server1';
+  const MAX_PLAYERS = 20;
+  let serverCountRef = null, serverCountRef2 = null;
+
+  function enterLobby() {
+    try {
+      playTrack('lobby');
+      document.getElementById('authScreen').classList.remove('visible');
+      document.getElementById('lobbyScreen').classList.add('visible');
+      const uName = (currentUser && currentUser.name) ? currentUser.name : '?';
+      const uLevel = (currentUser && currentUser.level) ? currentUser.level : 1;
+      const uExp = (currentUser && typeof currentUser.exp === 'number') ? currentUser.exp : 0;
+      const uCoin = (currentUser && typeof currentUser.coin === 'number') ? currentUser.coin : 0;
+      document.getElementById('lobbyAvatar').textContent = uName.charAt(0).toUpperCase();
+      document.getElementById('lobbyName').textContent = uName;
+      document.getElementById('lobbyLevel').textContent = `Level ${uLevel} • ${uExp} EXP`;
+      const expIntoLevel = uExp % 100;
+      document.getElementById('lobbyLevelNum').textContent = uLevel;
+      document.getElementById('lobbyExpNum').textContent = `${expIntoLevel} / 100`;
+      document.getElementById('lobbyExpFill').style.width = expIntoLevel + '%';
+      document.getElementById('lobbyCoinNum').textContent = uCoin;
+      document.getElementById('lobbyMenu').style.display = 'block';
+      document.getElementById('serverListSection').style.display = 'none';
+    } catch (e) {
+      console.error('enterLobby error:', e);
+      // pastikan layar lobby tetap tampil dan bisa dipakai walau ada data yang bermasalah
+      document.getElementById('authScreen').classList.remove('visible');
+      document.getElementById('lobbyScreen').classList.add('visible');
+      document.getElementById('lobbyMenu').style.display = 'block';
+      document.getElementById('serverListSection').style.display = 'none';
+    }
+    watchServerCount();
+    setupPresence();
+  }
+
+  // ================= PRESENCE (online / offline / in game) =================
+  let presenceConnRef = null;
+  function setupPresence() {
+    if (!currentUser) return;
+    try {
+      const presenceRef = db.ref('users/' + currentUser.uid + '/presence');
+      if (presenceConnRef) presenceConnRef.off();
+      presenceConnRef = db.ref('.info/connected');
+      presenceConnRef.on('value', snap => {
+        if (snap.val() === true) {
+          presenceRef.onDisconnect().set({ status: 'offline', updatedAt: firebase.database.ServerValue.TIMESTAMP });
+          presenceRef.set({ status: 'online', updatedAt: firebase.database.ServerValue.TIMESTAMP });
+        }
+      });
+    } catch (e) {}
+  }
+  function setPresenceStatus(status) {
+    if (!currentUser) return;
+    try { db.ref('users/' + currentUser.uid + '/presence').update({ status, updatedAt: firebase.database.ServerValue.TIMESTAMP }); } catch (e) {}
+  }
+
+  // ================= USER STATS HELPERS =================
+  function userStats(u) {
+    const s = (u && u.stats) || {};
+    return {
+      totalMatch: s.totalMatch || 0,
+      longestLength: s.longestLength || 0,
+      totalPlayTimeSec: s.totalPlayTimeSec || 0,
+      totalKill: s.totalKill || 0
+    };
+  }
+  function formatPlayTime(sec) {
+    sec = Math.floor(sec || 0);
+    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
+    return h + 'H ' + m + 'M';
+  }
+
+  function watchOneServer(sid, refHolder, slotElId, btnElId) {
+    try {
+      if (refHolder.ref) refHolder.ref.off();
+      const r = db.ref('servers/' + sid + '/players');
+      refHolder.ref = r;
+      const max = SERVERS[sid].maxPlayers;
+      r.on('value', snap => {
+        try {
+          // di server dengan bot, hitung hanya pemain manusia (bot tidak masuk slot)
+          let n = 0;
+          if (snap.exists()) {
+            snap.forEach(c => { if (!c.val().isBot) n++; });
+          }
+          const el = document.getElementById(slotElId);
+          el.textContent = n + '/' + max;
+          el.classList.toggle('full', n >= max);
+          document.getElementById(btnElId).disabled = n >= max;
+        } catch (e) {
+          console.error('watchServerCount value error:', e);
+        }
+      }, err => {
+        console.error('watchServerCount listener error:', err);
+        const el = document.getElementById(slotElId);
+        el.textContent = '.../' + max;
+        document.getElementById(btnElId).disabled = false;
+      });
+    } catch (e) {
+      console.error('watchServerCount setup error:', e);
+    }
+  }
+
+  const serverRefHolder1 = {}, serverRefHolder2 = {};
+  function watchServerCount() {
+    watchOneServer('server1', serverRefHolder1, 'server1Slot', 'joinServer1');
+    watchOneServer('server2', serverRefHolder2, 'server2Slot', 'joinServer2');
+  }
+
+  document.getElementById('playMenuBtn').addEventListener('click', () => {
+    document.getElementById('lobbyMenu').style.display = 'none';
+    document.getElementById('serverListSection').style.display = 'block';
+  });
+
+  // ================= SKIN PICKER =================
+  const SKIN_COLORS = ['#3CFFA0', '#FF5C7A', '#FFD23C', '#a86bff', '#4FC3F7', '#FF9F43', '#ff5cf1', '#ffffff'];
+  const SKIN_STORAGE_KEY = 'retrosnake_skin_color';
+  const SKIN_STORAGE_KEY_B = 'retrosnake_skin_color_b';
+  const SKIN_STORAGE_KEY_COLORS = 'retrosnake_skin_colors';
+  function readStoredColors() {
+    try {
+      const raw = localStorage.getItem(SKIN_STORAGE_KEY_COLORS);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+  let selectedSkin = {
+    colorA: localStorage.getItem(SKIN_STORAGE_KEY) || SKIN_COLORS[0],
+    colorB: localStorage.getItem(SKIN_STORAGE_KEY_B) || null,
+    colors: readStoredColors()
+  };
+
+  // ================= SHOP =================
+  const SHOP_TIERS = [
+    {
+      name: 'COMMON',
+      skins: [
+        { id: 'shop1', colorA: '#FF5C7A', colorB: '#4FC3F7', price: 100 },
+        { id: 'shop2', colorA: '#FFD23C', colorB: '#2b2b2b', price: 100 },
+        { id: 'shop3', colorA: '#4FC3F7', colorB: '#3CFFA0', price: 100 },
+        { id: 'shop4', colorA: '#FF9F43', colorB: '#FFD23C', price: 100 }
+      ]
+    },
+    {
+      name: 'UNCOMMON',
+      skins: [
+        { id: 'shop5', colorA: '#FFC93C', colorB: '#7A1E1E', colors: ['#FFC93C', '#FF9C3C', '#FF6B3C', '#E63C3C'], price: 200 },
+        { id: 'shop6', colorA: '#4FE0FF', colorB: '#4FE0FF', colors: ['#4FE0FF', '#C24FFF', '#9C3CFF', '#4FE0FF'], price: 200 },
+        { id: 'shop7', colorA: '#8FE3FF', colorB: '#173a91', colors: ['#8FE3FF', '#4FC3F7', '#3C8CFF', '#1F4FE0'], price: 200 },
+        { id: 'shop8', colorA: '#E8FF3C', colorB: '#E8FF3C', colors: ['#E8FF3C', '#9CFF3C', '#4FCC3C', '#E8FF3C'], price: 200 },
+        { id: 'shop9', colorA: '#F5F0DC', colorB: '#8a7a1f', colors: ['#B0B0B0', '#F5F0DC', '#F5E6A8', '#F2D66B'], price: 200 },
+        { id: 'shop10', colorA: '#FFD23C', colorB: '#5c1f8c', colors: ['#FF9C3C', '#FFD23C', '#FF3CE0', '#B33CFF'], price: 200 },
+        { id: 'shop11', colorA: '#F5F5F5', colorB: '#7A1E1E', colors: ['#B0B0B0', '#F5F5F5', '#FF6B5C', '#B32C1C'], price: 200 },
+        { id: 'shop12', colorA: '#4FC3F7', colorB: '#B32C1C', colors: ['#4FC3F7', '#7CFF3C', '#FFD23C', '#FF6B1C'], price: 200 }
+      ]
+    }
+  ];
+  const SHOP_SKINS = SHOP_TIERS.flatMap(t => t.skins);
+  const SHOP_PAGE_SIZE = 4;
+  let shopTierIndex = 0;
+  let shopSkinPage = 0;
+  function ownedSkins() { return (currentUser && currentUser.ownedSkins) || {}; }
+  function ownedShopSkins() { return SHOP_SKINS.filter(s => ownedSkins()[s.id]); }
+
+  function applySkinPreview(colorA, colorB, colors) {
+    const body = document.getElementById('skinPreviewBody');
+    const isMulti = colors && colors.length > 1;
+    body.classList.toggle('multiTone', !!isMulti);
+    body.classList.toggle('twoTone', !isMulti && !!colorB);
+    body.style.setProperty('--sc', colorA);
+    body.style.setProperty('--scB', colorB || colorA);
+    if (isMulti) body.style.setProperty('--grad', `linear-gradient(90deg, ${colors.join(',')})`);
+    if (!colorB && !isMulti) body.style.background = colorA;
+  }
+
+  function buildSkinGrid() {
+    const grid = document.getElementById('skinGrid');
+    grid.innerHTML = '';
+    const allSkins = SKIN_COLORS.map(c => ({ colorA: c, colorB: null, colors: null }))
+      .concat(ownedShopSkins().map(s => ({ colorA: s.colorA, colorB: s.colorB, colors: s.colors || null })));
+    allSkins.forEach(skin => {
+      const isMulti = skin.colors && skin.colors.length > 1;
+      const isSelected = skin.colorA === selectedSkin.colorA && (skin.colorB || null) === (selectedSkin.colorB || null);
+      const sw = document.createElement('div');
+      sw.className = 'skinSwatch' + (isMulti ? ' multiTone' : (skin.colorB ? ' twoTone' : '')) + (isSelected ? ' selected' : '');
+      sw.style.setProperty('--sc', skin.colorA);
+      if (skin.colorB) sw.style.setProperty('--scB', skin.colorB);
+      if (isMulti) sw.style.setProperty('--grad', `linear-gradient(90deg, ${skin.colors.join(',')})`);
+      sw.addEventListener('click', () => {
+        selectedSkin = { colorA: skin.colorA, colorB: skin.colorB || null, colors: skin.colors || null };
+        applySkinPreview(skin.colorA, skin.colorB, skin.colors);
+        document.querySelectorAll('.skinSwatch').forEach(el => el.classList.remove('selected'));
+        sw.classList.add('selected');
+      });
+      grid.appendChild(sw);
+    });
+    applySkinPreview(selectedSkin.colorA, selectedSkin.colorB, selectedSkin.colors);
+  }
+
+  document.getElementById('changeSkinBtn').addEventListener('click', () => {
+    buildSkinGrid();
+    document.getElementById('skinOverlay').classList.add('visible');
+  });
+
+  document.getElementById('skinCloseBtn').addEventListener('click', () => {
+    document.getElementById('skinOverlay').classList.remove('visible');
+  });
+
+  document.getElementById('skinConfirmBtn').addEventListener('click', () => {
+    localStorage.setItem(SKIN_STORAGE_KEY, selectedSkin.colorA);
+    if (selectedSkin.colorB) localStorage.setItem(SKIN_STORAGE_KEY_B, selectedSkin.colorB);
+    else localStorage.removeItem(SKIN_STORAGE_KEY_B);
+    if (selectedSkin.colors) localStorage.setItem(SKIN_STORAGE_KEY_COLORS, JSON.stringify(selectedSkin.colors));
+    else localStorage.removeItem(SKIN_STORAGE_KEY_COLORS);
+    document.getElementById('skinOverlay').classList.remove('visible');
+  });
+
+  document.getElementById('backToMenuLink').addEventListener('click', () => {
+    document.getElementById('serverListSection').style.display = 'none';
+    document.getElementById('lobbyMenu').style.display = 'block';
+  });
+
+  // ---- buka/tutup halaman Shop ----
+  document.getElementById('shopMenuBtn').addEventListener('click', () => {
+    document.getElementById('lobbyScreen').classList.remove('visible');
+    document.getElementById('shopScreen').classList.add('visible');
+    updateShopCoinDisplay();
+    shopTierIndex = 0;
+    shopSkinPage = 0;
+    buildShopGrid();
+  });
+
+  document.getElementById('shopTierPrev').addEventListener('click', () => {
+    shopTierIndex = (shopTierIndex - 1 + SHOP_TIERS.length) % SHOP_TIERS.length;
+    shopSkinPage = 0;
+    buildShopGrid();
+  });
+  document.getElementById('shopTierNext').addEventListener('click', () => {
+    shopTierIndex = (shopTierIndex + 1) % SHOP_TIERS.length;
+    shopSkinPage = 0;
+    buildShopGrid();
+  });
+
+  document.getElementById('skinPagePrev').addEventListener('click', () => {
+    shopSkinPage = Math.max(0, shopSkinPage - 1);
+    buildShopGrid();
+  });
+  document.getElementById('skinPageNext').addEventListener('click', () => {
+    const tier = SHOP_TIERS[shopTierIndex];
+    const totalPages = Math.max(1, Math.ceil(tier.skins.length / SHOP_PAGE_SIZE));
+    shopSkinPage = Math.min(totalPages - 1, shopSkinPage + 1);
+    buildShopGrid();
+  });
+
+  document.getElementById('shopBackBtn').addEventListener('click', () => {
+    document.getElementById('shopScreen').classList.remove('visible');
+    document.getElementById('lobbyScreen').classList.add('visible');
+    const uCoin = (currentUser && typeof currentUser.coin === 'number') ? currentUser.coin : 0;
+    document.getElementById('lobbyCoinNum').textContent = uCoin;
+  });
+
+  function updateShopCoinDisplay() {
+    const uCoin = (currentUser && typeof currentUser.coin === 'number') ? currentUser.coin : 0;
+    document.getElementById('shopCoinNum').textContent = uCoin;
+  }
+
+  function buildShopGrid() {
+    const tier = SHOP_TIERS[shopTierIndex];
+    document.getElementById('shopTierLabel').textContent = tier.name;
+    const totalPages = Math.max(1, Math.ceil(tier.skins.length / SHOP_PAGE_SIZE));
+    if (shopSkinPage >= totalPages) shopSkinPage = totalPages - 1;
+    if (shopSkinPage < 0) shopSkinPage = 0;
+    const start = shopSkinPage * SHOP_PAGE_SIZE;
+    const pageSkins = tier.skins.slice(start, start + SHOP_PAGE_SIZE);
+
+    const grid = document.getElementById('skinShopGrid');
+    grid.innerHTML = '';
+    pageSkins.forEach(skin => {
+      const isOwned = !!ownedSkins()[skin.id];
+      const isMulti = skin.colors && skin.colors.length > 1;
+      const swatchesHtml = isMulti
+        ? skin.colors.map(c => `<div class="sw" style="background:${c};"></div>`).join('') + `<div class="sw eyes" style="background:${skin.colorB || '#333'};"></div>`
+        : `<div class="sw" style="background:${skin.colorA};"></div><div class="sw eyes" style="background:${skin.colorB};"></div>`;
+      const card = document.createElement('div');
+      card.className = 'skinShopCard';
+      card.innerHTML = `
+        <div class="skinShopSwatches${isMulti ? ' multi' : ''}">${swatchesHtml}</div>
+        <div class="skinShopPrice">PRICE</div>
+        <div class="skinShopPriceVal">${skin.price}<span class="coinWord">COIN</span></div>
+        <div class="skinShopMsg"></div>
+        <button class="skinShopBuyBtn ${isOwned ? 'owned' : ''}" ${isOwned ? 'disabled' : ''}>${isOwned ? 'DIMILIKI' : 'BUY'}</button>
+      `;
+      const btn = card.querySelector('.skinShopBuyBtn');
+      const msg = card.querySelector('.skinShopMsg');
+      if (!isOwned) {
+        btn.addEventListener('click', () => buySkin(skin, msg, card));
+      }
+      grid.appendChild(card);
+    });
+
+    const prevBtn = document.getElementById('skinPagePrev');
+    const nextBtn = document.getElementById('skinPageNext');
+    const hasPaging = totalPages > 1;
+    prevBtn.classList.toggle('hidden', !hasPaging);
+    nextBtn.classList.toggle('hidden', !hasPaging);
+    prevBtn.disabled = shopSkinPage <= 0;
+    nextBtn.disabled = shopSkinPage >= totalPages - 1;
+  }
+
+  async function buySkin(skin, msg, card) {
+    if (!currentUser) return;
+    const balance = currentUser.coin || 0;
+    if (balance < skin.price) {
+      msg.style.color = '#FF5C7A';
+      msg.textContent = 'COIN TIDAK CUKUP';
+      return;
+    }
+    try {
+      const uref = db.ref('users/' + currentUser.uid);
+      const snap = await uref.once('value');
+      const u = snap.val() || currentUser;
+      const curCoin = u.coin || 0;
+      if (curCoin < skin.price) {
+        msg.style.color = '#FF5C7A';
+        msg.textContent = 'COIN TIDAK CUKUP';
+        return;
+      }
+      const newCoin = curCoin - skin.price;
+      await uref.update({ coin: newCoin, ['ownedSkins/' + skin.id]: true });
+      currentUser.coin = newCoin;
+      if (!currentUser.ownedSkins) currentUser.ownedSkins = {};
+      currentUser.ownedSkins[skin.id] = true;
+
+      selectedSkin = { colorA: skin.colorA, colorB: skin.colorB, colors: skin.colors || null };
+      localStorage.setItem(SKIN_STORAGE_KEY, skin.colorA);
+      localStorage.setItem(SKIN_STORAGE_KEY_B, skin.colorB);
+      if (skin.colors) localStorage.setItem(SKIN_STORAGE_KEY_COLORS, JSON.stringify(skin.colors));
+      else localStorage.removeItem(SKIN_STORAGE_KEY_COLORS);
+
+      updateShopCoinDisplay();
+      document.getElementById('lobbyCoinNum').textContent = newCoin;
+      const hudCoinNum = document.getElementById('hudCoinNum');
+      if (hudCoinNum) hudCoinNum.textContent = newCoin;
+      buildShopGrid();
+    } catch (e) {
+      msg.style.color = '#FF5C7A';
+      msg.textContent = 'GAGAL MEMBELI';
+    }
+  }
+
+  // ================= PLAYER LIST =================
+  let friendWatchRefs = []; // { ref, uid } -- watches presence of each listed player
+
+  function detachFriendWatchers() {
+    friendWatchRefs.forEach(f => f.ref.off());
+    friendWatchRefs = [];
+  }
+
+  document.getElementById('playerMenuBtn').addEventListener('click', () => {
+    document.getElementById('lobbyScreen').classList.remove('visible');
+    document.getElementById('playerScreen').classList.add('visible');
+    loadPlayerList();
+  });
+
+  document.getElementById('playerBackBtn').addEventListener('click', () => {
+    detachFriendWatchers();
+    document.getElementById('playerScreen').classList.remove('visible');
+    document.getElementById('lobbyScreen').classList.add('visible');
+  });
+
+  function statusMeta(presence) {
+    const status = (presence && presence.status) || 'offline';
+    if (status === 'ingame') return { cls: 'ingame', label: 'IN GAME' };
+    if (status === 'online') return { cls: 'online', label: 'ONLINE' };
+    return { cls: 'offline', label: 'OFFLINE' };
+  }
+
+  const PLAYER_PAGE_SIZE = 4;
+  let playerUsersObj = {};
+  let playerIdsAll = [];
+  let playerCurrentPage = 0;
+
+  function renderPlayerCard(pid, d) {
+    const card = document.createElement('div');
+    card.className = 'friendCard';
+    card.dataset.uid = pid;
+    const meta = statusMeta(d.presence);
+    const expIntoLevel = (d.exp || 0) % 100;
+    card.innerHTML = `
+      <div class="friendTop">
+        <div class="friendAvatar">${(d.name || '?').charAt(0).toUpperCase()}</div>
+        <div class="friendInfo">
+          <div class="fname">${d.name || '(nama tidak diketahui)'}</div>
+          <div class="flevelRow">
+            <span><span class="k">LV</span><span class="v">${d.level || 1}</span></span>
+            <span><span class="k">EXP</span><span class="v">${expIntoLevel}/100</span></span>
+          </div>
+          <div class="friendStatus ${meta.cls}"><span class="dot"></span><span class="stText">${meta.label}</span></div>
+        </div>
+      </div>
+      <div class="friendBtnRow">
+        <button class="friendViewBtn">VIEW</button>
+      </div>
+    `;
+    card.querySelector('.friendViewBtn').addEventListener('click', () => openProfileScreen(pid, 'playerScreen'));
+
+    const pRef = db.ref('users/' + pid + '/presence');
+    pRef.on('value', psnap => {
+      const meta2 = statusMeta(psnap.val());
+      const stEl = card.querySelector('.friendStatus');
+      if (!stEl) return;
+      stEl.className = 'friendStatus ' + meta2.cls;
+      stEl.querySelector('.stText').textContent = meta2.label;
+    });
+    friendWatchRefs.push({ ref: pRef, uid: pid });
+
+    return card;
+  }
+
+  function renderPlayerPage() {
+    detachFriendWatchers();
+    const rowsEl = document.getElementById('playerListRows');
+    const totalPages = Math.max(1, Math.ceil(playerIdsAll.length / PLAYER_PAGE_SIZE));
+    playerCurrentPage = Math.min(playerCurrentPage, totalPages - 1);
+
+    if (!playerIdsAll.length) {
+      rowsEl.innerHTML = '<div class="friendEmpty">BELUM ADA PEMAIN LAIN YANG TERDAFTAR.</div>';
+    } else {
+      rowsEl.innerHTML = '';
+      const start = playerCurrentPage * PLAYER_PAGE_SIZE;
+      const pageIds = playerIdsAll.slice(start, start + PLAYER_PAGE_SIZE);
+      pageIds.forEach(pid => rowsEl.appendChild(renderPlayerCard(pid, playerUsersObj[pid] || {})));
+    }
+
+    document.getElementById('playerPagerInfo').textContent = (playerCurrentPage + 1) + ' / ' + totalPages;
+    document.getElementById('playerPrevBtn').disabled = playerCurrentPage <= 0;
+    document.getElementById('playerNextBtn').disabled = playerCurrentPage >= totalPages - 1;
+  }
+
+  document.getElementById('playerPrevBtn').addEventListener('click', () => {
+    if (playerCurrentPage <= 0) return;
+    playerCurrentPage--;
+    renderPlayerPage();
+  });
+  document.getElementById('playerNextBtn').addEventListener('click', () => {
+    const totalPages = Math.max(1, Math.ceil(playerIdsAll.length / PLAYER_PAGE_SIZE));
+    if (playerCurrentPage >= totalPages - 1) return;
+    playerCurrentPage++;
+    renderPlayerPage();
+  });
+
+  async function loadPlayerList() {
+    detachFriendWatchers();
+    const rowsEl = document.getElementById('playerListRows');
+    rowsEl.innerHTML = '<div class="friendEmpty">MEMUAT...</div>';
+    if (!currentUser) return;
+
+    try {
+      const snap = await db.ref('users').once('value');
+      const usersObj = snap.exists() ? snap.val() : {};
+      const playerIds = Object.keys(usersObj).filter(uid => uid !== currentUser.uid);
+
+      // urutkan berdasarkan level tertinggi biar yang paling "jago" muncul duluan
+      playerIds.sort((a, b) => (usersObj[b].level || 1) - (usersObj[a].level || 1));
+
+      playerUsersObj = usersObj;
+      playerIdsAll = playerIds;
+      playerCurrentPage = 0;
+      renderPlayerPage();
+    } catch (e) {
+      rowsEl.innerHTML = '<div class="friendEmpty">GAGAL MEMUAT DAFTAR PEMAIN.</div>';
+    }
+  }
+
+  // ================= PLAYER PROFILE =================
+  let profileWatchRef = null;
+  let profileActiveTab = 'stat';
+
+  function switchProfileTab(tab) {
+    profileActiveTab = tab;
+    document.getElementById('profTabStat').classList.toggle('active', tab === 'stat');
+    document.getElementById('profTabSkin').classList.toggle('active', tab === 'skin');
+    document.getElementById('profTabAch').classList.toggle('active', tab === 'ach');
+    document.getElementById('profPanelStat').style.display = tab === 'stat' ? 'block' : 'none';
+    document.getElementById('profPanelSkin').style.display = tab === 'skin' ? 'block' : 'none';
+    document.getElementById('profPanelAch').style.display = tab === 'ach' ? 'block' : 'none';
+  }
+  document.getElementById('profTabStat').addEventListener('click', () => switchProfileTab('stat'));
+  document.getElementById('profTabSkin').addEventListener('click', () => switchProfileTab('skin'));
+  document.getElementById('profTabAch').addEventListener('click', () => switchProfileTab('ach'));
+
+  document.getElementById('profileBackBtn').addEventListener('click', () => {
+    if (profileWatchRef) { profileWatchRef.off(); profileWatchRef = null; }
+    document.getElementById('profileScreen').classList.remove('visible');
+    document.getElementById(profileReturnTo).classList.add('visible');
+  });
+
+  function renderProfileData(uid, d) {
+    document.getElementById('profAvatar').textContent = (d.name || '?').charAt(0).toUpperCase();
+    document.getElementById('profName').textContent = d.name || '(tidak diketahui)';
+    document.getElementById('profLevel').textContent = d.level || 1;
+    const expIntoLevel = (d.exp || 0) % 100;
+    document.getElementById('profExp').textContent = expIntoLevel + ' / 100';
+    document.getElementById('profExpFill').style.width = expIntoLevel + '%';
+    const meta = statusMeta(d.presence);
+    const stEl = document.getElementById('profStatus');
+    stEl.className = 'friendStatus ' + meta.cls;
+    document.getElementById('profStatusText').textContent = meta.label;
+
+    const st = userStats(d);
+    document.getElementById('statMatch').textContent = st.totalMatch;
+    document.getElementById('statLength').textContent = st.longestLength.toLocaleString('id-ID');
+    document.getElementById('statTime').textContent = formatPlayTime(st.totalPlayTimeSec);
+    document.getElementById('statCoin').textContent = (d.coin || 0).toLocaleString('id-ID');
+    document.getElementById('statKill').textContent = st.totalKill.toLocaleString('id-ID');
+
+    // ---- Skin tab ----
+    const skinGrid = document.getElementById('profSkinGrid');
+    skinGrid.innerHTML = '';
+    SKIN_COLORS.forEach(c => {
+      skinGrid.insertAdjacentHTML('beforeend', `
+        <div class="profSkinItem">
+          <div class="profSkinSwatch" style="--sc:${c};"></div>
+          <div class="profSkinLabel">DASAR</div>
+        </div>`);
+    });
+    const owned = d.ownedSkins || {};
+    SHOP_SKINS.forEach(skin => {
+      const isOwned = !!owned[skin.id];
+      const isMulti = skin.colors && skin.colors.length > 1;
+      const toneClass = isMulti ? 'multiTone' : 'twoTone';
+      const gradStyle = isMulti ? `--grad:linear-gradient(90deg, ${skin.colors.join(',')});` : '';
+      skinGrid.insertAdjacentHTML('beforeend', `
+        <div class="profSkinItem">
+          <div class="profSkinSwatch ${toneClass} ${isOwned ? '' : 'locked'}" style="--sc:${skin.colorA};--scB:${skin.colorB};${gradStyle}"></div>
+          <div class="profSkinLabel">${isOwned ? 'DIMILIKI' : 'TERKUNCI'}</div>
+        </div>`);
+    });
+
+    // ---- Achievement tab ----
+    const achList = document.getElementById('profAchList');
+    const achievements = [
+      { name: 'PEMULA', desc: 'Mainkan 1 pertandingan', done: st.totalMatch >= 1, icon: '&#9733;' },
+      { name: 'VETERAN', desc: 'Mainkan 50 pertandingan', done: st.totalMatch >= 50, icon: '&#127942;' },
+      { name: 'NAGA PANJANG', desc: 'Capai panjang 1.500', done: st.longestLength >= 1500, icon: '&#128207;' },
+      { name: 'PEMBUNUH ULUNG', desc: 'Raih 100 total kill', done: st.totalKill >= 100, icon: '&#128128;' },
+      { name: 'KOLEKTOR KOIN', desc: 'Kumpulkan 1.000 coin', done: (d.coin || 0) >= 1000, icon: '&#129689;' }
+    ];
+    achList.innerHTML = achievements.map(a => `
+      <div class="achRow ${a.done ? '' : 'locked'}">
+        <div class="achIcon">${a.done ? a.icon : '&#128274;'}</div>
+        <div class="achText">
+          <div class="achName">${a.name}</div>
+          <div class="achDesc">${a.desc}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  let profileReturnTo = 'playerScreen';
+  function openProfileScreen(uid, returnTo) {
+    profileReturnTo = returnTo || 'playerScreen';
+    switchProfileTab('stat');
+    document.getElementById('playerScreen').classList.remove('visible');
+    document.getElementById('lobbyScreen').classList.remove('visible');
+    document.getElementById('profileScreen').classList.add('visible');
+    if (profileWatchRef) profileWatchRef.off();
+    profileWatchRef = db.ref('users/' + uid);
+    profileWatchRef.on('value', snap => {
+      const d = snap.val();
+      if (!d) return;
+      renderProfileData(uid, d);
+    });
+  }
+
+  // Bersihkan food (dan riwayat chat) kalau server sudah tidak ada player manusianya sama sekali.
+  // Food dibersihkan biar "segmen"/item gak numpuk terus lama-lama jadi lag.
+  // Chat direset juga biar server yang mulai lagi dari nol gak kebawa obrolan lama.
+  async function cleanupServerIfEmpty(sid) {
+    try {
+      const snap = await db.ref('servers/' + sid + '/players').once('value');
+      let n = 0;
+      if (snap.exists()) snap.forEach(c => { if (!c.val().isBot) n++; });
+      if (n === 0) {
+        await Promise.all([
+          db.ref('servers/' + sid + '/food').remove(),
+          db.ref('servers/' + sid + '/chat').remove()
+        ]);
+      }
+    } catch (e) {}
+  }
+
+  async function joinServer(sid) {
+    const max = SERVERS[sid].maxPlayers;
+    const snap = await db.ref('servers/' + sid + '/players').once('value');
+    let n = 0;
+    if (snap.exists()) snap.forEach(c => { if (!c.val().isBot) n++; });
+    if (n >= max) return;
+    // fallback safety net: kalau ternyata server kosong (misal sesi sebelumnya
+    // crash/nutup tab tanpa sempat cleanup), sekalian bersihkan food & chat lama sebelum mulai
+    if (n === 0) {
+      db.ref('servers/' + sid + '/food').remove();
+      db.ref('servers/' + sid + '/chat').remove();
+    }
+    SERVER_ID = sid;
+    document.getElementById('lobbyScreen').classList.remove('visible');
+    startGame();
+  }
+
+  document.getElementById('lobbyViewBtn').addEventListener('click', () => {
+    if (currentUser) openProfileScreen(currentUser.uid, 'lobbyScreen');
+  });
+
+  document.getElementById('joinServer1').addEventListener('click', () => joinServer('server1'));
+  document.getElementById('joinServer2').addEventListener('click', () => joinServer('server2'));
+
+  document.getElementById('logoutLink').addEventListener('click', () => {
+    if (serverCountRef) serverCountRef.off();
+    if (presenceConnRef) { presenceConnRef.off(); presenceConnRef = null; }
+    if (currentUser) setPresenceStatus('offline');
+    currentUser = null;
+    document.getElementById('lobbyScreen').classList.remove('visible');
+    document.getElementById('authScreen').classList.add('visible');
+    document.getElementById('authName').value = '';
+    document.getElementById('authPass').value = '';
+  });
+
+  document.getElementById('toLobbyBtn').addEventListener('click', () => {
+    document.getElementById('deathScreen').classList.remove('visible');
+    enterLobby();
+    document.getElementById('lobbyScreen').classList.add('visible');
+  });
+
+  // ================= GAME ENGINE =================
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  const minimap = document.getElementById('minimap');
+  const mctx = minimap.getContext('2d');
+
+  let DPR = Math.min(window.devicePixelRatio || 1, 3);
+  let W = window.innerWidth, H = window.innerHeight;
+  let mmSize = 100;
+  let mmSizeApplied = 0, mmDprApplied = 0;
+  function resizeMinimap() {
+    // Ukuran ini harus selalu sinkron dengan breakpoint CSS #minimapWrap di bagian <style>
+    mmSize = window.innerWidth <= 640 ? 72 : 100;
+    if (mmSize === mmSizeApplied && DPR === mmDprApplied) return;
+    mmSizeApplied = mmSize; mmDprApplied = DPR;
+    minimap.width = Math.round(mmSize * DPR);
+    minimap.height = Math.round(mmSize * DPR);
+    mctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 3);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    resizeMinimap();
+  }
+  window.addEventListener('resize', resize);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', resize);
+  }
+  resize();
+
+  const WORLD = { w: 4200, h: 4200 };
+  const FOOD_TARGET = 140;
+  const START_LEN = 10;
+
+  let food = {}; // keyed by firebase id
+  let worms = []; // {id, name, isRemote, ...}
+  let particles = [];
+  let camera = { x: 0, y: 0 };
+  let zoom = 1;
+  let mouse = { x: 0, y: 0 };
+  let boosting = false;
+  let running = false;
+  let lastTime = 0;
+  let dtScale = 1;
+  let playerId = null;
+  let animFrame = null;
+  let playersRef = null, foodRef = null, myPlayerRef = null;
+  let lastNetPush = 0;
+
+  const NEON = ['#FF5C7A', '#FFD23C', '#3C9CFF', '#C13CFF', '#FF8A3C', '#3CFFA0'];
+  function rand(a, b) { return a + Math.random() * (b - a); }
+  function dist2(ax, ay, bx, by) { const dx = ax - bx, dy = ay - by; return dx * dx + dy * dy; }
+  function angleDiff(a, b) { let d = (b - a) % (Math.PI * 2); if (d > Math.PI) d -= Math.PI * 2; if (d < -Math.PI) d += Math.PI * 2; return d; }
+
+  function makeWormObj(id, name, isRemote, x, y, color, isBot, colorB, colors) {
+    const segs = [];
+    for (let i = 0; i < START_LEN; i++) segs.push({ x: x - i * 6, y: y });
+    return {
+      id, name, isRemote, isBot: !!isBot,
+      color: color || NEON[Math.floor(Math.random() * NEON.length)],
+      colorB: colorB || null,
+      colors: (colors && colors.length > 1) ? colors : null,
+      segs, angle: 0, targetAngle: 0, speed: 2.4,
+      boosting: false, alive: true, len: START_LEN, boostFuel: 100,
+      lastPos: { x, y }, targetPos: { x, y }, lastUpdateT: performance.now(), updateInterval: 100
+    };
+  }
+
+  // ================= BOT AI (client-lokal, hanya untuk Server 2) =================
+  const BOT_NAMES = ['Cacink', 'Bobi', 'Ular99', 'Slither_X', 'Krisu', 'Zonk', 'Wormo', 'Tobi', 'Kece', 'Nano', 'Gepeng', 'Rambo'];
+  let botRespawnQueue = [];
+
+  function spawnBot() {
+    const x = rand(WORLD.w * 0.2, WORLD.w * 0.8), y = rand(WORLD.h * 0.2, WORLD.h * 0.8);
+    const name = BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
+    const color = NEON[Math.floor(Math.random() * NEON.length)];
+    const id = 'bot_' + Math.random().toString(36).slice(2, 10);
+    const w = makeWormObj(id, name, false, x, y, color, true);
+    w.speed = rand(2.1, 2.7);
+    w.botTurnCooldown = 0;
+    worms.push(w);
+    return w;
+  }
+
+  function spawnInitialBots(count) {
+    for (let i = 0; i < count; i++) spawnBot();
+  }
+
+  function updateBotWorm(w, dt) {
+    if (!w.alive) return;
+
+    // cari makanan terdekat dalam radius pandang
+    let targetX = null, targetY = null, bestD = Infinity;
+    const SIGHT2 = 620 * 620;
+    for (const fid in food) {
+      const f = food[fid];
+      const d = dist2(w.segs[0].x, w.segs[0].y, f.x, f.y);
+      if (d < SIGHT2 && d < bestD) { bestD = d; targetX = f.x; targetY = f.y; }
+    }
+
+    w.botTurnCooldown -= dt;
+    if (targetX !== null) {
+      w.targetAngle = Math.atan2(targetY - w.segs[0].y, targetX - w.segs[0].x);
+    } else if (w.botTurnCooldown <= 0) {
+      // jalan acak kalau tidak ada makanan terlihat
+      w.targetAngle += rand(-1.2, 1.2);
+      w.botTurnCooldown = rand(500, 1400);
+    }
+
+    // hindari tembok dunia
+    const head = w.segs[0];
+    const margin = 220;
+    if (head.x < margin) w.targetAngle = 0;
+    else if (head.x > WORLD.w - margin) w.targetAngle = Math.PI;
+    if (head.y < margin) w.targetAngle = Math.PI / 2;
+    else if (head.y > WORLD.h - margin) w.targetAngle = -Math.PI / 2;
+
+    let diff = angleDiff(w.angle, w.targetAngle);
+    // Radius belok normal bot (spd / maxTurn) bisa lebih besar dari jarak ke makanan
+    // terdekat, jadi bot gagal belok cukup tajam dan malah muter-muter di sekitar
+    // makanan tanpa pernah tepat menabraknya. Kalau makanan sudah dekat, izinkan
+    // belok lebih tajam supaya bot bisa langsung mengarah ke makanan.
+    let maxTurn = 0.09 * dtScale;
+    if (targetX !== null && bestD < 130 * 130) {
+      const closeness = 1 - Math.sqrt(bestD) / 130; // 0..1, makin dekat makin besar
+      maxTurn = maxTurn + closeness * 0.18 * dtScale;
+    }
+    diff = Math.max(-maxTurn, Math.min(maxTurn, diff));
+    w.angle += diff;
+
+    const spd = w.speed * dtScale;
+    const nx = head.x + Math.cos(w.angle) * spd, ny = head.y + Math.sin(w.angle) * spd;
+    w.segs.unshift({ x: nx, y: ny });
+    const targetSegCount = Math.max(START_LEN, Math.floor(w.len));
+    while (w.segs.length > targetSegCount) w.segs.pop();
+
+    // makan
+    let closestFid = null, closestD = Infinity;
+    for (const fid in food) {
+      const f = food[fid];
+      const d = dist2(nx, ny, f.x, f.y);
+      if (d < (f.r + 10) * (f.r + 10) && d < closestD) { closestD = d; closestFid = fid; }
+    }
+    if (closestFid) {
+      w.len += 1;
+      db.ref('servers/' + SERVER_ID + '/food/' + closestFid).remove();
+      delete food[closestFid];
+      spawnFoodIfNeeded(1);
+    }
+
+    // tabrakan bot dengan worm lain (termasuk pemain)
+    const headR = wormRadius(w) * 0.7;
+    for (const other of worms) {
+      if (!other.alive || other === w) continue;
+      const otherR = wormRadius(other) * 0.65;
+      for (let i = 0; i < other.segs.length; i++) {
+        const s = other.segs[i];
+        if (dist2(nx, ny, s.x, s.y) < (headR + otherR) * (headR + otherR)) {
+          killBot(w, other);
+          return;
+        }
+      }
+    }
+  }
+
+  function killBot(w, killer) {
+    if (killer && killer.id === playerId && currentUser) {
+      const st = userStats(currentUser);
+      st.totalKill += 1;
+      currentUser.stats = st;
+      db.ref('users/' + currentUser.uid + '/stats/totalKill').set(st.totalKill).catch(() => {});
+    }
+    w.alive = false;
+    for (let i = 0; i < w.segs.length; i += 2) {
+      const seg = w.segs[i];
+      db.ref('servers/' + SERVER_ID + '/food').push({
+        x: seg.x + rand(-8, 8), y: seg.y + rand(-8, 8),
+        r: rand(4, 7), color: w.color
+      });
+    }
+    worms = worms.filter(x => x !== w);
+    // respawn setelah jeda singkat
+    botRespawnQueue.push(performance.now() + rand(2000, 5000));
+  }
+
+  function processBotRespawns() {
+    if (!botRespawnQueue.length) return;
+    const now = performance.now();
+    botRespawnQueue = botRespawnQueue.filter(t => {
+      if (now >= t) { spawnBot(); return false; }
+      return true;
+    });
+  }
+
+  function getPlayer() { return worms.find(w => w.id === playerId); }
+
+  // ---- input ----
+  canvas.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  canvas.addEventListener('mousedown', () => { if (!chatOpen) boosting = true; });
+  canvas.addEventListener('mouseup', () => boosting = false);
+  window.addEventListener('keydown', e => { if (e.code === 'Space') { boosting = true; e.preventDefault(); } });
+  window.addEventListener('keyup', e => { if (e.code === 'Space') { boosting = false; } });
+
+  const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  const joystickZone = document.getElementById('joystickZone');
+  const joyBase = document.getElementById('joyBase');
+  const joyStick = document.getElementById('joyStick');
+  const boostBtn = document.getElementById('boostBtn');
+  let joyActive = false, joyOrigin = { x: 0, y: 0 }, joyTouchId = null, touchAngle = null;
+  const JOY_RADIUS = 55;
+
+  function startJoystick(x, y, id) {
+    joyActive = true; joyTouchId = id; joyOrigin = { x, y };
+    joyBase.style.left = x + 'px'; joyBase.style.top = y + 'px';
+    joyStick.style.left = x + 'px'; joyStick.style.top = y + 'px';
+    joyBase.style.display = 'block'; joyStick.style.display = 'block';
+  }
+  function moveJoystick(x, y) {
+    if (!joyActive) return;
+    let dx = x - joyOrigin.x, dy = y - joyOrigin.y;
+    const d = Math.min(JOY_RADIUS, Math.hypot(dx, dy));
+    const ang = Math.atan2(dy, dx);
+    joyStick.style.left = (joyOrigin.x + Math.cos(ang) * d) + 'px';
+    joyStick.style.top = (joyOrigin.y + Math.sin(ang) * d) + 'px';
+    if (Math.hypot(dx, dy) > 6) touchAngle = ang;
+  }
+  function endJoystick() { joyActive = false; joyTouchId = null; joyBase.style.display = 'none'; joyStick.style.display = 'none'; }
+
+  joystickZone.addEventListener('touchstart', e => {
+    for (const t of e.changedTouches) {
+      if (t.clientX > W - 110 && t.clientY > H - 130) continue;
+      if (!joyActive) startJoystick(t.clientX, t.clientY, t.identifier);
+    }
+  }, { passive: true });
+  joystickZone.addEventListener('touchmove', e => {
+    for (const t of e.changedTouches) if (t.identifier === joyTouchId) moveJoystick(t.clientX, t.clientY);
+  }, { passive: true });
+  function handleTouchEnd(e) { for (const t of e.changedTouches) if (t.identifier === joyTouchId) endJoystick(); }
+  joystickZone.addEventListener('touchend', handleTouchEnd, { passive: true });
+  joystickZone.addEventListener('touchcancel', handleTouchEnd, { passive: true });
+  boostBtn.addEventListener('touchstart', e => { e.stopPropagation(); boosting = true; boostBtn.classList.add('active'); }, { passive: true });
+  boostBtn.addEventListener('touchend', e => { e.stopPropagation(); boosting = false; boostBtn.classList.remove('active'); }, { passive: true });
+
+  // ---- local update ----
+  function updateLocalWorm(w) {
+    if (!w.alive) return;
+    if (isTouch) { if (touchAngle !== null) w.targetAngle = touchAngle; }
+    else {
+      const dx = mouse.x - W / 2, dy = mouse.y - H / 2;
+      if (dx * dx + dy * dy > 25) w.targetAngle = Math.atan2(dy, dx);
+    }
+    w.boosting = boosting && w.len > 6;
+
+    // smooth turning: clamp max turn rate per frame instead of lerp, feels tighter and more consistent
+    let diff = angleDiff(w.angle, w.targetAngle);
+    const maxTurn = 0.09 * dtScale;
+    diff = Math.max(-maxTurn, Math.min(maxTurn, diff));
+    w.angle += diff;
+
+    let spd = w.speed * dtScale;
+    if (w.boosting && w.boostFuel > 0) {
+      spd *= 1.83; w.boostFuel -= 1.2 * dtScale; w.len = Math.max(START_LEN, w.len - 0.03 * dtScale);
+      if (Math.random() < 0.3) particles.push({ x: w.segs[w.segs.length - 1].x, y: w.segs[w.segs.length - 1].y, r: 3, color: w.color, life: 20 });
+    } else {
+      w.boostFuel = Math.min(100, w.boostFuel + 0.4 * dtScale);
+      if (w.boostFuel <= 0) w.boosting = false;
+    }
+
+    const head = w.segs[0];
+    const nx = head.x + Math.cos(w.angle) * spd, ny = head.y + Math.sin(w.angle) * spd;
+    if (nx < 6 || nx > WORLD.w - 6 || ny < 6 || ny > WORLD.h - 6) {
+      killLocalPlayer();
+      return;
+    }
+
+    w.segs.unshift({ x: nx, y: ny });
+    const targetSegCount = Math.max(START_LEN, Math.floor(w.len));
+    while (w.segs.length > targetSegCount) w.segs.pop();
+
+    // eat at most ONE food per frame (the closest one in range), not everything overlapping at once
+    let closestFid = null, closestD = Infinity;
+    for (const fid in food) {
+      const f = food[fid];
+      const d = dist2(nx, ny, f.x, f.y);
+      if (d < (f.r + 10) * (f.r + 10) && d < closestD) { closestD = d; closestFid = fid; }
+    }
+    if (closestFid) {
+      const eaten = food[closestFid];
+      w.len += 1;
+      db.ref('servers/' + SERVER_ID + '/food/' + closestFid).remove();
+      delete food[closestFid];
+      spawnFoodIfNeeded(1);
+      if (eaten && eaten.isCoin) gainCoin(1);
+    }
+  }
+
+  function gainCoin(amount) {
+    if (!currentUser) return;
+    currentUser.coin = (currentUser.coin || 0) + amount;
+    const hudCoinNum = document.getElementById('hudCoinNum');
+    if (hudCoinNum) hudCoinNum.textContent = currentUser.coin;
+    db.ref('users/' + currentUser.uid + '/coin').set(currentUser.coin).catch(() => {});
+    playCoinSfx();
+  }
+
+  function spawnFoodIfNeeded(n) {
+    const sconf = SERVERS[SERVER_ID];
+    const canCoin = !!(sconf && sconf.hasCoin);
+    for (let i = 0; i < n; i++) {
+      const isCoin = canCoin && Math.random() < COIN_CHANCE;
+      const nf = isCoin
+        ? { x: rand(40, WORLD.w - 40), y: rand(40, WORLD.h - 40), r: rand(4, 6), color: '#FFD23C', isCoin: true }
+        : { x: rand(40, WORLD.w - 40), y: rand(40, WORLD.h - 40), r: rand(3, 6), color: NEON[Math.floor(Math.random() * NEON.length)] };
+      db.ref('servers/' + SERVER_ID + '/food').push(nf);
+    }
+  }
+
+  // ---- remote worm interpolation ----
+  function updateRemoteWorm(w) {
+    if (!w.alive) return;
+    const now = performance.now();
+    const t = Math.min(1, (now - w.lastUpdateT) / w.updateInterval);
+    const cx = w.lastPos.x + (w.targetPos.x - w.lastPos.x) * t;
+    const cy = w.lastPos.y + (w.targetPos.y - w.lastPos.y) * t;
+    const head = w.segs[0];
+    if (dist2(head.x, head.y, cx, cy) > 1) {
+      w.segs.unshift({ x: cx, y: cy });
+      const targetSegCount = Math.max(START_LEN, Math.floor(w.len));
+      while (w.segs.length > targetSegCount) w.segs.pop();
+    }
+  }
+
+  // ---- collisions (local player only checks itself) ----
+  function checkCollisions() {
+    const p = getPlayer();
+    if (!p || !p.alive) return;
+    const head = p.segs[0], headR = wormRadius(p) * 0.7;
+    for (const other of worms) {
+      if (!other.alive || other === p) continue; // self-collision disabled — melingkar aman
+      const otherR = wormRadius(other) * 0.65;
+      for (let i = 0; i < other.segs.length; i++) {
+        const s = other.segs[i];
+        if (dist2(head.x, head.y, s.x, s.y) < (headR + otherR) * (headR + otherR)) { killLocalPlayer(); return; }
+      }
+    }
+  }
+
+  async function killLocalPlayer() {
+    const p = getPlayer();
+    if (!p || !p.alive) return;
+    p.alive = false;
+    running = false;
+    cancelAnimationFrame(animFrame);
+
+    const givesXp = SERVERS[SERVER_ID] ? SERVERS[SERVER_ID].givesXp : true;
+    const expGain = givesXp ? Math.floor(p.len) : 0;
+    const ranked = [...worms].sort((a, b) => b.len - a.len);
+    const rank = ranked.findIndex(w => w.id === playerId) + 1;
+
+    // drop the body as food orbs for others (and self) to eat
+    for (let i = 0; i < p.segs.length; i += 2) {
+      const seg = p.segs[i];
+      db.ref('servers/' + SERVER_ID + '/food').push({
+        x: seg.x + rand(-8, 8), y: seg.y + rand(-8, 8),
+        r: rand(4, 7), color: p.color
+      });
+    }
+
+    if (myPlayerRef) { await myPlayerRef.remove(); }
+    cleanupServerIfEmpty(SERVER_ID);
+
+    // update statistik: panjang terpanjang & total waktu main
+    if (currentUser) {
+      try {
+        const st = userStats(currentUser);
+        const finalLen = Math.floor(p.len);
+        if (finalLen > st.longestLength) st.longestLength = finalLen;
+        const elapsedSec = sessionStartTime ? Math.max(0, (Date.now() - sessionStartTime) / 1000) : 0;
+        st.totalPlayTimeSec += elapsedSec;
+        currentUser.stats = st;
+        await db.ref('users/' + currentUser.uid + '/stats').update({
+          longestLength: st.longestLength,
+          totalPlayTimeSec: st.totalPlayTimeSec
+        });
+      } catch (e) {}
+      setPresenceStatus('online');
+    }
+
+    if (givesXp) {
+      try {
+        const uref = db.ref('users/' + currentUser.uid);
+        const snap = await uref.once('value');
+        const u = snap.val() || currentUser;
+        const newExp = (u.exp || 0) + expGain;
+        const newLevel = Math.floor(newExp / 100) + 1;
+        await uref.update({ exp: newExp, level: newLevel });
+        currentUser.exp = newExp; currentUser.level = newLevel;
+      } catch (e) {}
+    }
+
+    document.getElementById('expGain').textContent = givesXp ? ('+' + expGain + ' EXP') : 'NO EXP (Server 2)';
+    document.getElementById('deathStats').textContent = `Panjang akhir: ${Math.floor(p.len)} • Peringkat: ${rank} dari ${worms.length}`;
+    document.getElementById('deathScreen').classList.add('visible');
+    playTrack('lobby');
+    hideGameUI();
+    detachServerListeners();
+  }
+
+  function hideGameUI() {
+    document.getElementById('hud').style.display = 'none';
+    document.getElementById('leaderboard').style.display = 'none';
+    document.getElementById('minimapWrap').style.display = 'none';
+    document.getElementById('boostBar').style.display = 'none';
+    document.getElementById('joystickZone').style.display = 'none';
+    boostBtn.style.display = 'none';
+    document.getElementById('chatToggleBtn').style.display = 'none';
+    setChatOpen(false);
+  }
+
+  // ---- rendering ----
+  function drawGrid() {
+    const gridSize = 40;
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
+    const startX = Math.floor((camera.x - W / 2 / zoom) / gridSize) * gridSize;
+    const startY = Math.floor((camera.y - H / 2 / zoom) / gridSize) * gridSize;
+    const endX = camera.x + W / 2 / zoom;
+    const endY = camera.y + H / 2 / zoom;
+    for (let gx = startX; gx < endX; gx += gridSize) {
+      const p1 = worldToScreen(gx, camera.y - H / zoom);
+      const p2 = worldToScreen(gx, camera.y + H / zoom);
+      ctx.beginPath(); ctx.moveTo(Math.round(p1.x) + 0.5, 0); ctx.lineTo(Math.round(p2.x) + 0.5, H); ctx.stroke();
+    }
+    for (let gy = startY; gy < endY; gy += gridSize) {
+      const p1 = worldToScreen(camera.x - W / zoom, gy);
+      const p2 = worldToScreen(camera.x + W / zoom, gy);
+      ctx.beginPath(); ctx.moveTo(0, Math.round(p1.y) + 0.5); ctx.lineTo(W, Math.round(p2.y) + 0.5); ctx.stroke();
+    }
+  }
+  function drawBoundary() {
+    ctx.strokeStyle = '#552222'; ctx.lineWidth = 6;
+    const b1 = worldToScreen(0, 0), b2 = worldToScreen(WORLD.w, WORLD.h);
+    ctx.strokeRect(b1.x, b1.y, b2.x - b1.x, b2.y - b1.y);
+  }
+  function worldToScreen(x, y) { return { x: (x - camera.x) * zoom + W / 2, y: (y - camera.y) * zoom + H / 2 }; }
+
+  function drawFood() {
+    const now = performance.now();
+    for (const fid in food) {
+      const f = food[fid];
+      const s = worldToScreen(f.x, f.y);
+      if (s.x < -30 || s.x > W + 30 || s.y < -30 || s.y > H + 30) continue;
+      if (f.isCoin) {
+        const seed = f.x * 0.07 + f.y * 0.03;
+        const blink = 0.6 + 0.4 * Math.sin(now / 180 + seed);
+        const pulse = 0.85 + 0.25 * Math.sin(now / 260 + seed);
+        const r = f.r * zoom * pulse;
+
+        // glow lembut di belakang koin
+        ctx.globalAlpha = 0.22 * blink;
+        ctx.fillStyle = '#FFD23C';
+        const gr = r * 2.4;
+        ctx.fillRect(Math.round(s.x - gr), Math.round(s.y - gr), Math.round(gr * 2), Math.round(gr * 2));
+
+        // sparkle kecil berputar mengelilingi koin
+        ctx.globalAlpha = 0.85 * blink;
+        ctx.fillStyle = '#fff6cc';
+        const spinR = r * 2.1;
+        for (let i = 0; i < 3; i++) {
+          const ang = now / 500 + (i * Math.PI * 2 / 3);
+          const sx = s.x + Math.cos(ang) * spinR, sy = s.y + Math.sin(ang) * spinR;
+          const sp = Math.max(1, Math.round(1.5 * zoom));
+          ctx.fillRect(Math.round(sx - sp / 2), Math.round(sy - sp / 2), sp, sp);
+        }
+
+        // rim luar koin (emas gelap) lalu badan koin (emas terang) -> efek pixel-coin
+        ctx.globalAlpha = 1;
+        const rimC = shadeColor('#FFD23C', -60);
+        ctx.fillStyle = rimC;
+        ctx.fillRect(Math.round(s.x - r), Math.round(s.y - r), Math.round(r * 2), Math.round(r * 2));
+        const innerR = r * 0.72;
+        ctx.fillStyle = '#FFD23C';
+        ctx.fillRect(Math.round(s.x - innerR), Math.round(s.y - innerR), Math.round(innerR * 2), Math.round(innerR * 2));
+
+        // kilau highlight yang berkedip di sudut koin
+        ctx.globalAlpha = blink;
+        ctx.fillStyle = '#fffde8';
+        const hr = innerR * 0.4;
+        ctx.fillRect(Math.round(s.x - innerR * 0.35 - hr), Math.round(s.y - innerR * 0.35 - hr), Math.round(hr * 1.6), Math.round(hr * 1.6));
+        ctx.globalAlpha = 1;
+      } else {
+        const r = f.r * zoom;
+        ctx.fillStyle = f.color;
+        ctx.fillRect(Math.round(s.x - r), Math.round(s.y - r), Math.round(r * 2), Math.round(r * 2));
+      }
+    }
+  }
+  function drawParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i]; p.life--; if (p.life <= 0) { particles.splice(i, 1); continue; }
+      const s = worldToScreen(p.x, p.y);
+      ctx.globalAlpha = p.life / 20;
+      const sz = Math.round(p.r * 1.6 * zoom);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(Math.round(s.x - sz / 2), Math.round(s.y - sz / 2), sz, sz);
+      ctx.globalAlpha = 1;
+    }
+  }
+  function wormRadius(w) {
+    return Math.min(28, 6 + w.len * 0.18);
+  }
+
+  function shadeColor(hex, percent) {
+    const num = parseInt(hex.replace('#', ''), 16);
+    let r = (num >> 16) + percent, g = ((num >> 8) & 0x00FF) + percent, b = (num & 0x0000FF) + percent;
+    r = Math.max(0, Math.min(255, r)); g = Math.max(0, Math.min(255, g)); b = Math.max(0, Math.min(255, b));
+    return '#' + (0x1000000 + r * 0x10000 + g * 0x100 + b).toString(16).slice(1);
+  }
+
+  function drawWorm(w) {
+    if (!w.alive) return;
+    const segR = wormRadius(w) * zoom;
+    const darkC = w.colorB || shadeColor(w.color, -55);
+    const multi = w.colors && w.colors.length > 1;
+    for (let i = w.segs.length - 1; i >= 0; i--) {
+      const seg = w.segs[i]; const s = worldToScreen(seg.x, seg.y);
+      if (s.x < -40 || s.x > W + 40 || s.y < -40 || s.y > H + 40) continue;
+      const size = Math.round((i === 0 ? segR + 3 : segR) * 1.8);
+      const px = Math.round(s.x - size / 2), py = Math.round(s.y - size / 2);
+      ctx.fillStyle = multi ? w.colors[Math.floor(i / 2) % w.colors.length] : ((i % 6 < 3) ? w.color : darkC);
+      ctx.fillRect(px, py, size, size);
+    }
+    const head = worldToScreen(w.segs[0].x, w.segs[0].y);
+    const ex1 = head.x + Math.cos(w.angle + 0.5) * segR * 0.5, ey1 = head.y + Math.sin(w.angle + 0.5) * segR * 0.5;
+    const ex2 = head.x + Math.cos(w.angle - 0.5) * segR * 0.5, ey2 = head.y + Math.sin(w.angle - 0.5) * segR * 0.5;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(Math.round(ex1 - 2), Math.round(ey1 - 2), 4, 4);
+    ctx.fillRect(Math.round(ex2 - 2), Math.round(ey2 - 2), 4, 4);
+    if (w.id !== playerId) {
+      ctx.font = "13px 'Silkscreen', 'Courier New'"; ctx.fillStyle = '#ddd'; ctx.textAlign = 'center';
+      ctx.fillText(w.name, head.x, head.y - segR - 12);
+    }
+    drawChatBubble(w, head, segR);
+  }
+
+  // balon chat kecil yang muncul di atas kepala worm ketika pemain (termasuk kita)
+  // mengirim pesan, biar semua orang di server bisa lihat langsung di map, bukan cuma di panel chat.
+  function drawChatBubble(w, head, segR) {
+    const b = chatBubbles[w.id];
+    if (!b) return;
+    const now = performance.now();
+    if (now > b.expire) { delete chatBubbles[w.id]; return; }
+    if (head.x < -80 || head.x > W + 80 || head.y < -60 || head.y > H + 60) return;
+
+    ctx.font = "11px 'Silkscreen', 'Courier New'";
+    const maxWidth = 180;
+    let text = b.text;
+    if (ctx.measureText(text).width > maxWidth) {
+      while (text.length > 1 && ctx.measureText(text + '…').width > maxWidth) text = text.slice(0, -1);
+      text += '…';
+    }
+    const paddingX = 8, paddingY = 6;
+    const textW = ctx.measureText(text).width;
+    const boxW = textW + paddingX * 2, boxH = 20 + paddingY;
+    const bx = head.x - boxW / 2;
+    const by = head.y - segR - 34 - boxH;
+
+    // fade out saat mendekati waktu habis
+    const remain = b.expire - now;
+    const alpha = remain < 500 ? Math.max(0, remain / 500) : 1;
+
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = 'rgba(0,0,0,0.75)';
+    ctx.strokeStyle = w.id === playerId ? '#3CFFA0' : '#FFD23C';
+    ctx.lineWidth = 1.5;
+    ctx.fillRect(bx, by, boxW, boxH);
+    ctx.strokeRect(bx, by, boxW, boxH);
+    // ekor kecil segitiga mengarah ke worm
+    ctx.beginPath();
+    ctx.moveTo(head.x - 5, by + boxH);
+    ctx.lineTo(head.x + 5, by + boxH);
+    ctx.lineTo(head.x, by + boxH + 7);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(0,0,0,0.75)';
+    ctx.fill();
+
+    ctx.fillStyle = '#eafff2';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, head.x, by + boxH / 2 + 4);
+    ctx.globalAlpha = 1;
+  }
+  function drawMinimap() {
+    mctx.clearRect(0, 0, mmSize, mmSize);
+    mctx.fillStyle = 'rgba(255,255,255,0.04)'; mctx.fillRect(0, 0, mmSize, mmSize);
+    const scaleX = mmSize / WORLD.w, scaleY = mmSize / WORLD.h;
+    for (const w of worms) {
+      if (!w.alive) continue;
+      const h = w.segs[0];
+      const mx = h.x * scaleX, my = h.y * scaleY;
+      if (w.id === playerId) {
+        mctx.fillStyle = '#3CFFA0';
+        mctx.fillRect(mx - 2.5, my - 2.5, 5, 5);
+      } else {
+        mctx.fillStyle = 'rgba(255,255,255,0.55)';
+        mctx.fillRect(mx - 1.5, my - 1.5, 3, 3);
+      }
+    }
+  }
+  function updateHUD() {
+    const p = getPlayer(); if (!p) return;
+    document.querySelector('#hud .score').textContent = Math.floor(p.len);
+    document.getElementById('boostFill').style.width = p.boostFuel + '%';
+    const ranked = [...worms].sort((a, b) => b.len - a.len).slice(0, 8);
+    document.getElementById('lbRows').innerHTML = ranked.map((w, i) =>
+      `<div class="row ${w.id === playerId ? 'me' : ''}"><span>${i + 1}. ${w.name}</span><span>${Math.floor(w.len)}</span></div>`
+    ).join('');
+  }
+
+  // ---- network push (throttled) ----
+  function pushLocalStateToFirebase(now) {
+    if (!myPlayerRef) return;
+    if (now - lastNetPush < 100) return;
+    lastNetPush = now;
+    const p = getPlayer();
+    if (!p || !p.alive) return;
+    myPlayerRef.update({
+      x: p.segs[0].x, y: p.segs[0].y, angle: p.angle,
+      len: p.len, alive: true, updatedAt: firebase.database.ServerValue.TIMESTAMP
+    });
+  }
+
+  function loop(ts) {
+    if (!running) return;
+    const dt = lastTime ? (ts - lastTime) : 16;
+    lastTime = ts;
+    dtScale = Math.min(2.2, dt / 16.67);
+
+    const p = getPlayer();
+    if (p) updateLocalWorm(p);
+    for (const w of worms) { if (w.isRemote) updateRemoteWorm(w); }
+    for (const w of worms.slice()) { if (w.isBot) updateBotWorm(w, dt); }
+    processBotRespawns();
+    checkCollisions();
+    pushLocalStateToFirebase(performance.now());
+
+    if (p && p.alive) {
+      camera.x += (p.segs[0].x - camera.x) * 0.12;
+      camera.y += (p.segs[0].y - camera.y) * 0.12;
+    }
+
+    // zoom out gradually as the worm grows, so a bigger snake still fits on screen
+    if (p) {
+      const targetZoom = Math.max(0.55, 1 - (p.len - 12) * 0.0035);
+      zoom += (targetZoom - zoom) * 0.05;
+    }
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#060a10'; ctx.fillRect(0, 0, W, H);
+    drawGrid(); drawBoundary(); drawFood(); drawParticles();
+    for (const w of worms) drawWorm(w);
+    resizeMinimap();
+    drawMinimap(); updateHUD();
+
+    animFrame = requestAnimationFrame(loop);
+  }
+
+  // ---- firebase server sync ----
+  function attachServerListeners() {
+    foodRef = db.ref('servers/' + SERVER_ID + '/food');
+    foodRef.on('child_added', snap => { food[snap.key] = snap.val(); });
+    foodRef.on('child_removed', snap => { delete food[snap.key]; });
+
+    foodRef.once('value', snap => {
+      const n = snap.exists() ? Object.keys(snap.val()).length : 0;
+      if (n < FOOD_TARGET / 2) spawnFoodIfNeeded(FOOD_TARGET - n);
+    });
+
+    playersRef = db.ref('servers/' + SERVER_ID + '/players');
+    playersRef.on('child_added', snap => {
+      if (snap.key === playerId) return;
+      const d = snap.val();
+      const w = makeWormObj(snap.key, d.name, true, d.x, d.y, d.color, false, d.colorB, d.colors || null);
+      w.angle = d.angle || 0; w.len = d.len || START_LEN;
+      w.targetPos = { x: d.x, y: d.y }; w.lastPos = { x: d.x, y: d.y }; w.lastUpdateT = performance.now();
+      worms.push(w);
+    });
+    playersRef.on('child_changed', snap => {
+      if (snap.key === playerId) return;
+      const d = snap.val();
+      const w = worms.find(x => x.id === snap.key);
+      if (!w) return;
+      w.lastPos = { x: w.segs[0].x, y: w.segs[0].y };
+      w.targetPos = { x: d.x, y: d.y };
+      w.lastUpdateT = performance.now();
+      w.angle = d.angle;
+      w.len = d.len;
+      w.alive = d.alive;
+    });
+    playersRef.on('child_removed', snap => {
+      worms = worms.filter(w => w.id !== snap.key);
+    });
+
+    attachChatListener();
+  }
+
+  function detachServerListeners() {
+    if (playersRef) playersRef.off();
+    if (foodRef) foodRef.off();
+    detachChatListener();
+    botRespawnQueue = [];
+  }
+
+  // ---- chat ----
+  let chatQueryRef = null;
+  let chatOpen = false;
+  let chatUnread = 0;
+  let lastChatSendTime = 0;
+  const renderedMsgKeys = new Set(); // cegah pesan sendiri dobel render (optimistic + child_added)
+  const chatRowByKey = {}; // msgKey -> elemen row chat, dipakai buat update saat pesan dihapus admin
+  const chatBubbles = {}; // wormId -> { text, expire } — balon chat di atas kepala worm
+  const CHAT_BUBBLE_MS = 4500;
+
+  function attachChatListener() {
+    const messagesEl = document.getElementById('chatMessages');
+    messagesEl.innerHTML = '';
+    chatUnread = 0;
+    updateChatBadge();
+    renderedMsgKeys.clear();
+    for (const k in chatRowByKey) delete chatRowByKey[k];
+    chatQueryRef = db.ref('servers/' + SERVER_ID + '/chat').limitToLast(50);
+    chatQueryRef.on('child_added', snap => {
+      // kalau pesan ini sudah ditampilkan lebih dulu secara optimistic (pesan kita sendiri), jangan dobel
+      if (renderedMsgKeys.has(snap.key)) return;
+      renderedMsgKeys.add(snap.key);
+      appendChatMessage(snap.val(), snap.key);
+    }, err => {
+      // ini yang paling penting: kalau baca chat kena "permission_denied", artinya rules
+      // Firebase Realtime Database untuk path servers/<id>/chat belum ngizinin read/write —
+      // beda dari path players/food yang mungkin rules-nya lebih longgar.
+      console.error('Gagal baca chat (cek Firebase Rules untuk path servers/' + SERVER_ID + '/chat):', err);
+      appendSystemChatMessage('⚠ Gagal memuat chat server (' + (err && err.code ? err.code : 'error') + '). Kemungkinan izin Firebase belum diatur untuk fitur chat.');
+    });
+    // pesan yang dihapus/diubah admin dari panel admin masuk lewat child_changed, bukan child_added lagi
+    chatQueryRef.on('child_changed', snap => {
+      updateChatMessage(snap.key, snap.val());
+    });
+  }
+
+  function appendSystemChatMessage(text) {
+    const messagesEl = document.getElementById('chatMessages');
+    const row = document.createElement('div');
+    row.className = 'chatMsgRow';
+    row.style.color = '#FF5C7A';
+    row.textContent = text;
+    messagesEl.appendChild(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function detachChatListener() {
+    if (chatQueryRef) chatQueryRef.off();
+    chatQueryRef = null;
+  }
+
+  function appendChatMessage(d, key) {
+    if (!d) return null;
+    const messagesEl = document.getElementById('chatMessages');
+    const isMe = d.uid === playerId;
+    const isDeleted = !!d.deleted;
+    const row = document.createElement('div');
+    row.className = 'chatMsgRow' + (isMe ? ' me' : '');
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'chatMsgName';
+    nameSpan.textContent = (d.name || '???') + ': ';
+    const textSpan = document.createElement('span');
+    textSpan.className = 'chatMsgText';
+    if (isDeleted) {
+      textSpan.textContent = '⚠ Pesan telah dihapus sistem';
+      textSpan.style.color = '#666';
+      textSpan.style.fontStyle = 'italic';
+    } else {
+      textSpan.textContent = d.text || '';
+    }
+    row.appendChild(nameSpan);
+    row.appendChild(textSpan);
+    messagesEl.appendChild(row);
+    while (messagesEl.children.length > 50) {
+      const removed = messagesEl.removeChild(messagesEl.firstChild);
+      for (const k in chatRowByKey) { if (chatRowByKey[k] === removed) delete chatRowByKey[k]; }
+    }
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    if (key) chatRowByKey[key] = row;
+    if (!chatOpen && !isMe && !isDeleted) {
+      chatUnread++;
+      updateChatBadge();
+    }
+    if (d.uid && d.text && !isDeleted) {
+      chatBubbles[d.uid] = { text: d.text, expire: performance.now() + CHAT_BUBBLE_MS };
+    }
+    return row;
+  }
+
+  // dipanggil saat admin menghapus/mengubah pesan lewat panel admin (event child_changed)
+  function updateChatMessage(key, d) {
+    if (!d) return;
+    const row = chatRowByKey[key];
+    if (!row) return; // pesan itu sudah tergeser keluar dari 50 baris terakhir, tidak perlu diupdate
+    if (d.deleted) {
+      const textSpan = row.querySelector('.chatMsgText');
+      if (textSpan) {
+        textSpan.textContent = '⚠ Pesan telah dihapus sistem';
+        textSpan.style.color = '#666';
+        textSpan.style.fontStyle = 'italic';
+      }
+    }
+  }
+
+  function updateChatBadge() {
+    const badge = document.getElementById('chatBadge');
+    if (chatUnread > 0) {
+      badge.style.display = 'flex';
+      badge.textContent = chatUnread > 9 ? '9+' : String(chatUnread);
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  function sendChatMessage() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    // dulu di sini dicek "running", tapi saat baru saja mati ada jeda beberapa saat
+    // (nunggu proses simpan statistik) di mana panel chat masih kebuka tapi "running"
+    // sudah false — pesan jadi gagal terkirim tanpa alasan yang kelihatan.
+    // sekarang cukup pastikan kita masih tersambung ke room chat servernya.
+    if (!text || !currentUser || !chatQueryRef) return;
+    const now = Date.now();
+    if (now - lastChatSendTime < 500) return; // anti-spam
+    lastChatSendTime = now;
+    const msg = {
+      uid: playerId, name: currentUser.name, text: text.slice(0, 140),
+      ts: firebase.database.ServerValue.TIMESTAMP
+    };
+    // tampilkan pesan kita duluan (optimistic) biar gak ada jeda/lag nunggu server,
+    // baru kirim ke firebase di belakang layar.
+    const ref = db.ref('servers/' + SERVER_ID + '/chat').push();
+    renderedMsgKeys.add(ref.key);
+    const row = appendChatMessage(msg, ref.key);
+    ref.set(msg).catch(err => {
+      renderedMsgKeys.delete(ref.key);
+      console.error('Gagal kirim chat (cek Firebase Rules untuk path servers/' + SERVER_ID + '/chat):', err);
+      if (row) {
+        row.style.opacity = '0.55';
+        const failSpan = document.createElement('span');
+        failSpan.style.color = '#FF5C7A';
+        failSpan.style.marginLeft = '6px';
+        failSpan.textContent = '(gagal terkirim, ' + (err && err.code ? err.code : 'error') + ')';
+        row.appendChild(failSpan);
+      }
+    });
+    input.value = '';
+  }
+
+  function setChatOpen(open) {
+    chatOpen = open;
+    document.getElementById('chatPanel').classList.toggle('visible', chatOpen);
+    if (chatOpen) {
+      chatUnread = 0;
+      updateChatBadge();
+      document.getElementById('chatInput').focus();
+    } else {
+      document.getElementById('chatInput').blur();
+    }
+  }
+
+  document.getElementById('chatToggleBtn').addEventListener('click', () => setChatOpen(!chatOpen));
+  document.getElementById('chatCloseBtn').addEventListener('click', () => setChatOpen(false));
+  document.getElementById('chatSendBtn').addEventListener('click', sendChatMessage);
+  document.getElementById('chatInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); sendChatMessage(); }
+    else if (e.key === 'Escape') { e.preventDefault(); setChatOpen(false); }
+    e.stopPropagation();
+  });
+  // klik/tap di luar panel chat (misal di area game) buat nutup chat juga
+  document.addEventListener('pointerdown', e => {
+    if (!chatOpen) return;
+    const panel = document.getElementById('chatPanel');
+    const toggle = document.getElementById('chatToggleBtn');
+    if (panel.contains(e.target) || toggle.contains(e.target)) return;
+    setChatOpen(false);
+  });
+
+  // ---- start game ----
+  let sessionStartTime = 0;
+  function startGame() {
+    playTrack('game');
+    worms = []; food = {}; particles = [];
+    playerId = currentUser.uid;
+    sessionStartTime = Date.now();
+    setPresenceStatus('ingame');
+    if (currentUser) {
+      const st = userStats(currentUser);
+      st.totalMatch += 1;
+      currentUser.stats = st;
+      db.ref('users/' + currentUser.uid + '/stats/totalMatch').set(st.totalMatch).catch(() => {});
+    }
+    const px = rand(WORLD.w * 0.3, WORLD.w * 0.7), py = rand(WORLD.h * 0.3, WORLD.h * 0.7);
+    const myColor = localStorage.getItem(SKIN_STORAGE_KEY) || SKIN_COLORS[0];
+    const myColorB = localStorage.getItem(SKIN_STORAGE_KEY_B) || null;
+    const myColors = readStoredColors();
+    const me = makeWormObj(playerId, currentUser.name, false, px, py, myColor, false, myColorB, myColors);
+    worms.push(me);
+
+    myPlayerRef = db.ref('servers/' + SERVER_ID + '/players/' + playerId);
+    myPlayerRef.set({ name: currentUser.name, x: px, y: py, angle: 0, len: START_LEN, color: myColor, colorB: myColorB, colors: myColors || null, alive: true, isBot: false, updatedAt: firebase.database.ServerValue.TIMESTAMP });
+    myPlayerRef.onDisconnect().remove();
+
+    attachServerListeners();
+
+    botRespawnQueue = [];
+    const sconf = SERVERS[SERVER_ID];
+    if (sconf && sconf.hasBots) spawnInitialBots(sconf.botCount);
+
+    document.getElementById('hud').style.display = 'block';
+    const hudCoinRow = document.getElementById('hudCoinRow');
+    if (hudCoinRow) hudCoinRow.style.display = (sconf && sconf.hasCoin) ? 'block' : 'none';
+    document.getElementById('hudCoinNum').textContent = (currentUser && currentUser.coin) || 0;
+    document.getElementById('leaderboard').style.display = 'block';
+    document.getElementById('minimapWrap').style.display = 'block';
+    resizeMinimap();
+    document.getElementById('boostBar').style.display = 'block';
+    if (isTouch) { boostBtn.style.display = 'flex'; joystickZone.style.display = 'block'; }
+    document.getElementById('chatToggleBtn').style.display = 'flex';
+
+    running = true;
+    lastTime = 0;
+    cancelAnimationFrame(animFrame);
+    animFrame = requestAnimationFrame(loop);
+  }
+
+  document.getElementById('respawnBtn').addEventListener('click', () => {
+    document.getElementById('deathScreen').classList.remove('visible');
+    startGame();
+  });
+})();
+</script>
+</body>
+</html>
