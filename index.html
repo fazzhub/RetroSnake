@@ -212,6 +212,7 @@ input:focus { border-color: #3CFFA0; }
 }
 .skinPreview .body { width: 40px; height: 40px; }
 .skinPreview .body.twoTone { background-image: linear-gradient(135deg, var(--sc) 50%, var(--scB) 50%) !important; }
+.skinPreview .body.multiTone { background-image: var(--grad) !important; }
 .skinGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
 .skinSwatch {
   width: 100%; aspect-ratio: 1; cursor: pointer;
@@ -225,6 +226,9 @@ input:focus { border-color: #3CFFA0; }
 }
 .skinSwatch.twoTone::after {
   background-image: linear-gradient(135deg, var(--sc) 50%, var(--scB) 50%);
+}
+.skinSwatch.multiTone::after {
+  background-image: var(--grad);
 }
 .skinConfirmBtn {
   width: 100%; padding: 14px; font-size: 13px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 2px;
@@ -258,34 +262,61 @@ input:focus { border-color: #3CFFA0; }
 
 .sectionLabel {
   display: flex; align-items: center; justify-content: center; gap: 10px;
-  color: #3CFFA0; font-size: 15px; font-weight: 700; letter-spacing: 3px;
-  margin-bottom: clamp(14px, 3vh, 24px);
+  color: #3CFFA0; font-size: 14px; font-weight: 700; letter-spacing: 3px;
+  margin-bottom: clamp(4px, 0.8vh, 8px);
 }
 .sectionLabel .sq { width: 6px; height: 6px; border: 1.5px solid #3CFFA0; }
+.sectionSubLabel {
+  color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 3px;
+  text-align: center; flex-shrink: 0;
+  margin-bottom: clamp(10px, 2vh, 20px);
+}
 
 #shopScreen { overflow: hidden; }
-#shopScreen .screenTopBar { flex-shrink: 0; padding: clamp(8px, 2vh, 18px) 0 clamp(4px, 1.5vh, 10px); }
-#shopScreen .screenDivider { flex-shrink: 0; margin-bottom: clamp(8px, 2vh, 20px); }
-#shopScreen .logo { flex-shrink: 0; font-size: clamp(18px, 5vh, 46px); margin-bottom: 2px; }
-#shopScreen .sectionLabel { flex-shrink: 0; margin-bottom: clamp(8px, 2vh, 24px); }
+#shopScreen .screenTopBar { flex-shrink: 0; padding: clamp(6px, 1.6vh, 14px) 0 clamp(3px, 1.2vh, 8px); }
+#shopScreen .screenDivider { flex-shrink: 0; margin-bottom: clamp(6px, 1.6vh, 16px); }
+#shopScreen .logo { flex-shrink: 0; font-size: clamp(16px, 4.2vh, 38px); margin-bottom: 2px; }
+#shopScreen .sectionLabel { flex-shrink: 0; }
 
-.skinShopGrid {
+.skinShopGridWrap {
+  position: relative;
   width: 100%; max-width: 640px;
-  display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); grid-template-rows: repeat(2, minmax(0,1fr));
-  gap: clamp(6px, 1.6vh, 14px);
   flex: 1 1 auto; min-height: 0;
 }
+.skinShopGridWrap .skinShopGrid { width: 100%; height: 100%; }
+.skinShopGrid {
+  display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); grid-template-rows: repeat(2, minmax(0,1fr));
+  gap: clamp(6px, 1.4vh, 12px);
+}
+.skinPageArrow {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
+  border: 1.5px solid #3CFFA0; background: #050505; color: #3CFFA0;
+  width: 24px; height: 24px;
+  font-size: 13px; cursor: pointer; font-family: 'Silkscreen', monospace;
+  display: flex; align-items: center; justify-content: center;
+}
+.skinPageArrow.left { left: -8px; }
+.skinPageArrow.right { right: -8px; }
+.skinPageArrow:hover { background: rgba(60,255,160,0.15); }
+.skinPageArrow:disabled { opacity: 0.25; cursor: not-allowed; }
+.skinPageArrow.hidden { visibility: hidden; }
+
 @media (max-width: 340px) { .skinShopGrid { grid-template-columns: minmax(0,1fr); grid-template-rows: repeat(4, minmax(0,1fr)); } }
 .skinShopCard {
   border: 1.5px solid #3CFFA0; background: rgba(0,0,0,0.4);
-  padding: clamp(4px, 1.5vh, 22px) clamp(8px, 3vw, 16px); text-align: center;
+  padding: clamp(10px, 2vh, 18px) clamp(12px, 3.4vw, 18px); text-align: center;
   min-width: 0; min-height: 0; height: 100%;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   overflow: hidden;
 }
-.skinShopSwatches { display: flex; justify-content: center; gap: clamp(6px, 3vw, 12px); margin-bottom: clamp(4px, 1.6vh, 18px); flex-shrink: 0; }
+.skinShopSwatches {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%;
+  gap: clamp(7px, 2.2vw, 10px); margin-bottom: clamp(6px, 1.5vh, 14px); flex-shrink: 0;
+}
 .skinShopSwatches .sw {
-  width: clamp(28px, min(8vh, 18vw), 78px); height: clamp(28px, min(8vh, 18vw), 78px); position: relative;
+  width: clamp(22px, min(5.6vh, 11.5vw), 52px); height: clamp(22px, min(5.6vh, 11.5vw), 52px);
+  flex-shrink: 0; position: relative;
   box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
 }
 .skinShopSwatches .sw.eyes::before, .skinShopSwatches .sw.eyes::after {
@@ -293,11 +324,11 @@ input:focus { border-color: #3CFFA0; }
 }
 .skinShopSwatches .sw.eyes::before { left: 24%; }
 .skinShopSwatches .sw.eyes::after { right: 24%; }
-.skinShopPrice { font-size: clamp(7px, 1.4vh, 10px); letter-spacing: 2px; color: #3CFFA0; margin-bottom: clamp(2px, 0.6vh, 4px); flex-shrink: 0; }
-.skinShopPriceVal { font-size: clamp(12px, 2.6vh, 20px); color: #fff; font-weight: 700; margin-bottom: clamp(4px, 1.6vh, 16px); flex-shrink: 0; }
-.skinShopPriceVal .coinWord { font-size: clamp(9px, 1.7vh, 13px); color: #FFD23C; margin-left: 4px; }
+.skinShopPrice { font-size: clamp(6px, 1.2vh, 9px); letter-spacing: 2px; color: #3CFFA0; margin-bottom: clamp(2px, 0.5vh, 3px); flex-shrink: 0; }
+.skinShopPriceVal { font-size: clamp(11px, 2.2vh, 17px); color: #fff; font-weight: 700; margin-bottom: clamp(4px, 1.3vh, 13px); flex-shrink: 0; }
+.skinShopPriceVal .coinWord { font-size: clamp(8px, 1.5vh, 11px); color: #FFD23C; margin-left: 4px; }
 .skinShopBuyBtn {
-  width: 100%; padding: clamp(6px, 1.4vh, 13px); font-size: clamp(9px, 1.7vh, 13px); font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 1px;
+  width: 100%; padding: clamp(5px, 1.2vh, 11px); font-size: clamp(8px, 1.5vh, 12px); font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 1px;
   border: 1.5px solid #3CFFA0; cursor: pointer;
   background: transparent; color: #3CFFA0;
   display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -314,6 +345,25 @@ input:focus { border-color: #3CFFA0; }
   color: #FF5C7A; font-size: clamp(7px, 1.3vh, 10px); text-align: center; min-height: clamp(8px, 1.4vh, 14px); margin-bottom: clamp(2px, 0.8vh, 8px);
   font-family: 'Silkscreen', monospace; letter-spacing: 1px; flex-shrink: 0;
 }
+
+.skinShopSwatches.multi { gap: clamp(2px, 1vw, 6px); }
+.skinShopSwatches.multi .sw {
+  width: clamp(11px, min(3.2vh, 6vw), 34px); height: clamp(11px, min(3.2vh, 6vw), 34px);
+}
+
+.shopTierNav {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  flex-shrink: 0; margin-bottom: clamp(10px, 2vh, 20px);
+}
+.shopTierNav .sectionSubLabel { margin-bottom: 0; min-width: 100px; }
+.tierArrowBtn {
+  border: 1.5px solid #3CFFA0; background: transparent; color: #3CFFA0;
+  width: 30px; height: 30px; font-size: 16px; cursor: pointer;
+  font-family: 'Silkscreen', monospace; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.tierArrowBtn:hover { background: rgba(60,255,160,0.08); }
+.tierArrowBtn:disabled { opacity: 0.3; cursor: not-allowed; }
 
 .errMsg {
   color: #FF5C7A; font-size: 11px; margin: -2px 0 12px 2px; min-height: 12px;
@@ -608,6 +658,70 @@ input:focus { border-color: #3CFFA0; }
 #joyBase { width: 120px; height: 120px; background: rgba(255,255,255,0.06); border: 3px solid rgba(255,255,255,0.35); margin-left: -60px; margin-top: -60px; }
 #joyStick { width: 52px; height: 52px; background: #3CFFA0; box-shadow: 0 0 12px rgba(60,255,160,0.7); border: none; margin-left: -26px; margin-top: -26px; }
 
+/* ---------- Chat ---------- */
+#chatToggleBtn {
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 8;
+  width: 44px; height: 40px; display: none; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.55); border: 2px solid #3CFFA0; color: #3CFFA0;
+  cursor: pointer; padding: 0;
+}
+#chatToggleBtn:active { background: rgba(60,255,160,0.15); }
+#chatToggleBtn svg { image-rendering: pixelated; }
+#chatBadge {
+  position: absolute; top: -7px; right: -7px; min-width: 16px; height: 16px; padding: 0 3px;
+  background: #FF5C7A; color: #000; border: 1.5px solid #050505;
+  font-family: 'Silkscreen', monospace; font-size: 9px; font-weight: 700;
+  display: none; align-items: center; justify-content: center;
+}
+
+#chatPanel {
+  position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 8;
+  width: min(280px, calc(100vw - 24px)); max-height: 46vh;
+  background: rgba(0,0,0,0.8); border: 2px solid #3CFFA0;
+  display: none; flex-direction: column;
+  font-family: 'Silkscreen', monospace;
+}
+#chatPanel.visible { display: flex; }
+#chatPanelHead {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.2);
+  color: #3CFFA0; font-size: 10px; letter-spacing: 1px; font-weight: 700;
+}
+#chatCloseBtn {
+  background: transparent; border: none; color: #FF5C7A; font-size: 16px; line-height: 1;
+  cursor: pointer; padding: 0 4px; font-family: 'Silkscreen', monospace;
+}
+#chatMessages {
+  flex: 1 1 auto; min-height: 60px; max-height: 32vh; overflow-y: auto; overscroll-behavior: contain;
+  padding: 6px 8px; display: flex; flex-direction: column; gap: 3px;
+}
+.chatMsgRow { font-size: 11px; line-height: 1.5; color: #ddd; word-break: break-word; }
+.chatMsgRow.me .chatMsgName { color: #3CFFA0; }
+.chatMsgName { color: #FFD23C; font-weight: 700; }
+.chatMsgText { color: #eee; }
+.chatMsgRow.system { background: rgba(168,107,255,0.08); border-left: 2px solid #a86bff; padding: 4px 6px; margin: 2px 0; }
+.chatMsgRow.system .chatMsgName { color: #a86bff; }
+.chatMsgRow.system .chatMsgText { color: #d9c9ff; }
+#chatInputRow {
+  display: flex; border-top: 1px solid rgba(255,255,255,0.2);
+}
+#chatInput {
+  flex: 1 1 auto; min-width: 0; background: transparent; border: none; outline: none;
+  color: #eafff2; font-family: 'Silkscreen', monospace; font-size: 11px; padding: 8px;
+}
+#chatInput::placeholder { color: #555; }
+#chatSendBtn {
+  flex-shrink: 0; width: 38px; background: transparent; border: none; border-left: 1px solid rgba(255,255,255,0.2);
+  color: #3CFFA0; font-size: 13px; cursor: pointer;
+}
+#chatSendBtn:active { background: rgba(60,255,160,0.15); }
+
+@media (max-width: 640px) {
+  #chatToggleBtn { top: 10px; width: 38px; height: 34px; }
+  #chatPanel { top: 50px; }
+}
+
+
 @media (max-width: 640px) {
   #leaderboard { font-size: 9px; width: 100px; padding: 5px 8px; }
   #leaderboard h3 { font-size: 10px; }
@@ -751,8 +865,17 @@ input:focus { border-color: #3CFFA0; }
   <div class="screenDivider" style="margin-top: clamp(14px, 3vh, 30px);"></div>
 
   <div class="sectionLabel"><span class="sq"></span><span class="sq"></span> SKINS <span class="sq"></span><span class="sq"></span></div>
+  <div class="shopTierNav">
+    <button class="tierArrowBtn" id="shopTierPrev">&#8249;</button>
+    <div class="sectionSubLabel" id="shopTierLabel">COMMON</div>
+    <button class="tierArrowBtn" id="shopTierNext">&#8250;</button>
+  </div>
 
-  <div class="skinShopGrid" id="skinShopGrid"></div>
+  <div class="skinShopGridWrap">
+    <button class="skinPageArrow left" id="skinPagePrev">&#8249;</button>
+    <div class="skinShopGrid" id="skinShopGrid"></div>
+    <button class="skinPageArrow right" id="skinPageNext">&#8250;</button>
+  </div>
 
   <div class="footNote">HAVE FUN &amp; GOOD LUCK!</div>
 </div>
@@ -847,6 +970,31 @@ input:focus { border-color: #3CFFA0; }
 <div id="joyBase"></div>
 <div id="joyStick"></div>
 <div id="boostBtn">BOOST</div>
+
+<button id="chatToggleBtn" aria-label="Chat">
+  <svg viewBox="0 0 21 18" width="22" height="18" shape-rendering="crispEdges">
+    <rect x="3" y="0" width="3" height="3" fill="currentColor"/><rect x="6" y="0" width="3" height="3" fill="currentColor"/><rect x="9" y="0" width="3" height="3" fill="currentColor"/><rect x="12" y="0" width="3" height="3" fill="currentColor"/><rect x="15" y="0" width="3" height="3" fill="currentColor"/>
+    <rect x="0" y="3" width="3" height="3" fill="currentColor"/><rect x="3" y="3" width="3" height="3" fill="currentColor"/><rect x="6" y="3" width="3" height="3" fill="currentColor"/><rect x="9" y="3" width="3" height="3" fill="currentColor"/><rect x="12" y="3" width="3" height="3" fill="currentColor"/><rect x="15" y="3" width="3" height="3" fill="currentColor"/><rect x="18" y="3" width="3" height="3" fill="currentColor"/>
+    <rect x="0" y="6" width="3" height="3" fill="currentColor"/><rect x="3" y="6" width="3" height="3" fill="#050505"/><rect x="6" y="6" width="3" height="3" fill="#050505"/><rect x="9" y="6" width="3" height="3" fill="currentColor"/><rect x="12" y="6" width="3" height="3" fill="#050505"/><rect x="15" y="6" width="3" height="3" fill="#050505"/><rect x="18" y="6" width="3" height="3" fill="currentColor"/>
+    <rect x="0" y="9" width="3" height="3" fill="currentColor"/><rect x="3" y="9" width="3" height="3" fill="currentColor"/><rect x="6" y="9" width="3" height="3" fill="currentColor"/><rect x="9" y="9" width="3" height="3" fill="currentColor"/><rect x="12" y="9" width="3" height="3" fill="currentColor"/><rect x="15" y="9" width="3" height="3" fill="currentColor"/><rect x="18" y="9" width="3" height="3" fill="currentColor"/>
+    <rect x="3" y="12" width="3" height="3" fill="currentColor"/><rect x="6" y="12" width="3" height="3" fill="currentColor"/><rect x="9" y="12" width="3" height="3" fill="currentColor"/><rect x="12" y="12" width="3" height="3" fill="currentColor"/><rect x="15" y="12" width="3" height="3" fill="currentColor"/>
+    <rect x="6" y="15" width="3" height="3" fill="currentColor"/>
+  </svg>
+  <span id="chatBadge"></span>
+</button>
+
+<div id="chatPanel">
+  <div id="chatPanelHead">
+    <span>CHAT SERVER</span>
+    <button id="chatCloseBtn">&times;</button>
+  </div>
+  <div id="chatMessages"></div>
+  <div id="chatInputRow">
+    <input id="chatInput" type="text" placeholder="Ketik pesan..." maxlength="140" autocomplete="off" />
+    <button id="chatSendBtn">&#9658;</button>
+  </div>
+</div>
+
 
 <!-- SKIN PICKER MODAL -->
 <div class="skinOverlay" id="skinOverlay">
@@ -1208,49 +1356,84 @@ input:focus { border-color: #3CFFA0; }
   const SKIN_COLORS = ['#3CFFA0', '#FF5C7A', '#FFD23C', '#a86bff', '#4FC3F7', '#FF9F43', '#ff5cf1', '#ffffff'];
   const SKIN_STORAGE_KEY = 'retrosnake_skin_color';
   const SKIN_STORAGE_KEY_B = 'retrosnake_skin_color_b';
+  const SKIN_STORAGE_KEY_COLORS = 'retrosnake_skin_colors';
+  function readStoredColors() {
+    try {
+      const raw = localStorage.getItem(SKIN_STORAGE_KEY_COLORS);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
   let selectedSkin = {
     colorA: localStorage.getItem(SKIN_STORAGE_KEY) || SKIN_COLORS[0],
-    colorB: localStorage.getItem(SKIN_STORAGE_KEY_B) || null
+    colorB: localStorage.getItem(SKIN_STORAGE_KEY_B) || null,
+    colors: readStoredColors()
   };
 
   // ================= SHOP =================
-  const SHOP_SKINS = [
-    { id: 'shop1', colorA: '#FF5C7A', colorB: '#4FC3F7', price: 100 },
-    { id: 'shop2', colorA: '#FFD23C', colorB: '#2b2b2b', price: 100 },
-    { id: 'shop3', colorA: '#4FC3F7', colorB: '#3CFFA0', price: 100 },
-    { id: 'shop4', colorA: '#FF9F43', colorB: '#FFD23C', price: 100 }
+  const SHOP_TIERS = [
+    {
+      name: 'COMMON',
+      skins: [
+        { id: 'shop1', colorA: '#FF5C7A', colorB: '#4FC3F7', price: 100 },
+        { id: 'shop2', colorA: '#FFD23C', colorB: '#2b2b2b', price: 100 },
+        { id: 'shop3', colorA: '#4FC3F7', colorB: '#3CFFA0', price: 100 },
+        { id: 'shop4', colorA: '#FF9F43', colorB: '#FFD23C', price: 100 }
+      ]
+    },
+    {
+      name: 'UNCOMMON',
+      skins: [
+        { id: 'shop5', colorA: '#FFC93C', colorB: '#7A1E1E', colors: ['#FFC93C', '#FF9C3C', '#FF6B3C', '#E63C3C'], price: 200 },
+        { id: 'shop6', colorA: '#4FE0FF', colorB: '#3a3a3a', colors: ['#4FE0FF', '#C24FFF', '#9C3CFF', '#6B1FCC'], price: 200 },
+        { id: 'shop7', colorA: '#8FE3FF', colorB: '#173a91', colors: ['#8FE3FF', '#4FC3F7', '#3C8CFF', '#1F4FE0'], price: 200 },
+        { id: 'shop8', colorA: '#E8FF3C', colorB: '#3a3a3a', colors: ['#E8FF3C', '#9CFF3C', '#4FCC3C', '#1F8C3C'], price: 200 },
+        { id: 'shop9', colorA: '#F5F0DC', colorB: '#8a7a1f', colors: ['#B0B0B0', '#F5F0DC', '#F5E6A8', '#F2D66B'], price: 200 },
+        { id: 'shop10', colorA: '#FFD23C', colorB: '#5c1f8c', colors: ['#FF9C3C', '#FFD23C', '#FF3CE0', '#B33CFF'], price: 200 },
+        { id: 'shop11', colorA: '#F5F5F5', colorB: '#7A1E1E', colors: ['#B0B0B0', '#F5F5F5', '#FF6B5C', '#B32C1C'], price: 200 },
+        { id: 'shop12', colorA: '#4FC3F7', colorB: '#B32C1C', colors: ['#4FC3F7', '#7CFF3C', '#FFD23C', '#FF6B1C'], price: 200 }
+      ]
+    }
   ];
+  const SHOP_SKINS = SHOP_TIERS.flatMap(t => t.skins);
+  const SHOP_PAGE_SIZE = 4;
+  let shopTierIndex = 0;
+  let shopSkinPage = 0;
   function ownedSkins() { return (currentUser && currentUser.ownedSkins) || {}; }
   function ownedShopSkins() { return SHOP_SKINS.filter(s => ownedSkins()[s.id]); }
 
-  function applySkinPreview(colorA, colorB) {
+  function applySkinPreview(colorA, colorB, colors) {
     const body = document.getElementById('skinPreviewBody');
-    body.classList.toggle('twoTone', !!colorB);
+    const isMulti = colors && colors.length > 1;
+    body.classList.toggle('multiTone', !!isMulti);
+    body.classList.toggle('twoTone', !isMulti && !!colorB);
     body.style.setProperty('--sc', colorA);
     body.style.setProperty('--scB', colorB || colorA);
-    if (!colorB) body.style.background = colorA;
+    if (isMulti) body.style.setProperty('--grad', `linear-gradient(90deg, ${colors.join(',')})`);
+    if (!colorB && !isMulti) body.style.background = colorA;
   }
 
   function buildSkinGrid() {
     const grid = document.getElementById('skinGrid');
     grid.innerHTML = '';
-    const allSkins = SKIN_COLORS.map(c => ({ colorA: c, colorB: null }))
-      .concat(ownedShopSkins().map(s => ({ colorA: s.colorA, colorB: s.colorB })));
+    const allSkins = SKIN_COLORS.map(c => ({ colorA: c, colorB: null, colors: null }))
+      .concat(ownedShopSkins().map(s => ({ colorA: s.colorA, colorB: s.colorB, colors: s.colors || null })));
     allSkins.forEach(skin => {
+      const isMulti = skin.colors && skin.colors.length > 1;
       const isSelected = skin.colorA === selectedSkin.colorA && (skin.colorB || null) === (selectedSkin.colorB || null);
       const sw = document.createElement('div');
-      sw.className = 'skinSwatch' + (skin.colorB ? ' twoTone' : '') + (isSelected ? ' selected' : '');
+      sw.className = 'skinSwatch' + (isMulti ? ' multiTone' : (skin.colorB ? ' twoTone' : '')) + (isSelected ? ' selected' : '');
       sw.style.setProperty('--sc', skin.colorA);
       if (skin.colorB) sw.style.setProperty('--scB', skin.colorB);
+      if (isMulti) sw.style.setProperty('--grad', `linear-gradient(90deg, ${skin.colors.join(',')})`);
       sw.addEventListener('click', () => {
-        selectedSkin = { colorA: skin.colorA, colorB: skin.colorB || null };
-        applySkinPreview(skin.colorA, skin.colorB);
+        selectedSkin = { colorA: skin.colorA, colorB: skin.colorB || null, colors: skin.colors || null };
+        applySkinPreview(skin.colorA, skin.colorB, skin.colors);
         document.querySelectorAll('.skinSwatch').forEach(el => el.classList.remove('selected'));
         sw.classList.add('selected');
       });
       grid.appendChild(sw);
     });
-    applySkinPreview(selectedSkin.colorA, selectedSkin.colorB);
+    applySkinPreview(selectedSkin.colorA, selectedSkin.colorB, selectedSkin.colors);
   }
 
   document.getElementById('changeSkinBtn').addEventListener('click', () => {
@@ -1266,6 +1449,8 @@ input:focus { border-color: #3CFFA0; }
     localStorage.setItem(SKIN_STORAGE_KEY, selectedSkin.colorA);
     if (selectedSkin.colorB) localStorage.setItem(SKIN_STORAGE_KEY_B, selectedSkin.colorB);
     else localStorage.removeItem(SKIN_STORAGE_KEY_B);
+    if (selectedSkin.colors) localStorage.setItem(SKIN_STORAGE_KEY_COLORS, JSON.stringify(selectedSkin.colors));
+    else localStorage.removeItem(SKIN_STORAGE_KEY_COLORS);
     document.getElementById('skinOverlay').classList.remove('visible');
   });
 
@@ -1279,6 +1464,30 @@ input:focus { border-color: #3CFFA0; }
     document.getElementById('lobbyScreen').classList.remove('visible');
     document.getElementById('shopScreen').classList.add('visible');
     updateShopCoinDisplay();
+    shopTierIndex = 0;
+    shopSkinPage = 0;
+    buildShopGrid();
+  });
+
+  document.getElementById('shopTierPrev').addEventListener('click', () => {
+    shopTierIndex = (shopTierIndex - 1 + SHOP_TIERS.length) % SHOP_TIERS.length;
+    shopSkinPage = 0;
+    buildShopGrid();
+  });
+  document.getElementById('shopTierNext').addEventListener('click', () => {
+    shopTierIndex = (shopTierIndex + 1) % SHOP_TIERS.length;
+    shopSkinPage = 0;
+    buildShopGrid();
+  });
+
+  document.getElementById('skinPagePrev').addEventListener('click', () => {
+    shopSkinPage = Math.max(0, shopSkinPage - 1);
+    buildShopGrid();
+  });
+  document.getElementById('skinPageNext').addEventListener('click', () => {
+    const tier = SHOP_TIERS[shopTierIndex];
+    const totalPages = Math.max(1, Math.ceil(tier.skins.length / SHOP_PAGE_SIZE));
+    shopSkinPage = Math.min(totalPages - 1, shopSkinPage + 1);
     buildShopGrid();
   });
 
@@ -1295,17 +1504,26 @@ input:focus { border-color: #3CFFA0; }
   }
 
   function buildShopGrid() {
+    const tier = SHOP_TIERS[shopTierIndex];
+    document.getElementById('shopTierLabel').textContent = tier.name;
+    const totalPages = Math.max(1, Math.ceil(tier.skins.length / SHOP_PAGE_SIZE));
+    if (shopSkinPage >= totalPages) shopSkinPage = totalPages - 1;
+    if (shopSkinPage < 0) shopSkinPage = 0;
+    const start = shopSkinPage * SHOP_PAGE_SIZE;
+    const pageSkins = tier.skins.slice(start, start + SHOP_PAGE_SIZE);
+
     const grid = document.getElementById('skinShopGrid');
     grid.innerHTML = '';
-    SHOP_SKINS.forEach(skin => {
+    pageSkins.forEach(skin => {
       const isOwned = !!ownedSkins()[skin.id];
+      const isMulti = skin.colors && skin.colors.length > 1;
+      const swatchesHtml = isMulti
+        ? skin.colors.map(c => `<div class="sw" style="background:${c};"></div>`).join('') + `<div class="sw eyes" style="background:${skin.colorB || '#333'};"></div>`
+        : `<div class="sw" style="background:${skin.colorA};"></div><div class="sw eyes" style="background:${skin.colorB};"></div>`;
       const card = document.createElement('div');
       card.className = 'skinShopCard';
       card.innerHTML = `
-        <div class="skinShopSwatches">
-          <div class="sw" style="background:${skin.colorA};"></div>
-          <div class="sw eyes" style="background:${skin.colorB};"></div>
-        </div>
+        <div class="skinShopSwatches${isMulti ? ' multi' : ''}">${swatchesHtml}</div>
         <div class="skinShopPrice">PRICE</div>
         <div class="skinShopPriceVal">${skin.price}<span class="coinWord">COIN</span></div>
         <div class="skinShopMsg"></div>
@@ -1318,6 +1536,14 @@ input:focus { border-color: #3CFFA0; }
       }
       grid.appendChild(card);
     });
+
+    const prevBtn = document.getElementById('skinPagePrev');
+    const nextBtn = document.getElementById('skinPageNext');
+    const hasPaging = totalPages > 1;
+    prevBtn.classList.toggle('hidden', !hasPaging);
+    nextBtn.classList.toggle('hidden', !hasPaging);
+    prevBtn.disabled = shopSkinPage <= 0;
+    nextBtn.disabled = shopSkinPage >= totalPages - 1;
   }
 
   async function buySkin(skin, msg, card) {
@@ -1344,9 +1570,11 @@ input:focus { border-color: #3CFFA0; }
       if (!currentUser.ownedSkins) currentUser.ownedSkins = {};
       currentUser.ownedSkins[skin.id] = true;
 
-      selectedSkin = { colorA: skin.colorA, colorB: skin.colorB };
+      selectedSkin = { colorA: skin.colorA, colorB: skin.colorB, colors: skin.colors || null };
       localStorage.setItem(SKIN_STORAGE_KEY, skin.colorA);
       localStorage.setItem(SKIN_STORAGE_KEY_B, skin.colorB);
+      if (skin.colors) localStorage.setItem(SKIN_STORAGE_KEY_COLORS, JSON.stringify(skin.colors));
+      else localStorage.removeItem(SKIN_STORAGE_KEY_COLORS);
 
       updateShopCoinDisplay();
       document.getElementById('lobbyCoinNum').textContent = newCoin;
@@ -1693,13 +1921,14 @@ input:focus { border-color: #3CFFA0; }
   function dist2(ax, ay, bx, by) { const dx = ax - bx, dy = ay - by; return dx * dx + dy * dy; }
   function angleDiff(a, b) { let d = (b - a) % (Math.PI * 2); if (d > Math.PI) d -= Math.PI * 2; if (d < -Math.PI) d += Math.PI * 2; return d; }
 
-  function makeWormObj(id, name, isRemote, x, y, color, isBot, colorB) {
+  function makeWormObj(id, name, isRemote, x, y, color, isBot, colorB, colors) {
     const segs = [];
     for (let i = 0; i < START_LEN; i++) segs.push({ x: x - i * 6, y: y });
     return {
       id, name, isRemote, isBot: !!isBot,
       color: color || NEON[Math.floor(Math.random() * NEON.length)],
       colorB: colorB || null,
+      colors: (colors && colors.length > 1) ? colors : null,
       segs, angle: 0, targetAngle: 0, speed: 2.4,
       boosting: false, alive: true, len: START_LEN, boostFuel: 100,
       lastPos: { x, y }, targetPos: { x, y }, lastUpdateT: performance.now(), updateInterval: 100
@@ -1828,7 +2057,7 @@ input:focus { border-color: #3CFFA0; }
 
   // ---- input ----
   canvas.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-  canvas.addEventListener('mousedown', () => boosting = true);
+  canvas.addEventListener('mousedown', () => { if (!chatOpen) boosting = true; });
   canvas.addEventListener('mouseup', () => boosting = false);
   window.addEventListener('keydown', e => { if (e.code === 'Space') { boosting = true; e.preventDefault(); } });
   window.addEventListener('keyup', e => { if (e.code === 'Space') { boosting = false; } });
@@ -2045,6 +2274,8 @@ input:focus { border-color: #3CFFA0; }
     document.getElementById('boostBar').style.display = 'none';
     document.getElementById('joystickZone').style.display = 'none';
     boostBtn.style.display = 'none';
+    document.getElementById('chatToggleBtn').style.display = 'none';
+    setChatOpen(false);
   }
 
   // ---- rendering ----
@@ -2150,12 +2381,13 @@ input:focus { border-color: #3CFFA0; }
     if (!w.alive) return;
     const segR = wormRadius(w) * zoom;
     const darkC = w.colorB || shadeColor(w.color, -55);
+    const multi = w.colors && w.colors.length > 1;
     for (let i = w.segs.length - 1; i >= 0; i--) {
       const seg = w.segs[i]; const s = worldToScreen(seg.x, seg.y);
       if (s.x < -40 || s.x > W + 40 || s.y < -40 || s.y > H + 40) continue;
       const size = Math.round((i === 0 ? segR + 3 : segR) * 1.8);
       const px = Math.round(s.x - size / 2), py = Math.round(s.y - size / 2);
-      ctx.fillStyle = (i % 6 < 3) ? w.color : darkC;
+      ctx.fillStyle = multi ? w.colors[Math.floor(i / 2) % w.colors.length] : ((i % 6 < 3) ? w.color : darkC);
       ctx.fillRect(px, py, size, size);
     }
     const head = worldToScreen(w.segs[0].x, w.segs[0].y);
@@ -2168,6 +2400,54 @@ input:focus { border-color: #3CFFA0; }
       ctx.font = "13px 'Silkscreen', 'Courier New'"; ctx.fillStyle = '#ddd'; ctx.textAlign = 'center';
       ctx.fillText(w.name, head.x, head.y - segR - 12);
     }
+    drawChatBubble(w, head, segR);
+  }
+
+  // balon chat kecil yang muncul di atas kepala worm ketika pemain (termasuk kita)
+  // mengirim pesan, biar semua orang di server bisa lihat langsung di map, bukan cuma di panel chat.
+  function drawChatBubble(w, head, segR) {
+    const b = chatBubbles[w.id];
+    if (!b) return;
+    const now = performance.now();
+    if (now > b.expire) { delete chatBubbles[w.id]; return; }
+    if (head.x < -80 || head.x > W + 80 || head.y < -60 || head.y > H + 60) return;
+
+    ctx.font = "11px 'Silkscreen', 'Courier New'";
+    const maxWidth = 180;
+    let text = b.text;
+    if (ctx.measureText(text).width > maxWidth) {
+      while (text.length > 1 && ctx.measureText(text + '…').width > maxWidth) text = text.slice(0, -1);
+      text += '…';
+    }
+    const paddingX = 8, paddingY = 6;
+    const textW = ctx.measureText(text).width;
+    const boxW = textW + paddingX * 2, boxH = 20 + paddingY;
+    const bx = head.x - boxW / 2;
+    const by = head.y - segR - 34 - boxH;
+
+    // fade out saat mendekati waktu habis
+    const remain = b.expire - now;
+    const alpha = remain < 500 ? Math.max(0, remain / 500) : 1;
+
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = 'rgba(0,0,0,0.75)';
+    ctx.strokeStyle = w.id === playerId ? '#3CFFA0' : '#FFD23C';
+    ctx.lineWidth = 1.5;
+    ctx.fillRect(bx, by, boxW, boxH);
+    ctx.strokeRect(bx, by, boxW, boxH);
+    // ekor kecil segitiga mengarah ke worm
+    ctx.beginPath();
+    ctx.moveTo(head.x - 5, by + boxH);
+    ctx.lineTo(head.x + 5, by + boxH);
+    ctx.lineTo(head.x, by + boxH + 7);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(0,0,0,0.75)';
+    ctx.fill();
+
+    ctx.fillStyle = '#eafff2';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, head.x, by + boxH / 2 + 4);
+    ctx.globalAlpha = 1;
   }
   function drawMinimap() {
     mctx.clearRect(0, 0, mmSize, mmSize);
@@ -2259,7 +2539,7 @@ input:focus { border-color: #3CFFA0; }
     playersRef.on('child_added', snap => {
       if (snap.key === playerId) return;
       const d = snap.val();
-      const w = makeWormObj(snap.key, d.name, true, d.x, d.y, d.color, false, d.colorB);
+      const w = makeWormObj(snap.key, d.name, true, d.x, d.y, d.color, false, d.colorB, d.colors || null);
       w.angle = d.angle || 0; w.len = d.len || START_LEN;
       w.targetPos = { x: d.x, y: d.y }; w.lastPos = { x: d.x, y: d.y }; w.lastUpdateT = performance.now();
       worms.push(w);
@@ -2279,13 +2559,195 @@ input:focus { border-color: #3CFFA0; }
     playersRef.on('child_removed', snap => {
       worms = worms.filter(w => w.id !== snap.key);
     });
+
+    attachChatListener();
   }
 
   function detachServerListeners() {
     if (playersRef) playersRef.off();
     if (foodRef) foodRef.off();
+    detachChatListener();
     botRespawnQueue = [];
   }
+
+  // ---- chat ----
+  let chatQueryRef = null;
+  let chatOpen = false;
+  let chatUnread = 0;
+  let lastChatSendTime = 0;
+  const renderedMsgKeys = new Set(); // cegah pesan sendiri dobel render (optimistic + child_added)
+  const chatRowByKey = {}; // msgKey -> elemen row chat, dipakai buat update saat pesan dihapus admin
+  const chatBubbles = {}; // wormId -> { text, expire } — balon chat di atas kepala worm
+  const CHAT_BUBBLE_MS = 4500;
+
+  function attachChatListener() {
+    const messagesEl = document.getElementById('chatMessages');
+    messagesEl.innerHTML = '';
+    chatUnread = 0;
+    updateChatBadge();
+    renderedMsgKeys.clear();
+    for (const k in chatRowByKey) delete chatRowByKey[k];
+    chatQueryRef = db.ref('servers/' + SERVER_ID + '/chat').limitToLast(50);
+    chatQueryRef.on('child_added', snap => {
+      // kalau pesan ini sudah ditampilkan lebih dulu secara optimistic (pesan kita sendiri), jangan dobel
+      if (renderedMsgKeys.has(snap.key)) return;
+      renderedMsgKeys.add(snap.key);
+      appendChatMessage(snap.val(), snap.key);
+    }, err => {
+      // ini yang paling penting: kalau baca chat kena "permission_denied", artinya rules
+      // Firebase Realtime Database untuk path servers/<id>/chat belum ngizinin read/write —
+      // beda dari path players/food yang mungkin rules-nya lebih longgar.
+      console.error('Gagal baca chat (cek Firebase Rules untuk path servers/' + SERVER_ID + '/chat):', err);
+      appendSystemChatMessage('⚠ Gagal memuat chat server (' + (err && err.code ? err.code : 'error') + '). Kemungkinan izin Firebase belum diatur untuk fitur chat.');
+    });
+    // pesan yang dihapus/diubah admin dari panel admin masuk lewat child_changed, bukan child_added lagi
+    chatQueryRef.on('child_changed', snap => {
+      updateChatMessage(snap.key, snap.val());
+    });
+  }
+
+  function appendSystemChatMessage(text) {
+    const messagesEl = document.getElementById('chatMessages');
+    const row = document.createElement('div');
+    row.className = 'chatMsgRow';
+    row.style.color = '#FF5C7A';
+    row.textContent = text;
+    messagesEl.appendChild(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function detachChatListener() {
+    if (chatQueryRef) chatQueryRef.off();
+    chatQueryRef = null;
+  }
+
+  function appendChatMessage(d, key) {
+    if (!d) return null;
+    const messagesEl = document.getElementById('chatMessages');
+    const isMe = d.uid === playerId;
+    const isDeleted = !!d.deleted;
+    const isSystem = !!d.isSystem;
+    const row = document.createElement('div');
+    row.className = 'chatMsgRow' + (isMe ? ' me' : '') + (isSystem ? ' system' : '');
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'chatMsgName';
+    nameSpan.textContent = (d.name || '???') + ': ';
+    const textSpan = document.createElement('span');
+    textSpan.className = 'chatMsgText';
+    if (isDeleted) {
+      textSpan.textContent = '⚠ Pesan telah dihapus sistem';
+      textSpan.style.color = '#666';
+      textSpan.style.fontStyle = 'italic';
+    } else {
+      textSpan.textContent = d.text || '';
+    }
+    row.appendChild(nameSpan);
+    row.appendChild(textSpan);
+    messagesEl.appendChild(row);
+    while (messagesEl.children.length > 50) {
+      const removed = messagesEl.removeChild(messagesEl.firstChild);
+      for (const k in chatRowByKey) { if (chatRowByKey[k] === removed) delete chatRowByKey[k]; }
+    }
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    if (key) chatRowByKey[key] = row;
+    if (!chatOpen && !isMe && !isDeleted) {
+      chatUnread++;
+      updateChatBadge();
+    }
+    if (d.uid && d.text && !isDeleted && !isSystem) {
+      chatBubbles[d.uid] = { text: d.text, expire: performance.now() + CHAT_BUBBLE_MS };
+    }
+    return row;
+  }
+
+  // dipanggil saat admin menghapus/mengubah pesan lewat panel admin (event child_changed)
+  function updateChatMessage(key, d) {
+    if (!d) return;
+    const row = chatRowByKey[key];
+    if (!row) return; // pesan itu sudah tergeser keluar dari 50 baris terakhir, tidak perlu diupdate
+    if (d.deleted) {
+      const textSpan = row.querySelector('.chatMsgText');
+      if (textSpan) {
+        textSpan.textContent = '⚠ Pesan telah dihapus sistem';
+        textSpan.style.color = '#666';
+        textSpan.style.fontStyle = 'italic';
+      }
+    }
+  }
+
+  function updateChatBadge() {
+    const badge = document.getElementById('chatBadge');
+    if (chatUnread > 0) {
+      badge.style.display = 'flex';
+      badge.textContent = chatUnread > 9 ? '9+' : String(chatUnread);
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  function sendChatMessage() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    // dulu di sini dicek "running", tapi saat baru saja mati ada jeda beberapa saat
+    // (nunggu proses simpan statistik) di mana panel chat masih kebuka tapi "running"
+    // sudah false — pesan jadi gagal terkirim tanpa alasan yang kelihatan.
+    // sekarang cukup pastikan kita masih tersambung ke room chat servernya.
+    if (!text || !currentUser || !chatQueryRef) return;
+    const now = Date.now();
+    if (now - lastChatSendTime < 500) return; // anti-spam
+    lastChatSendTime = now;
+    const msg = {
+      uid: playerId, name: currentUser.name, text: text.slice(0, 140),
+      ts: firebase.database.ServerValue.TIMESTAMP
+    };
+    // tampilkan pesan kita duluan (optimistic) biar gak ada jeda/lag nunggu server,
+    // baru kirim ke firebase di belakang layar.
+    const ref = db.ref('servers/' + SERVER_ID + '/chat').push();
+    renderedMsgKeys.add(ref.key);
+    const row = appendChatMessage(msg, ref.key);
+    ref.set(msg).catch(err => {
+      renderedMsgKeys.delete(ref.key);
+      console.error('Gagal kirim chat (cek Firebase Rules untuk path servers/' + SERVER_ID + '/chat):', err);
+      if (row) {
+        row.style.opacity = '0.55';
+        const failSpan = document.createElement('span');
+        failSpan.style.color = '#FF5C7A';
+        failSpan.style.marginLeft = '6px';
+        failSpan.textContent = '(gagal terkirim, ' + (err && err.code ? err.code : 'error') + ')';
+        row.appendChild(failSpan);
+      }
+    });
+    input.value = '';
+  }
+
+  function setChatOpen(open) {
+    chatOpen = open;
+    document.getElementById('chatPanel').classList.toggle('visible', chatOpen);
+    if (chatOpen) {
+      chatUnread = 0;
+      updateChatBadge();
+      document.getElementById('chatInput').focus();
+    } else {
+      document.getElementById('chatInput').blur();
+    }
+  }
+
+  document.getElementById('chatToggleBtn').addEventListener('click', () => setChatOpen(!chatOpen));
+  document.getElementById('chatCloseBtn').addEventListener('click', () => setChatOpen(false));
+  document.getElementById('chatSendBtn').addEventListener('click', sendChatMessage);
+  document.getElementById('chatInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); sendChatMessage(); }
+    else if (e.key === 'Escape') { e.preventDefault(); setChatOpen(false); }
+    e.stopPropagation();
+  });
+  // klik/tap di luar panel chat (misal di area game) buat nutup chat juga
+  document.addEventListener('pointerdown', e => {
+    if (!chatOpen) return;
+    const panel = document.getElementById('chatPanel');
+    const toggle = document.getElementById('chatToggleBtn');
+    if (panel.contains(e.target) || toggle.contains(e.target)) return;
+    setChatOpen(false);
+  });
 
   // ---- start game ----
   let sessionStartTime = 0;
@@ -2304,11 +2766,12 @@ input:focus { border-color: #3CFFA0; }
     const px = rand(WORLD.w * 0.3, WORLD.w * 0.7), py = rand(WORLD.h * 0.3, WORLD.h * 0.7);
     const myColor = localStorage.getItem(SKIN_STORAGE_KEY) || SKIN_COLORS[0];
     const myColorB = localStorage.getItem(SKIN_STORAGE_KEY_B) || null;
-    const me = makeWormObj(playerId, currentUser.name, false, px, py, myColor, false, myColorB);
+    const myColors = readStoredColors();
+    const me = makeWormObj(playerId, currentUser.name, false, px, py, myColor, false, myColorB, myColors);
     worms.push(me);
 
     myPlayerRef = db.ref('servers/' + SERVER_ID + '/players/' + playerId);
-    myPlayerRef.set({ name: currentUser.name, x: px, y: py, angle: 0, len: START_LEN, color: myColor, colorB: myColorB, alive: true, isBot: false, updatedAt: firebase.database.ServerValue.TIMESTAMP });
+    myPlayerRef.set({ name: currentUser.name, x: px, y: py, angle: 0, len: START_LEN, color: myColor, colorB: myColorB, colors: myColors || null, alive: true, isBot: false, updatedAt: firebase.database.ServerValue.TIMESTAMP });
     myPlayerRef.onDisconnect().remove();
 
     attachServerListeners();
@@ -2326,6 +2789,7 @@ input:focus { border-color: #3CFFA0; }
     resizeMinimap();
     document.getElementById('boostBar').style.display = 'block';
     if (isTouch) { boostBtn.style.display = 'flex'; joystickZone.style.display = 'block'; }
+    document.getElementById('chatToggleBtn').style.display = 'flex';
 
     running = true;
     lastTime = 0;
