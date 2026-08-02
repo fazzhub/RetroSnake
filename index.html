@@ -483,24 +483,41 @@ input:focus { border-color: #3CFFA0; }
 /* ---------- Lobby ---------- */
 .userBadge {
   width: 100%; max-width: 380px;
-  display: flex; align-items: center; gap: 14px;
+  display: flex; flex-direction: column; gap: clamp(10px, 2vh, 14px);
   background: rgba(0,0,0,0.4); border: 1.5px solid #3CFFA0;
   padding: clamp(14px, 2.5vh, 20px) 18px; margin-bottom: clamp(16px, 3vh, 26px);
 }
+.userBadgeTop { display: flex; align-items: center; gap: 12px; }
 .userAvatar {
-  width: 54px; height: 54px; flex-shrink: 0;
+  width: 46px; height: 46px; flex-shrink: 0;
   background: rgba(60,255,160,0.08); border: 1.5px solid #3CFFA0;
   display: flex; align-items: center; justify-content: center;
-  font-weight: 700; color: #3CFFA0; font-size: 22px; font-family: 'Silkscreen', monospace;
+  font-weight: 700; color: #3CFFA0; font-size: 18px; font-family: 'Silkscreen', monospace;
 }
-.userInfo { flex: 1; }
-.userInfo .plabel { font-size: 10px; letter-spacing: 2px; color: #3CFFA0; margin-bottom: 4px; }
-.userInfo .uname { font-size: 17px; color: #fff; font-family: 'Silkscreen', monospace; margin-bottom: 10px; }
-.userInfo .ulevelRow { display: flex; gap: 18px; margin-bottom: 8px; }
-.userInfo .ulevelRow .stat .k { font-size: 9px; letter-spacing: 1px; color: #3CFFA0; margin-bottom: 2px; }
-.userInfo .ulevelRow .stat .v { font-size: 14px; color: #fff; font-weight: 700; }
-.userInfo .ulevelRow .stat.coinStat .k { color: #FFD23C; }
-.userInfo .ulevelRow .stat.coinStat .v { color: #FFD23C; }
+.userNameWrap { flex: 1; min-width: 0; }
+.userInfo { flex: 1; min-width: 0; }
+.userInfo .plabel, .userNameWrap .plabel { font-size: 10px; letter-spacing: 2px; color: #3CFFA0; margin-bottom: 4px; }
+.userInfo .uname, .userNameWrap .uname {
+  font-size: 16px; color: #fff; font-family: 'Silkscreen', monospace;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.userInfo .ulevelRow, .ulevelRow {
+  display: flex; gap: 8px;
+}
+.userInfo .ulevelRow .stat, .ulevelRow .stat { flex: 1; min-width: 0; }
+.userInfo .ulevelRow .stat:first-child, .ulevelRow .stat:first-child { text-align: left; }
+.userInfo .ulevelRow .stat:nth-child(2), .ulevelRow .stat:nth-child(2) { text-align: center; }
+.userInfo .ulevelRow .stat:last-child, .ulevelRow .stat:last-child { text-align: right; }
+.userInfo .ulevelRow .stat .k, .ulevelRow .stat .k {
+  font-size: 9px; letter-spacing: 1px; color: #3CFFA0; margin-bottom: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.userInfo .ulevelRow .stat .v, .ulevelRow .stat .v {
+  font-size: clamp(11px, 3.4vw, 14px); color: #fff; font-weight: 700;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.userInfo .ulevelRow .stat.coinStat .k, .ulevelRow .stat.coinStat .k { color: #FFD23C; }
+.userInfo .ulevelRow .stat.coinStat .v, .ulevelRow .stat.coinStat .v { color: #FFD23C; }
 .expBar { width: 100%; height: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); overflow: hidden; }
 .expBar .fill { height: 100%; background: #3CFFA0; }
 
@@ -671,18 +688,21 @@ input:focus { border-color: #3CFFA0; }
   </div>
 
   <div class="userBadge">
-    <div class="userAvatar" id="lobbyAvatar">?</div>
-    <div class="userInfo">
-      <div class="plabel">PLAYER</div>
-      <div class="uname" id="lobbyName">-</div>
-      <div class="ulevelRow">
-        <div class="stat"><div class="k">LEVEL</div><div class="v" id="lobbyLevelNum">1</div></div>
-        <div class="stat"><div class="k">EXP</div><div class="v" id="lobbyExpNum">0 / 100</div></div>
-        <div class="stat coinStat"><div class="k">COIN</div><div class="v" id="lobbyCoinNum">0</div></div>
+    <div class="userBadgeTop">
+      <div class="userAvatar" id="lobbyAvatar">?</div>
+      <div class="userNameWrap">
+        <div class="plabel">PLAYER</div>
+        <div class="uname" id="lobbyName">-</div>
       </div>
-      <div class="expBar"><div class="fill" id="lobbyExpFill" style="width:0%"></div></div>
-      <div class="ulevel" id="lobbyLevel" style="display:none;">Level 1 • 0 EXP</div>
+      <button class="friendViewBtn" id="lobbyViewBtn" style="flex-shrink:0;">VIEW</button>
     </div>
+    <div class="ulevelRow">
+      <div class="stat"><div class="k">LEVEL</div><div class="v" id="lobbyLevelNum">1</div></div>
+      <div class="stat"><div class="k">EXP</div><div class="v" id="lobbyExpNum">0 / 100</div></div>
+      <div class="stat coinStat"><div class="k">COIN</div><div class="v" id="lobbyCoinNum">0</div></div>
+    </div>
+    <div class="expBar"><div class="fill" id="lobbyExpFill" style="width:0%"></div></div>
+    <div class="ulevel" id="lobbyLevel" style="display:none;">Level 1 • 0 EXP</div>
   </div>
 
   <div id="lobbyMenu" style="width:100%;max-width:380px;">
@@ -1393,7 +1413,7 @@ input:focus { border-color: #3CFFA0; }
         <button class="friendViewBtn">VIEW</button>
       </div>
     `;
-    card.querySelector('.friendViewBtn').addEventListener('click', () => openProfileScreen(pid));
+    card.querySelector('.friendViewBtn').addEventListener('click', () => openProfileScreen(pid, 'playerScreen'));
 
     const pRef = db.ref('users/' + pid + '/presence');
     pRef.on('value', psnap => {
@@ -1483,7 +1503,7 @@ input:focus { border-color: #3CFFA0; }
   document.getElementById('profileBackBtn').addEventListener('click', () => {
     if (profileWatchRef) { profileWatchRef.off(); profileWatchRef = null; }
     document.getElementById('profileScreen').classList.remove('visible');
-    document.getElementById('playerScreen').classList.add('visible');
+    document.getElementById(profileReturnTo).classList.add('visible');
   });
 
   function renderProfileData(uid, d) {
@@ -1530,7 +1550,7 @@ input:focus { border-color: #3CFFA0; }
     const achievements = [
       { name: 'PEMULA', desc: 'Mainkan 1 pertandingan', done: st.totalMatch >= 1, icon: '&#9733;' },
       { name: 'VETERAN', desc: 'Mainkan 50 pertandingan', done: st.totalMatch >= 50, icon: '&#127942;' },
-      { name: 'NAGA PANJANG', desc: 'Capai panjang 5.000', done: st.longestLength >= 5000, icon: '&#128207;' },
+      { name: 'NAGA PANJANG', desc: 'Capai panjang 1.500', done: st.longestLength >= 1500, icon: '&#128207;' },
       { name: 'PEMBUNUH ULUNG', desc: 'Raih 100 total kill', done: st.totalKill >= 100, icon: '&#128128;' },
       { name: 'KOLEKTOR KOIN', desc: 'Kumpulkan 1.000 coin', done: (d.coin || 0) >= 1000, icon: '&#129689;' }
     ];
@@ -1545,9 +1565,12 @@ input:focus { border-color: #3CFFA0; }
     `).join('');
   }
 
-  function openProfileScreen(uid) {
+  let profileReturnTo = 'playerScreen';
+  function openProfileScreen(uid, returnTo) {
+    profileReturnTo = returnTo || 'playerScreen';
     switchProfileTab('stat');
     document.getElementById('playerScreen').classList.remove('visible');
+    document.getElementById('lobbyScreen').classList.remove('visible');
     document.getElementById('profileScreen').classList.add('visible');
     if (profileWatchRef) profileWatchRef.off();
     profileWatchRef = db.ref('users/' + uid);
@@ -1584,6 +1607,10 @@ input:focus { border-color: #3CFFA0; }
     document.getElementById('lobbyScreen').classList.remove('visible');
     startGame();
   }
+
+  document.getElementById('lobbyViewBtn').addEventListener('click', () => {
+    if (currentUser) openProfileScreen(currentUser.uid, 'lobbyScreen');
+  });
 
   document.getElementById('joinServer1').addEventListener('click', () => joinServer('server1'));
   document.getElementById('joinServer2').addEventListener('click', () => joinServer('server2'));
