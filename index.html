@@ -1810,19 +1810,15 @@ input:focus { border-color: #3CFFA0; }
     });
   }
 
-  // Bersihkan food (dan riwayat chat) kalau server sudah tidak ada player manusianya sama sekali.
-  // Food dibersihkan biar "segmen"/item gak numpuk terus lama-lama jadi lag.
-  // Chat direset juga biar server yang mulai lagi dari nol gak kebawa obrolan lama.
+  // Bersihkan food yang menumpuk kalau server sudah tidak ada player manusianya sama sekali.
+  // Ini yang bikin "segmen"/item numpuk terus lama-lama jadi lag.
   async function cleanupServerIfEmpty(sid) {
     try {
       const snap = await db.ref('servers/' + sid + '/players').once('value');
       let n = 0;
       if (snap.exists()) snap.forEach(c => { if (!c.val().isBot) n++; });
       if (n === 0) {
-        await Promise.all([
-          db.ref('servers/' + sid + '/food').remove(),
-          db.ref('servers/' + sid + '/chat').remove()
-        ]);
+        await db.ref('servers/' + sid + '/food').remove();
       }
     } catch (e) {}
   }
@@ -1834,11 +1830,8 @@ input:focus { border-color: #3CFFA0; }
     if (snap.exists()) snap.forEach(c => { if (!c.val().isBot) n++; });
     if (n >= max) return;
     // fallback safety net: kalau ternyata server kosong (misal sesi sebelumnya
-    // crash/nutup tab tanpa sempat cleanup), sekalian bersihkan food & chat lama sebelum mulai
-    if (n === 0) {
-      db.ref('servers/' + sid + '/food').remove();
-      db.ref('servers/' + sid + '/chat').remove();
-    }
+    // crash/nutup tab tanpa sempat cleanup), sekalian bersihkan food lama sebelum mulai
+    if (n === 0) { db.ref('servers/' + sid + '/food').remove(); }
     SERVER_ID = sid;
     document.getElementById('lobbyScreen').classList.remove('visible');
     startGame();
@@ -2561,8 +2554,16 @@ input:focus { border-color: #3CFFA0; }
       worms.push(w);
     });
     playersRef.on('child_changed', snap => {
-      if (snap.key === playerId) return;
       const d = snap.val();
+      if (snap.key === playerId) {
+        // len bisa diubah dari luar (misal admin panel via "ATUR LENGTH PLAYER").
+        // Normalnya field ini di-echo balik oleh push kita sendiri tiap 100ms dengan nilai yang sama,
+        // jadi assignment ini aman/idempotent — tapi kalau nilainya beda dari punya kita
+        // (artinya perubahan dari luar), langsung terapkan ke worm lokal biar keliatan berubah di game.
+        const p = getPlayer();
+        if (p && typeof d.len === 'number' && d.len !== p.len) p.len = d.len;
+        return;
+      }
       const w = worms.find(x => x.id === snap.key);
       if (!w) return;
       w.lastPos = { x: w.segs[0].x, y: w.segs[0].y };
