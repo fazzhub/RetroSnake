@@ -320,6 +320,158 @@ input:focus { border-color: #3CFFA0; }
   font-family: 'Silkscreen', monospace;
 }
 
+/* ---------- Player button (sama gaya kayak Shop) ---------- */
+.btnPlayer {
+  width: 100%; padding: 16px; font-size: 15px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 2px;
+  border: 1.5px solid #3CFFA0; cursor: pointer;
+  background: transparent; color: #3CFFA0;
+  transition: all .12s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin-top: 10px;
+}
+.btnPlayer::before { content: '\25B6'; font-size: 12px; }
+.btnPlayer:hover { background: rgba(60,255,160,0.08); }
+.btnPlayer:active { transform: translate(1px, 1px); }
+
+/* ---------- Friend list screen ---------- */
+#playerScreen .logo { margin-bottom: 2px; }
+
+/* Halaman player tidak boleh digulir — semua elemen mengecil otomatis
+   mengikuti tinggi layar (pakai satuan vh) supaya selalu muat. */
+#playerScreen { overflow: hidden !important; padding-top: clamp(4px, 1.2vh, 12px); padding-bottom: clamp(4px, 1.2vh, 12px); }
+#playerScreen .screenTopBar { padding: clamp(6px, 1.4vh, 14px) 0 clamp(4px, 1vh, 8px); }
+#playerScreen .screenDivider { margin-bottom: clamp(6px, 1.2vh, 14px); }
+#playerScreen .logo { font-size: clamp(15px, 4vh, 30px); }
+#playerScreen .logoWorm { margin-bottom: clamp(4px, 1vh, 10px); transform: scale(0.7); transform-origin: center; }
+#playerScreen #playerListRows { flex: 1 1 auto; min-height: 0; justify-content: center; }
+#playerScreen .friendCard { padding: clamp(5px, 1.1vh, 12px) clamp(8px, 2vw, 14px); margin-bottom: clamp(4px, 0.9vh, 10px); gap: clamp(3px, 0.7vh, 8px); }
+#playerScreen .friendAvatar { width: clamp(28px, 4.4vh, 42px); height: clamp(28px, 4.4vh, 42px); font-size: clamp(12px, 1.9vh, 18px); }
+#playerScreen .friendInfo .fname { font-size: clamp(10px, 1.5vh, 13px); margin-bottom: clamp(2px, 0.4vh, 6px); }
+#playerScreen .friendInfo .flevelRow { margin-bottom: clamp(2px, 0.4vh, 6px); }
+#playerScreen .friendInfo .flevelRow .k, #playerScreen .friendStatus { font-size: 8px; }
+#playerScreen .friendInfo .flevelRow .v { font-size: clamp(9px, 1.2vh, 11px); }
+#playerScreen .friendViewBtn { padding: clamp(4px, 0.9vh, 7px) clamp(10px, 2vw, 14px); font-size: 9px; }
+#playerScreen .playerPagerRow { margin-top: clamp(4px, 1vh, 8px); }
+#playerScreen .footNote { display: none; }
+.friendCard {
+  width: 100%; max-width: 380px;
+  background: rgba(0,0,0,0.4); border: 1.5px solid #3CFFA0;
+  padding: clamp(10px, 2.2vh, 16px) 14px; margin-bottom: clamp(10px, 2vh, 14px);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.friendTop { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.friendAvatar {
+  width: 48px; height: 48px; flex-shrink: 0;
+  background: rgba(60,255,160,0.08); border: 1.5px solid #3CFFA0;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: #3CFFA0; font-size: 20px; font-family: 'Silkscreen', monospace;
+}
+.friendInfo { flex: 1; min-width: 0; }
+.friendInfo .fname { font-size: 14px; color: #fff; font-family: 'Silkscreen', monospace; margin-bottom: 6px; letter-spacing: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.friendInfo .flevelRow { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 6px; }
+.friendInfo .flevelRow .k { font-size: 9px; letter-spacing: 1px; color: #3CFFA0; margin-right: 4px; }
+.friendInfo .flevelRow .v { font-size: 11px; color: #fff; font-weight: 700; }
+.friendStatus { display: flex; align-items: center; gap: 6px; font-size: 9px; letter-spacing: 1px; font-weight: 700; white-space: nowrap; }
+.friendStatus .dot { width: 7px; height: 7px; flex-shrink: 0; }
+.friendStatus.online { color: #3CFFA0; } .friendStatus.online .dot { background: #3CFFA0; }
+.friendStatus.offline { color: #888; } .friendStatus.offline .dot { background: transparent; border: 1.5px solid #888; width: 5px; height: 5px; }
+.friendStatus.ingame { color: #FFD23C; } .friendStatus.ingame .dot { background: #FFD23C; }
+.friendBtnRow { display: flex; justify-content: flex-end; gap: 8px; }
+.friendViewBtn {
+  padding: 8px 16px; border: 1.5px solid #3CFFA0; background: transparent; color: #3CFFA0;
+  font-size: 10px; font-family: 'Silkscreen', monospace; font-weight: 700; cursor: pointer; letter-spacing: 1px;
+}
+.friendViewBtn:hover { background: rgba(60,255,160,0.08); }
+.friendRemoveBtn {
+  width: 34px; height: 34px; flex-shrink: 0; border: 1.5px solid #FF5C7A; background: transparent; color: #FF5C7A;
+  font-size: 14px; font-family: 'Silkscreen', monospace; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.friendRemoveBtn:hover { background: rgba(255,92,122,0.1); }
+.friendEmpty { color: #666; font-size: 11px; letter-spacing: 1px; text-align: center; padding: 20px 0 6px; width: 100%; max-width: 380px; line-height: 1.9; }
+
+.playerPagerRow {
+  width: 100%; max-width: 380px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-top: clamp(6px, 1.5vh, 12px);
+}
+.pagerBtn {
+  flex-shrink: 0;
+  padding: 10px 12px; font-size: 10px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 1px;
+  border: 1.5px solid #3CFFA0; cursor: pointer; background: transparent; color: #3CFFA0;
+}
+.pagerBtn:hover:not(:disabled) { background: rgba(60,255,160,0.08); }
+.pagerBtn:disabled { opacity: 0.35; cursor: not-allowed; border-color: #444; color: #666; }
+.pagerInfo { font-size: 11px; letter-spacing: 1px; color: #aaa; white-space: nowrap; }
+
+/* ---------- Player profile screen ---------- */
+#profileScreen { overflow: hidden; }
+#profileScreen .screenTopBar { flex-shrink: 0; padding: clamp(8px, 2vh, 18px) 0 clamp(4px, 1.5vh, 10px); }
+#profileScreen .screenDivider { flex-shrink: 0; margin-bottom: clamp(8px, 2vh, 18px); }
+.profileHeading {
+  display: flex; align-items: center; justify-content: center; gap: 10px; flex-shrink: 0;
+  color: #fff; font-size: clamp(12px, 3.2vw, 18px); letter-spacing: 2px; font-weight: 700;
+  margin-bottom: clamp(8px, 1.8vh, 16px); font-family: 'Silkscreen', monospace;
+}
+.profileHeading .bracket { color: #3CFFA0; font-size: clamp(14px, 3.6vw, 20px); }
+.profileCard {
+  width: 100%; max-width: 420px; flex-shrink: 0;
+  display: flex; align-items: center; gap: 14px;
+  background: rgba(0,0,0,0.4); border: 1.5px solid #3CFFA0;
+  padding: clamp(10px, 2vh, 16px) 16px; margin-bottom: clamp(8px, 1.6vh, 14px);
+}
+.profileAvatar {
+  width: 50px; height: 50px; flex-shrink: 0;
+  background: rgba(60,255,160,0.08); border: 1.5px solid #3CFFA0;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: #3CFFA0; font-size: 20px; font-family: 'Silkscreen', monospace;
+}
+.profileInfo { flex: 1; min-width: 0; }
+.profileInfo .pname { font-size: 15px; color: #fff; font-family: 'Silkscreen', monospace; margin-bottom: 4px; letter-spacing: 1px; }
+.profileInfo .flevelRow { display: flex; gap: 18px; margin: 6px 0; }
+.profileInfo .flevelRow .k { font-size: 9px; letter-spacing: 1px; color: #3CFFA0; margin-bottom: 2px; }
+.profileInfo .flevelRow .v { font-size: 13px; color: #fff; font-weight: 700; }
+
+.profileTabs { width: 100%; max-width: 420px; flex-shrink: 0; margin-bottom: clamp(6px, 1.4vh, 10px); }
+.profileBody { width: 100%; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+.profilePanel {
+  width: 100%; max-width: 420px;
+  background: rgba(0,0,0,0.4); border: 1.5px solid #3CFFA0;
+  padding: clamp(10px, 2vh, 16px) 16px; margin-bottom: clamp(8px, 1.6vh, 14px);
+}
+.profilePanel .panelLabel { color: #3CFFA0; font-size: 11px; letter-spacing: 2px; font-weight: 700; margin-bottom: clamp(6px, 1.4vh, 12px); }
+.statRow {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: clamp(6px, 1.3vh, 10px) 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.18);
+}
+.statRow:last-child { border-bottom: none; }
+.statRow .sLeft { display: flex; align-items: center; gap: 10px; color: #3CFFA0; font-size: 10px; letter-spacing: 1px; }
+.statRow .sLeft .icon { font-size: 14px; }
+.statRow .sVal { color: #fff; font-size: 13px; font-weight: 700; letter-spacing: 1px; }
+.profileEmpty { color: #666; font-size: 11px; letter-spacing: 1px; text-align: center; padding: 10px 0; line-height: 1.9; }
+#profileScreen .footNote { flex-shrink: 0; margin-top: clamp(4px, 1vh, 10px); padding: clamp(8px, 1.6vh, 14px) 0 6px; }
+
+.profSkinGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.profSkinItem { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.profSkinSwatch { width: 100%; aspect-ratio: 1; border: 1.5px solid #333; position: relative; overflow: hidden; }
+.profSkinSwatch::before { content: ''; position: absolute; inset: 0; background-color: var(--sc); }
+.profSkinSwatch.twoTone::before { background-color: transparent; background-image: linear-gradient(135deg, var(--sc) 50%, var(--scB) 50%); }
+.profSkinSwatch.locked { filter: grayscale(1) brightness(0.4); }
+.profSkinSwatch.locked::after {
+  content: '\1F512'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; filter: none; z-index: 2;
+}
+.profSkinLabel { font-size: 7px; color: #888; letter-spacing: 1px; }
+
+.achRow { display: flex; align-items: center; gap: 10px; padding: clamp(6px, 1.3vh, 10px) 0; border-bottom: 1px dashed rgba(255,255,255,0.18); }
+.achRow:last-child { border-bottom: none; }
+.achRow .achIcon { width: 26px; height: 26px; flex-shrink: 0; border: 1.5px solid #3CFFA0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #3CFFA0; }
+.achRow.locked .achIcon { border-color: #444; color: #444; }
+.achRow .achText .achName { font-size: 11px; color: #fff; letter-spacing: 1px; margin-bottom: 2px; }
+.achRow.locked .achText .achName { color: #666; }
+.achRow .achText .achDesc { font-size: 8px; color: #888; letter-spacing: 1px; }
+
 .forgotLink {
   margin-top: clamp(16px, 3vh, 26px); color: #3CFFA0; font-size: 11px; letter-spacing: 1px;
   display: flex; align-items: center; gap: 8px; cursor: pointer;
@@ -478,7 +630,7 @@ input:focus { border-color: #3CFFA0; }
 <!-- AUTH SCREEN -->
 <div class="screen visible" id="authScreen">
   <div class="screenTopBar">
-    <div class="screenBrand">RETROSNAKE <span class="ver">v1.0.0</span></div>
+    <div class="screenBrand">RETROSNAKE <span class="ver">v2.0.0</span></div>
   </div>
   <div class="screenDivider"></div>
 
@@ -535,6 +687,7 @@ input:focus { border-color: #3CFFA0; }
     <button class="btnPrimary" id="playMenuBtn">PLAY ONLINE</button>
     <button class="btnWhite" id="changeSkinBtn">CHANGE SKIN</button>
     <button class="btnShop" id="shopMenuBtn">SHOP</button>
+    <button class="btnPlayer" id="playerMenuBtn">PLAYER</button>
   </div>
 
   <div id="serverListSection" style="width:100%;max-width:380px;display:none;">
@@ -581,6 +734,84 @@ input:focus { border-color: #3CFFA0; }
 
   <div class="footNote">HAVE FUN &amp; GOOD LUCK!</div>
 </div>
+
+<!-- PLAYER SCREEN -->
+<div class="screen" id="playerScreen">
+  <div class="screenTopBar">
+    <div class="screenBrand">RETROSNAKE <span class="ver">v1.0.0</span></div>
+    <button class="screenBackBtn" id="playerBackBtn">&#8618; KEMBALI</button>
+  </div>
+  <div class="screenDivider"></div>
+
+  <div class="logo">PLAYE<span class="accent">R</span></div>
+  <div class="logoWorm">
+    <span></span><span></span><span></span><span></span><span></span><span class="head"></span><span class="dot"></span><span class="dot"></span>
+  </div>
+
+  <div id="playerListRows" style="width:100%;display:flex;flex-direction:column;align-items:center;"></div>
+
+  <div class="playerPagerRow" id="playerPagerRow">
+    <button class="pagerBtn" id="playerPrevBtn">&#8592; SEBELUMNYA</button>
+    <div class="pagerInfo" id="playerPagerInfo">1 / 1</div>
+    <button class="pagerBtn" id="playerNextBtn">NEXT &#8594;</button>
+  </div>
+
+  <div class="footNote">HAVE FUN &amp; GOOD LUCK!</div>
+</div>
+
+<!-- PLAYER PROFILE SCREEN -->
+<div class="screen" id="profileScreen">
+  <div class="screenTopBar">
+    <div class="screenBrand">RETROSNAKE <span class="ver">v1.0.0</span></div>
+    <button class="screenBackBtn" id="profileBackBtn">&#8618; KEMBALI</button>
+  </div>
+  <div class="screenDivider"></div>
+
+  <div class="profileHeading"><span class="bracket">[</span> PLAYER PROFILE <span class="bracket">]</span></div>
+
+  <div class="profileCard">
+    <div class="profileAvatar" id="profAvatar">?</div>
+    <div class="profileInfo">
+      <div class="pname" id="profName">-</div>
+      <div class="friendStatus online" id="profStatus"><span class="dot"></span><span id="profStatusText">ONLINE</span></div>
+      <div class="flevelRow">
+        <div class="stat"><div class="k">LEVEL</div><div class="v" id="profLevel">1</div></div>
+        <div class="stat"><div class="k">EXP</div><div class="v" id="profExp">0 / 100</div></div>
+      </div>
+      <div class="expBar"><div class="fill" id="profExpFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="tabs profileTabs">
+    <div class="tabBtn active" id="profTabStat">STATISTIK</div>
+    <div class="tabBtn" id="profTabSkin">SKIN</div>
+    <div class="tabBtn" id="profTabAch">ACHIEVEMENT</div>
+  </div>
+
+  <div class="profileBody" id="profileBody">
+  <div class="profilePanel" id="profPanelStat">
+    <div class="panelLabel">STATISTIK</div>
+    <div class="statRow"><div class="sLeft"><span class="icon">&#127942;</span>TOTAL MATCH</div><div class="sVal" id="statMatch">0</div></div>
+    <div class="statRow"><div class="sLeft"><span class="icon">&#128207;</span>LONGEST LENGTH</div><div class="sVal" id="statLength">0</div></div>
+    <div class="statRow"><div class="sLeft"><span class="icon">&#9201;&#65039;</span>TOTAL PLAY TIME</div><div class="sVal" id="statTime">0H 0M</div></div>
+    <div class="statRow"><div class="sLeft"><span class="icon">&#129689;</span>TOTAL COIN</div><div class="sVal" id="statCoin">0</div></div>
+    <div class="statRow"><div class="sLeft"><span class="icon">&#128128;</span>TOTAL KILL</div><div class="sVal" id="statKill">0</div></div>
+  </div>
+
+  <div class="profilePanel" id="profPanelSkin" style="display:none;">
+    <div class="panelLabel">SKIN</div>
+    <div class="profSkinGrid" id="profSkinGrid"></div>
+  </div>
+
+  <div class="profilePanel" id="profPanelAch" style="display:none;">
+    <div class="panelLabel">ACHIEVEMENT</div>
+    <div id="profAchList"></div>
+  </div>
+  </div>
+
+  <div class="footNote">HAVE FUN &amp; GOOD LUCK!</div>
+</div>
+
 <div id="hud">
   Length: <span class="score">0</span>
   <div class="coinRow" id="hudCoinRow">Coin: <span id="hudCoinNum">0</span></div>
@@ -805,6 +1036,8 @@ input:focus { border-color: #3CFFA0; }
           level: 1,
           coin: 0,
           ownedSkins: {},
+          friends: {},
+          stats: { totalMatch: 0, longestLength: 0, totalPlayTimeSec: 0, totalKill: 0 },
           createdAt: Date.now()
         };
         await db.ref('users/' + uid).set(userData);
@@ -867,6 +1100,44 @@ input:focus { border-color: #3CFFA0; }
       document.getElementById('serverListSection').style.display = 'none';
     }
     watchServerCount();
+    setupPresence();
+  }
+
+  // ================= PRESENCE (online / offline / in game) =================
+  let presenceConnRef = null;
+  function setupPresence() {
+    if (!currentUser) return;
+    try {
+      const presenceRef = db.ref('users/' + currentUser.uid + '/presence');
+      if (presenceConnRef) presenceConnRef.off();
+      presenceConnRef = db.ref('.info/connected');
+      presenceConnRef.on('value', snap => {
+        if (snap.val() === true) {
+          presenceRef.onDisconnect().set({ status: 'offline', updatedAt: firebase.database.ServerValue.TIMESTAMP });
+          presenceRef.set({ status: 'online', updatedAt: firebase.database.ServerValue.TIMESTAMP });
+        }
+      });
+    } catch (e) {}
+  }
+  function setPresenceStatus(status) {
+    if (!currentUser) return;
+    try { db.ref('users/' + currentUser.uid + '/presence').update({ status, updatedAt: firebase.database.ServerValue.TIMESTAMP }); } catch (e) {}
+  }
+
+  // ================= USER STATS HELPERS =================
+  function userStats(u) {
+    const s = (u && u.stats) || {};
+    return {
+      totalMatch: s.totalMatch || 0,
+      longestLength: s.longestLength || 0,
+      totalPlayTimeSec: s.totalPlayTimeSec || 0,
+      totalKill: s.totalKill || 0
+    };
+  }
+  function formatPlayTime(sec) {
+    sec = Math.floor(sec || 0);
+    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
+    return h + 'H ' + m + 'M';
   }
 
   function watchOneServer(sid, refHolder, slotElId, btnElId) {
@@ -1066,6 +1337,225 @@ input:focus { border-color: #3CFFA0; }
     }
   }
 
+  // ================= PLAYER LIST =================
+  let friendWatchRefs = []; // { ref, uid } -- watches presence of each listed player
+
+  function detachFriendWatchers() {
+    friendWatchRefs.forEach(f => f.ref.off());
+    friendWatchRefs = [];
+  }
+
+  document.getElementById('playerMenuBtn').addEventListener('click', () => {
+    document.getElementById('lobbyScreen').classList.remove('visible');
+    document.getElementById('playerScreen').classList.add('visible');
+    loadPlayerList();
+  });
+
+  document.getElementById('playerBackBtn').addEventListener('click', () => {
+    detachFriendWatchers();
+    document.getElementById('playerScreen').classList.remove('visible');
+    document.getElementById('lobbyScreen').classList.add('visible');
+  });
+
+  function statusMeta(presence) {
+    const status = (presence && presence.status) || 'offline';
+    if (status === 'ingame') return { cls: 'ingame', label: 'IN GAME' };
+    if (status === 'online') return { cls: 'online', label: 'ONLINE' };
+    return { cls: 'offline', label: 'OFFLINE' };
+  }
+
+  const PLAYER_PAGE_SIZE = 5;
+  let playerUsersObj = {};
+  let playerIdsAll = [];
+  let playerCurrentPage = 0;
+
+  function renderPlayerCard(pid, d) {
+    const card = document.createElement('div');
+    card.className = 'friendCard';
+    card.dataset.uid = pid;
+    const meta = statusMeta(d.presence);
+    const expIntoLevel = (d.exp || 0) % 100;
+    card.innerHTML = `
+      <div class="friendTop">
+        <div class="friendAvatar">${(d.name || '?').charAt(0).toUpperCase()}</div>
+        <div class="friendInfo">
+          <div class="fname">${d.name || '(nama tidak diketahui)'}</div>
+          <div class="flevelRow">
+            <span><span class="k">LV</span><span class="v">${d.level || 1}</span></span>
+            <span><span class="k">EXP</span><span class="v">${expIntoLevel}/100</span></span>
+          </div>
+          <div class="friendStatus ${meta.cls}"><span class="dot"></span><span class="stText">${meta.label}</span></div>
+        </div>
+      </div>
+      <div class="friendBtnRow">
+        <button class="friendViewBtn">VIEW</button>
+      </div>
+    `;
+    card.querySelector('.friendViewBtn').addEventListener('click', () => openProfileScreen(pid));
+
+    const pRef = db.ref('users/' + pid + '/presence');
+    pRef.on('value', psnap => {
+      const meta2 = statusMeta(psnap.val());
+      const stEl = card.querySelector('.friendStatus');
+      if (!stEl) return;
+      stEl.className = 'friendStatus ' + meta2.cls;
+      stEl.querySelector('.stText').textContent = meta2.label;
+    });
+    friendWatchRefs.push({ ref: pRef, uid: pid });
+
+    return card;
+  }
+
+  function renderPlayerPage() {
+    detachFriendWatchers();
+    const rowsEl = document.getElementById('playerListRows');
+    const totalPages = Math.max(1, Math.ceil(playerIdsAll.length / PLAYER_PAGE_SIZE));
+    playerCurrentPage = Math.min(playerCurrentPage, totalPages - 1);
+
+    if (!playerIdsAll.length) {
+      rowsEl.innerHTML = '<div class="friendEmpty">BELUM ADA PEMAIN LAIN YANG TERDAFTAR.</div>';
+    } else {
+      rowsEl.innerHTML = '';
+      const start = playerCurrentPage * PLAYER_PAGE_SIZE;
+      const pageIds = playerIdsAll.slice(start, start + PLAYER_PAGE_SIZE);
+      pageIds.forEach(pid => rowsEl.appendChild(renderPlayerCard(pid, playerUsersObj[pid] || {})));
+    }
+
+    document.getElementById('playerPagerInfo').textContent = (playerCurrentPage + 1) + ' / ' + totalPages;
+    document.getElementById('playerPrevBtn').disabled = playerCurrentPage <= 0;
+    document.getElementById('playerNextBtn').disabled = playerCurrentPage >= totalPages - 1;
+  }
+
+  document.getElementById('playerPrevBtn').addEventListener('click', () => {
+    if (playerCurrentPage <= 0) return;
+    playerCurrentPage--;
+    renderPlayerPage();
+  });
+  document.getElementById('playerNextBtn').addEventListener('click', () => {
+    const totalPages = Math.max(1, Math.ceil(playerIdsAll.length / PLAYER_PAGE_SIZE));
+    if (playerCurrentPage >= totalPages - 1) return;
+    playerCurrentPage++;
+    renderPlayerPage();
+  });
+
+  async function loadPlayerList() {
+    detachFriendWatchers();
+    const rowsEl = document.getElementById('playerListRows');
+    rowsEl.innerHTML = '<div class="friendEmpty">MEMUAT...</div>';
+    if (!currentUser) return;
+
+    try {
+      const snap = await db.ref('users').once('value');
+      const usersObj = snap.exists() ? snap.val() : {};
+      const playerIds = Object.keys(usersObj).filter(uid => uid !== currentUser.uid);
+
+      // urutkan berdasarkan level tertinggi biar yang paling "jago" muncul duluan
+      playerIds.sort((a, b) => (usersObj[b].level || 1) - (usersObj[a].level || 1));
+
+      playerUsersObj = usersObj;
+      playerIdsAll = playerIds;
+      playerCurrentPage = 0;
+      renderPlayerPage();
+    } catch (e) {
+      rowsEl.innerHTML = '<div class="friendEmpty">GAGAL MEMUAT DAFTAR PEMAIN.</div>';
+    }
+  }
+
+  // ================= PLAYER PROFILE =================
+  let profileWatchRef = null;
+  let profileActiveTab = 'stat';
+
+  function switchProfileTab(tab) {
+    profileActiveTab = tab;
+    document.getElementById('profTabStat').classList.toggle('active', tab === 'stat');
+    document.getElementById('profTabSkin').classList.toggle('active', tab === 'skin');
+    document.getElementById('profTabAch').classList.toggle('active', tab === 'ach');
+    document.getElementById('profPanelStat').style.display = tab === 'stat' ? 'block' : 'none';
+    document.getElementById('profPanelSkin').style.display = tab === 'skin' ? 'block' : 'none';
+    document.getElementById('profPanelAch').style.display = tab === 'ach' ? 'block' : 'none';
+  }
+  document.getElementById('profTabStat').addEventListener('click', () => switchProfileTab('stat'));
+  document.getElementById('profTabSkin').addEventListener('click', () => switchProfileTab('skin'));
+  document.getElementById('profTabAch').addEventListener('click', () => switchProfileTab('ach'));
+
+  document.getElementById('profileBackBtn').addEventListener('click', () => {
+    if (profileWatchRef) { profileWatchRef.off(); profileWatchRef = null; }
+    document.getElementById('profileScreen').classList.remove('visible');
+    document.getElementById('playerScreen').classList.add('visible');
+  });
+
+  function renderProfileData(uid, d) {
+    document.getElementById('profAvatar').textContent = (d.name || '?').charAt(0).toUpperCase();
+    document.getElementById('profName').textContent = d.name || '(tidak diketahui)';
+    document.getElementById('profLevel').textContent = d.level || 1;
+    const expIntoLevel = (d.exp || 0) % 100;
+    document.getElementById('profExp').textContent = expIntoLevel + ' / 100';
+    document.getElementById('profExpFill').style.width = expIntoLevel + '%';
+    const meta = statusMeta(d.presence);
+    const stEl = document.getElementById('profStatus');
+    stEl.className = 'friendStatus ' + meta.cls;
+    document.getElementById('profStatusText').textContent = meta.label;
+
+    const st = userStats(d);
+    document.getElementById('statMatch').textContent = st.totalMatch;
+    document.getElementById('statLength').textContent = st.longestLength.toLocaleString('id-ID');
+    document.getElementById('statTime').textContent = formatPlayTime(st.totalPlayTimeSec);
+    document.getElementById('statCoin').textContent = (d.coin || 0).toLocaleString('id-ID');
+    document.getElementById('statKill').textContent = st.totalKill.toLocaleString('id-ID');
+
+    // ---- Skin tab ----
+    const skinGrid = document.getElementById('profSkinGrid');
+    skinGrid.innerHTML = '';
+    SKIN_COLORS.forEach(c => {
+      skinGrid.insertAdjacentHTML('beforeend', `
+        <div class="profSkinItem">
+          <div class="profSkinSwatch" style="--sc:${c};"></div>
+          <div class="profSkinLabel">DASAR</div>
+        </div>`);
+    });
+    const owned = d.ownedSkins || {};
+    SHOP_SKINS.forEach(skin => {
+      const isOwned = !!owned[skin.id];
+      skinGrid.insertAdjacentHTML('beforeend', `
+        <div class="profSkinItem">
+          <div class="profSkinSwatch twoTone ${isOwned ? '' : 'locked'}" style="--sc:${skin.colorA};--scB:${skin.colorB};"></div>
+          <div class="profSkinLabel">${isOwned ? 'DIMILIKI' : 'TERKUNCI'}</div>
+        </div>`);
+    });
+
+    // ---- Achievement tab ----
+    const achList = document.getElementById('profAchList');
+    const achievements = [
+      { name: 'PEMULA', desc: 'Mainkan 1 pertandingan', done: st.totalMatch >= 1, icon: '&#9733;' },
+      { name: 'VETERAN', desc: 'Mainkan 50 pertandingan', done: st.totalMatch >= 50, icon: '&#127942;' },
+      { name: 'NAGA PANJANG', desc: 'Capai panjang 5.000', done: st.longestLength >= 5000, icon: '&#128207;' },
+      { name: 'PEMBUNUH ULUNG', desc: 'Raih 100 total kill', done: st.totalKill >= 100, icon: '&#128128;' },
+      { name: 'KOLEKTOR KOIN', desc: 'Kumpulkan 1.000 coin', done: (d.coin || 0) >= 1000, icon: '&#129689;' }
+    ];
+    achList.innerHTML = achievements.map(a => `
+      <div class="achRow ${a.done ? '' : 'locked'}">
+        <div class="achIcon">${a.done ? a.icon : '&#128274;'}</div>
+        <div class="achText">
+          <div class="achName">${a.name}</div>
+          <div class="achDesc">${a.desc}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openProfileScreen(uid) {
+    switchProfileTab('stat');
+    document.getElementById('playerScreen').classList.remove('visible');
+    document.getElementById('profileScreen').classList.add('visible');
+    if (profileWatchRef) profileWatchRef.off();
+    profileWatchRef = db.ref('users/' + uid);
+    profileWatchRef.on('value', snap => {
+      const d = snap.val();
+      if (!d) return;
+      renderProfileData(uid, d);
+    });
+  }
+
   async function joinServer(sid) {
     const max = SERVERS[sid].maxPlayers;
     const snap = await db.ref('servers/' + sid + '/players').once('value');
@@ -1082,6 +1572,8 @@ input:focus { border-color: #3CFFA0; }
 
   document.getElementById('logoutLink').addEventListener('click', () => {
     if (serverCountRef) serverCountRef.off();
+    if (presenceConnRef) { presenceConnRef.off(); presenceConnRef = null; }
+    if (currentUser) setPresenceStatus('offline');
     currentUser = null;
     document.getElementById('lobbyScreen').classList.remove('visible');
     document.getElementById('authScreen').classList.add('visible');
@@ -1251,14 +1743,20 @@ input:focus { border-color: #3CFFA0; }
       for (let i = 0; i < other.segs.length; i++) {
         const s = other.segs[i];
         if (dist2(nx, ny, s.x, s.y) < (headR + otherR) * (headR + otherR)) {
-          killBot(w);
+          killBot(w, other);
           return;
         }
       }
     }
   }
 
-  function killBot(w) {
+  function killBot(w, killer) {
+    if (killer && killer.id === playerId && currentUser) {
+      const st = userStats(currentUser);
+      st.totalKill += 1;
+      currentUser.stats = st;
+      db.ref('users/' + currentUser.uid + '/stats/totalKill').set(st.totalKill).catch(() => {});
+    }
     w.alive = false;
     for (let i = 0; i < w.segs.length; i += 2) {
       const seg = w.segs[i];
@@ -1456,6 +1954,23 @@ input:focus { border-color: #3CFFA0; }
     }
 
     if (myPlayerRef) myPlayerRef.remove();
+
+    // update statistik: panjang terpanjang & total waktu main
+    if (currentUser) {
+      try {
+        const st = userStats(currentUser);
+        const finalLen = Math.floor(p.len);
+        if (finalLen > st.longestLength) st.longestLength = finalLen;
+        const elapsedSec = sessionStartTime ? Math.max(0, (Date.now() - sessionStartTime) / 1000) : 0;
+        st.totalPlayTimeSec += elapsedSec;
+        currentUser.stats = st;
+        await db.ref('users/' + currentUser.uid + '/stats').update({
+          longestLength: st.longestLength,
+          totalPlayTimeSec: st.totalPlayTimeSec
+        });
+      } catch (e) {}
+      setPresenceStatus('online');
+    }
 
     if (givesXp) {
       try {
@@ -1727,10 +2242,19 @@ input:focus { border-color: #3CFFA0; }
   }
 
   // ---- start game ----
+  let sessionStartTime = 0;
   function startGame() {
     playTrack('game');
     worms = []; food = {}; particles = [];
     playerId = currentUser.uid;
+    sessionStartTime = Date.now();
+    setPresenceStatus('ingame');
+    if (currentUser) {
+      const st = userStats(currentUser);
+      st.totalMatch += 1;
+      currentUser.stats = st;
+      db.ref('users/' + currentUser.uid + '/stats/totalMatch').set(st.totalMatch).catch(() => {});
+    }
     const px = rand(WORLD.w * 0.3, WORLD.w * 0.7), py = rand(WORLD.h * 0.3, WORLD.h * 0.7);
     const myColor = localStorage.getItem(SKIN_STORAGE_KEY) || SKIN_COLORS[0];
     const myColorB = localStorage.getItem(SKIN_STORAGE_KEY_B) || null;
