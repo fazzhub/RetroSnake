@@ -26,9 +26,9 @@ html, body {
   background: #000;
   display: none;
   flex-direction: column; align-items: center; justify-content: center;
-  color: #3CFFA0; text-align: center; padding: 20px;
+  color: #2EE65C; text-align: center; padding: 20px;
 }
-.rotateIcon { font-size: 44px; margin-bottom: 18px; color: #3CFFA0; animation: spin 1.8s steps(4) infinite; }
+.rotateIcon { font-size: 44px; margin-bottom: 18px; color: #2EE65C; animation: spin 1.8s steps(4) infinite; }
 .rotateText { font-size: 13px; color: #aaa; line-height: 1.9; }
 @keyframes spin {
   0%, 100% { transform: rotate(0deg); }
@@ -44,15 +44,15 @@ html, body {
   background: #050505;
   background-image:
     radial-gradient(1px 1px at 8% 10%, #a86bff 100%, transparent),
-    radial-gradient(1px 1px at 20% 24%, #3CFFA0 100%, transparent),
-    radial-gradient(2px 2px at 68% 8%, #3CFFA0 100%, transparent),
+    radial-gradient(1px 1px at 20% 24%, #2EE65C 100%, transparent),
+    radial-gradient(2px 2px at 68% 8%, #2EE65C 100%, transparent),
     radial-gradient(1px 1px at 92% 14%, #FFD23C 100%, transparent),
-    radial-gradient(2px 2px at 10% 40%, #3CFFA0 100%, transparent),
+    radial-gradient(2px 2px at 10% 40%, #2EE65C 100%, transparent),
     radial-gradient(1px 1px at 88% 40%, #ccc 100%, transparent),
     radial-gradient(1px 1px at 6% 65%, #FFD23C 100%, transparent),
     radial-gradient(1px 1px at 94% 66%, #FF5C7A 100%, transparent),
     radial-gradient(2px 2px at 78% 84%, #a86bff 100%, transparent),
-    radial-gradient(1px 1px at 30% 90%, #3CFFA0 100%, transparent),
+    radial-gradient(1px 1px at 30% 90%, #2EE65C 100%, transparent),
     radial-gradient(1px 1px at 55% 96%, #FFD23C 100%, transparent),
     radial-gradient(1px 1px at 96% 92%, #7fd6c8 100%, transparent),
     linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
@@ -62,17 +62,17 @@ html, body {
   padding: clamp(8px, 3vh, 20px) 20px;
   overflow-y: auto; overflow-x: hidden;
   overscroll-behavior: contain;
-  color: #3CFFA0;
+  color: #2EE65C;
 }
 .screen.visible { display: flex; }
 
 .screenTopBar {
   width: 100%; max-width: 640px;
   display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 8px;
+  flex-wrap: nowrap; gap: 8px;
   padding: 18px 0 10px;
 }
-.screenBrand { font-size: 13px; letter-spacing: 2px; color: #3CFFA0; font-weight: 700; white-space: nowrap; }
+.screenBrand { font-size: 13px; letter-spacing: 2px; color: #2EE65C; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
 .screenBrand .ver { color: #666; font-size: 10px; letter-spacing: 1px; margin-left: 8px; font-weight: 400; }
 .screenBackBtn {
   display: flex; align-items: center; gap: 6px;
@@ -81,10 +81,40 @@ html, body {
   padding: 8px 10px; font-size: 10px; letter-spacing: 1px; font-weight: 700;
   cursor: pointer; font-family: 'Silkscreen', monospace;
   white-space: nowrap; flex-shrink: 0;
+  box-shadow: 0 0 5px rgba(255,92,122,0.4), inset 0 0 8px rgba(255,92,122,0.28);
 }
 .screenDivider {
   width: 100%; max-width: 640px; height: 1px;
   background: rgba(255,255,255,0.15); margin-bottom: clamp(14px, 3vh, 30px);
+}
+
+/* ---- header brand box + ikon (trophy/mail/gear) khusus lobby ---- */
+.screenBrandBox {
+  border: 1.5px solid #2EE65C; background: rgba(0,0,0,0.3);
+  padding: 8px 14px; display: flex; flex-direction: column; justify-content: center;
+  min-width: 0; overflow: hidden; flex-shrink: 1;
+  box-shadow: 0 0 5px rgba(46,230,92,0.4), inset 0 0 8px rgba(46,230,92,0.28);
+}
+.topIconRow { display: flex; gap: 6px; flex-shrink: 0; }
+.topIconBtn {
+  width: 34px; height: 34px; flex-shrink: 0;
+  border: 1.5px solid #2EE65C; background: transparent;
+  color: #2EE65C; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-family: 'Silkscreen', monospace;
+  box-shadow: 0 0 5px rgba(46,230,92,0.4), inset 0 0 8px rgba(46,230,92,0.28);
+}
+.topIconBtn:hover { background: rgba(46,230,92,0.08); }
+.pixIcon { width: 15px; height: 15px; fill: currentColor; shape-rendering: crispEdges; flex-shrink: 0; display: block; }
+.pixWarnIcon { display: inline-flex; vertical-align: middle; margin-right: 5px; }
+.pixWarnIcon .pixIcon { width: 10px; height: 8px; }
+.topIconBtn:active { transform: translate(1px, 1px); }
+
+.screenBackBtn.wide {
+  width: 100%; max-width: 640px;
+  justify-content: flex-start;
+  padding: 10px 14px;
+  margin: 8px 0 clamp(14px, 3vh, 26px);
 }
 
 .logo {
@@ -101,11 +131,11 @@ html, body {
   overflow-wrap: break-word;
   word-break: break-word;
 }
-.logo .accent { color: #3CFFA0; }
+.logo .accent { color: #2EE65C; }
 .logoWorm { margin-bottom: clamp(10px, 3vh, 20px); line-height: 0; text-align: center; }
 .logoWorm span {
   display: inline-block; width: 13px; height: 13px; margin: 0 1px;
-  background: #3CFFA0; vertical-align: middle;
+  background: #2EE65C; vertical-align: middle;
 }
 .logoWorm span.head { position: relative; width: 17px; height: 17px; }
 .logoWorm span.head::before, .logoWorm span.head::after {
@@ -123,12 +153,12 @@ html, body {
 .card {
   width: 100%; max-width: 380px;
   background: rgba(0,0,0,0.4);
-  border: 1.5px solid #3CFFA0;
+  border: 1.5px solid #2EE65C;
   padding: clamp(18px, 3vh, 28px) 24px;
 }
 
 .cardHead { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.15); }
-.cardHead .icon { color: #3CFFA0; font-size: 18px; }
+.cardHead .icon { color: #2EE65C; font-size: 18px; }
 .cardHead .title { color: #fff; font-size: 15px; letter-spacing: 1px; font-weight: 700; }
 
 .tabs { display: flex; gap: 4px; margin-bottom: clamp(10px, 2vh, 18px); }
@@ -140,11 +170,11 @@ html, body {
   transition: all .1s;
 }
 .tabBtn.active {
-  color: #000; background: #3CFFA0;
-  border-color: #3CFFA0;
+  color: #000; background: #2EE65C;
+  border-color: #2EE65C;
 }
 
-.fieldLabel { font-size: 10px; letter-spacing: 2px; color: #3CFFA0; margin-bottom: 6px; display: block; }
+.fieldLabel { font-size: 10px; letter-spacing: 2px; color: #2EE65C; margin-bottom: 6px; display: block; }
 
 input {
   width: 100%; padding: clamp(10px, 1.8vh, 13px) 12px; font-size: 14px;
@@ -154,17 +184,21 @@ input {
   margin-bottom: clamp(10px, 1.8vh, 14px); transition: border-color .15s;
 }
 input::placeholder { color: #555; }
-input:focus { border-color: #3CFFA0; }
+input:focus { border-color: #2EE65C; }
 
 .btnPrimary {
   width: 100%; padding: 16px; font-size: 15px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 2px;
-  border: 1.5px solid #3CFFA0; cursor: pointer;
-  background: transparent; color: #3CFFA0;
+  border: 1.5px solid #2EE65C; cursor: pointer;
+  background: transparent; color: #2EE65C;
   transition: all .12s;
   display: flex; align-items: center; justify-content: center; gap: 10px;
+  box-shadow: 0 0 5px rgba(46,230,92,0.4), inset 0 0 9px rgba(46,230,92,0.28);
 }
-.btnPrimary::before { content: '\25B6'; font-size: 12px; }
-.btnPrimary:hover { background: rgba(60,255,160,0.08); }
+.btnPrimary::before {
+  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 5'%3E%3Crect x='0' y='0' width='1' height='1' fill='%232EE65C'/%3E%3Crect x='0' y='1' width='2' height='1' fill='%232EE65C'/%3E%3Crect x='0' y='2' width='3' height='1' fill='%232EE65C'/%3E%3Crect x='0' y='3' width='2' height='1' fill='%232EE65C'/%3E%3Crect x='0' y='4' width='1' height='1' fill='%232EE65C'/%3E%3C/svg%3E");
+  width: 9px; height: 15px; image-rendering: pixelated;
+}
+.btnPrimary:hover { background: rgba(46,230,92,0.08); }
 .btnPrimary:active { transform: translate(1px, 1px); }
 .btnPrimary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
@@ -173,7 +207,7 @@ input:focus { border-color: #3CFFA0; }
   border: 1.5px solid #444; cursor: pointer;
   background: transparent; color: #ccc; margin-top: 0;
 }
-.btnGhost:hover { border-color: #3CFFA0; color: #3CFFA0; }
+.btnGhost:hover { border-color: #2EE65C; color: #2EE65C; }
 
 .btnWhite {
   width: 100%; padding: 16px; font-size: 15px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 2px;
@@ -182,8 +216,9 @@ input:focus { border-color: #3CFFA0; }
   transition: all .12s;
   display: flex; align-items: center; justify-content: center; gap: 10px;
   margin-top: 10px;
+  box-shadow: 0 0 5px rgba(255,255,255,0.3), inset 0 0 9px rgba(255,255,255,0.18);
 }
-.btnWhite::before { content: '\25B6'; font-size: 12px; }
+.btnWhite::before { display: none; }
 .btnWhite:hover { background: rgba(255,255,255,0.08); }
 .btnWhite:active { transform: translate(1px, 1px); }
 
@@ -194,9 +229,43 @@ input:focus { border-color: #3CFFA0; }
   display: none; align-items: center; justify-content: center; padding: 20px;
 }
 .skinOverlay.visible { display: flex; }
+
+.quitOverlay {
+  position: fixed; inset: 0; z-index: 45;
+  background: rgba(0,0,0,0.75);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.quitOverlay.visible { display: flex; }
+.quitModal {
+  width: 100%; max-width: 340px;
+  background: #050505; border: 1.5px solid #2EE65C;
+  padding: clamp(20px, 3vh, 28px) 22px;
+  box-shadow: 0 0 5px rgba(46,230,92,0.4), inset 0 0 9px rgba(46,230,92,0.28);
+  text-align: center;
+}
+.quitModalHead {
+  color: #2EE65C; font-size: 14px; letter-spacing: 2px; font-weight: 700;
+  font-family: 'Silkscreen', monospace;
+  margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+.quitModalMsg {
+  color: #ccc; font-size: 11px; letter-spacing: 0.5px; line-height: 1.9;
+  margin-bottom: 22px; font-family: 'Silkscreen', monospace;
+}
+.quitModalBtnRow { display: flex; gap: 10px; }
+.quitNoBtn, .quitYesBtn {
+  flex: 1; padding: 12px 8px; font-size: 11px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 1px;
+  cursor: pointer; transition: all .12s;
+}
+.quitNoBtn { border: 1.5px solid #2EE65C; background: transparent; color: #2EE65C; }
+.quitNoBtn:hover { background: rgba(46,230,92,0.08); }
+.quitYesBtn { border: 1.5px solid #FF5C7A; background: rgba(255,92,122,0.06); color: #FF5C7A; }
+.quitYesBtn:hover { background: rgba(255,92,122,0.15); }
+.quitNoBtn:active, .quitYesBtn:active { transform: translate(1px, 1px); }
+
 .skinModal {
   width: 100%; max-width: 380px;
-  background: #050505; border: 1.5px solid #3CFFA0;
+  background: #050505; border: 1.5px solid #2EE65C;
   padding: clamp(18px, 3vh, 26px) 22px;
 }
 .skinModalHead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.15); }
@@ -232,10 +301,10 @@ input:focus { border-color: #3CFFA0; }
 }
 .skinConfirmBtn {
   width: 100%; padding: 14px; font-size: 13px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 2px;
-  border: 1.5px solid #3CFFA0; cursor: pointer;
-  background: transparent; color: #3CFFA0;
+  border: 1.5px solid #2EE65C; cursor: pointer;
+  background: transparent; color: #2EE65C;
 }
-.skinConfirmBtn:hover { background: rgba(60,255,160,0.08); }
+.skinConfirmBtn:hover { background: rgba(46,230,92,0.08); }
 
 .orDivider { display: flex; align-items: center; gap: 12px; margin: clamp(12px, 2.5vh, 18px) 0; color: #555; font-size: 10px; letter-spacing: 2px; }
 .orDivider::before, .orDivider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.15); }
@@ -243,29 +312,30 @@ input:focus { border-color: #3CFFA0; }
 /* ---------- Shop button (border ijo sama kayak Play Online) ---------- */
 .btnShop {
   width: 100%; padding: 16px; font-size: 15px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 2px;
-  border: 1.5px solid #3CFFA0; cursor: pointer;
-  background: transparent; color: #3CFFA0; margin-top: 10px;
+  border: 1.5px solid #2EE65C; cursor: pointer;
+  background: transparent; color: #2EE65C; margin-top: 10px;
   transition: all .12s;
   display: flex; align-items: center; justify-content: center; gap: 10px;
+  box-shadow: 0 0 5px rgba(46,230,92,0.4), inset 0 0 9px rgba(46,230,92,0.28);
 }
-.btnShop::before { content: '\25B6'; font-size: 12px; }
-.btnShop:hover { background: rgba(60,255,160,0.08); }
+.btnShop::before { display: none; }
+.btnShop:hover { background: rgba(46,230,92,0.08); }
 .btnShop:active { transform: translate(1px, 1px); }
 
 /* ---------- Shop screen ---------- */
 .shopCoinBadge {
-  border: 1.5px solid #3CFFA0; background: rgba(0,0,0,0.4);
+  border: 1.5px solid #2EE65C; background: rgba(0,0,0,0.4);
   padding: 8px 16px; text-align: center;
 }
-.shopCoinBadge .lbl { font-size: 10px; letter-spacing: 2px; color: #3CFFA0; margin-bottom: 4px; }
+.shopCoinBadge .lbl { font-size: 10px; letter-spacing: 2px; color: #2EE65C; margin-bottom: 4px; }
 .shopCoinBadge .val { font-size: 18px; color: #FFD23C; font-weight: 700; }
 
 .sectionLabel {
   display: flex; align-items: center; justify-content: center; gap: 10px;
-  color: #3CFFA0; font-size: 14px; font-weight: 700; letter-spacing: 3px;
+  color: #2EE65C; font-size: 14px; font-weight: 700; letter-spacing: 3px;
   margin-bottom: clamp(4px, 0.8vh, 8px);
 }
-.sectionLabel .sq { width: 6px; height: 6px; border: 1.5px solid #3CFFA0; }
+.sectionLabel .sq { width: 6px; height: 6px; border: 1.5px solid #2EE65C; }
 .sectionSubLabel {
   color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 3px;
   text-align: center; flex-shrink: 0;
@@ -290,20 +360,20 @@ input:focus { border-color: #3CFFA0; }
 }
 .skinPageArrow {
   position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
-  border: 1.5px solid #3CFFA0; background: #050505; color: #3CFFA0;
+  border: 1.5px solid #2EE65C; background: #050505; color: #2EE65C;
   width: 24px; height: 24px;
   font-size: 13px; cursor: pointer; font-family: 'Silkscreen', monospace;
   display: flex; align-items: center; justify-content: center;
 }
 .skinPageArrow.left { left: -8px; }
 .skinPageArrow.right { right: -8px; }
-.skinPageArrow:hover { background: rgba(60,255,160,0.15); }
+.skinPageArrow:hover { background: rgba(46,230,92,0.15); }
 .skinPageArrow:disabled { opacity: 0.25; cursor: not-allowed; }
 .skinPageArrow.hidden { visibility: hidden; }
 
 @media (max-width: 340px) { .skinShopGrid { grid-template-columns: minmax(0,1fr); grid-template-rows: repeat(4, minmax(0,1fr)); } }
 .skinShopCard {
-  border: 1.5px solid #3CFFA0; background: rgba(0,0,0,0.4);
+  border: 1.5px solid #2EE65C; background: rgba(0,0,0,0.4);
   padding: clamp(10px, 2vh, 18px) clamp(12px, 3.4vw, 18px); text-align: center;
   min-width: 0; min-height: 0; height: 100%;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -324,22 +394,28 @@ input:focus { border-color: #3CFFA0; }
 }
 .skinShopSwatches .sw.eyes::before { left: 24%; }
 .skinShopSwatches .sw.eyes::after { right: 24%; }
-.skinShopPrice { font-size: clamp(6px, 1.2vh, 9px); letter-spacing: 2px; color: #3CFFA0; margin-bottom: clamp(2px, 0.5vh, 3px); flex-shrink: 0; }
+.skinShopPrice { font-size: clamp(6px, 1.2vh, 9px); letter-spacing: 2px; color: #2EE65C; margin-bottom: clamp(2px, 0.5vh, 3px); flex-shrink: 0; }
 .skinShopPriceVal { font-size: clamp(11px, 2.2vh, 17px); color: #fff; font-weight: 700; margin-bottom: clamp(4px, 1.3vh, 13px); flex-shrink: 0; }
 .skinShopPriceVal .coinWord { font-size: clamp(8px, 1.5vh, 11px); color: #FFD23C; margin-left: 4px; }
 .skinShopBuyBtn {
   width: 100%; padding: clamp(5px, 1.2vh, 11px); font-size: clamp(8px, 1.5vh, 12px); font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 1px;
-  border: 1.5px solid #3CFFA0; cursor: pointer;
-  background: transparent; color: #3CFFA0;
+  border: 1.5px solid #2EE65C; cursor: pointer;
+  background: transparent; color: #2EE65C;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   transition: all .12s;
   flex-shrink: 0;
 }
-.skinShopBuyBtn::before { content: '\25B6'; font-size: 10px; }
-.skinShopBuyBtn:hover { background: rgba(60,255,160,0.08); }
+.skinShopBuyBtn::before {
+  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 5'%3E%3Crect x='0' y='0' width='1' height='1' fill='%232EE65C'/%3E%3Crect x='0' y='1' width='2' height='1' fill='%232EE65C'/%3E%3Crect x='0' y='2' width='3' height='1' fill='%232EE65C'/%3E%3Crect x='0' y='3' width='2' height='1' fill='%232EE65C'/%3E%3Crect x='0' y='4' width='1' height='1' fill='%232EE65C'/%3E%3C/svg%3E");
+  width: 7px; height: 12px; image-rendering: pixelated;
+}
+.skinShopBuyBtn:hover { background: rgba(46,230,92,0.08); }
 .skinShopBuyBtn:disabled { opacity: 0.45; cursor: not-allowed; }
 .skinShopBuyBtn.owned { border-color: #777; color: #999; cursor: default; }
-.skinShopBuyBtn.owned::before { content: '\2713'; }
+.skinShopBuyBtn.owned::before {
+  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Crect x='0' y='4' width='1' height='1' fill='%23999'/%3E%3Crect x='1' y='5' width='1' height='1' fill='%23999'/%3E%3Crect x='2' y='6' width='1' height='1' fill='%23999'/%3E%3Crect x='3' y='5' width='1' height='1' fill='%23999'/%3E%3Crect x='4' y='4' width='1' height='1' fill='%23999'/%3E%3Crect x='5' y='3' width='1' height='1' fill='%23999'/%3E%3Crect x='6' y='2' width='1' height='1' fill='%23999'/%3E%3Crect x='7' y='1' width='1' height='1' fill='%23999'/%3E%3C/svg%3E");
+  width: 11px; height: 11px; image-rendering: pixelated;
+}
 .skinShopBuyBtn.owned:hover { background: transparent; }
 .skinShopMsg {
   color: #FF5C7A; font-size: clamp(7px, 1.3vh, 10px); text-align: center; min-height: clamp(8px, 1.4vh, 14px); margin-bottom: clamp(2px, 0.8vh, 8px);
@@ -357,12 +433,12 @@ input:focus { border-color: #3CFFA0; }
 }
 .shopTierNav .sectionSubLabel { margin-bottom: 0; min-width: 100px; }
 .tierArrowBtn {
-  border: 1.5px solid #3CFFA0; background: transparent; color: #3CFFA0;
+  border: 1.5px solid #2EE65C; background: transparent; color: #2EE65C;
   width: 30px; height: 30px; font-size: 16px; cursor: pointer;
   font-family: 'Silkscreen', monospace; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
 }
-.tierArrowBtn:hover { background: rgba(60,255,160,0.08); }
+.tierArrowBtn:hover { background: rgba(46,230,92,0.08); }
 .tierArrowBtn:disabled { opacity: 0.3; cursor: not-allowed; }
 
 .errMsg {
@@ -373,14 +449,15 @@ input:focus { border-color: #3CFFA0; }
 /* ---------- Player button (sama gaya kayak Shop) ---------- */
 .btnPlayer {
   width: 100%; padding: 16px; font-size: 15px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 2px;
-  border: 1.5px solid #3CFFA0; cursor: pointer;
-  background: transparent; color: #3CFFA0;
+  border: 1.5px solid #2EE65C; cursor: pointer;
+  background: transparent; color: #2EE65C;
   transition: all .12s;
   display: flex; align-items: center; justify-content: center; gap: 10px;
   margin-top: 10px;
+  box-shadow: 0 0 5px rgba(46,230,92,0.4), inset 0 0 9px rgba(46,230,92,0.28);
 }
-.btnPlayer::before { content: '\25B6'; font-size: 12px; }
-.btnPlayer:hover { background: rgba(60,255,160,0.08); }
+.btnPlayer::before { display: none; }
+.btnPlayer:hover { background: rgba(46,230,92,0.08); }
 .btnPlayer:active { transform: translate(1px, 1px); }
 
 /* ---------- Friend list screen ---------- */
@@ -407,33 +484,33 @@ input:focus { border-color: #3CFFA0; }
 #playerScreen .footNote { display: none; }
 .friendCard {
   width: 100%; max-width: 380px;
-  background: rgba(0,0,0,0.4); border: 1.5px solid #3CFFA0;
+  background: rgba(0,0,0,0.4); border: 1.5px solid #2EE65C;
   padding: clamp(10px, 2.2vh, 16px) 14px; margin-bottom: clamp(10px, 2vh, 14px);
   display: flex; flex-direction: column; gap: 10px;
 }
 .friendTop { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .friendAvatar {
   width: 48px; height: 48px; flex-shrink: 0;
-  background: rgba(60,255,160,0.08); border: 1.5px solid #3CFFA0;
+  background: rgba(46,230,92,0.08); border: 1.5px solid #2EE65C;
   display: flex; align-items: center; justify-content: center;
-  font-weight: 700; color: #3CFFA0; font-size: 20px; font-family: 'Silkscreen', monospace;
+  font-weight: 700; color: #2EE65C; font-size: 20px; font-family: 'Silkscreen', monospace;
 }
 .friendInfo { flex: 1; min-width: 0; }
 .friendInfo .fname { font-size: 14px; color: #fff; font-family: 'Silkscreen', monospace; margin-bottom: 6px; letter-spacing: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .friendInfo .flevelRow { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 6px; }
-.friendInfo .flevelRow .k { font-size: 9px; letter-spacing: 1px; color: #3CFFA0; margin-right: 4px; }
+.friendInfo .flevelRow .k { font-size: 9px; letter-spacing: 1px; color: #2EE65C; margin-right: 4px; }
 .friendInfo .flevelRow .v { font-size: 11px; color: #fff; font-weight: 700; }
 .friendStatus { display: flex; align-items: center; gap: 6px; font-size: 9px; letter-spacing: 1px; font-weight: 700; white-space: nowrap; }
 .friendStatus .dot { width: 7px; height: 7px; flex-shrink: 0; }
-.friendStatus.online { color: #3CFFA0; } .friendStatus.online .dot { background: #3CFFA0; }
+.friendStatus.online { color: #2EE65C; } .friendStatus.online .dot { background: #2EE65C; }
 .friendStatus.offline { color: #888; } .friendStatus.offline .dot { background: transparent; border: 1.5px solid #888; width: 5px; height: 5px; }
 .friendStatus.ingame { color: #FFD23C; } .friendStatus.ingame .dot { background: #FFD23C; }
 .friendBtnRow { display: flex; justify-content: flex-end; gap: 8px; }
 .friendViewBtn {
-  padding: 8px 16px; border: 1.5px solid #3CFFA0; background: transparent; color: #3CFFA0;
+  padding: 8px 16px; border: 1.5px solid #2EE65C; background: transparent; color: #2EE65C;
   font-size: 10px; font-family: 'Silkscreen', monospace; font-weight: 700; cursor: pointer; letter-spacing: 1px;
 }
-.friendViewBtn:hover { background: rgba(60,255,160,0.08); }
+.friendViewBtn:hover { background: rgba(46,230,92,0.08); }
 .friendRemoveBtn {
   width: 34px; height: 34px; flex-shrink: 0; border: 1.5px solid #FF5C7A; background: transparent; color: #FF5C7A;
   font-size: 14px; font-family: 'Silkscreen', monospace; font-weight: 700; cursor: pointer;
@@ -450,9 +527,9 @@ input:focus { border-color: #3CFFA0; }
 .pagerBtn {
   flex-shrink: 0;
   padding: 10px 12px; font-size: 10px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 1px;
-  border: 1.5px solid #3CFFA0; cursor: pointer; background: transparent; color: #3CFFA0;
+  border: 1.5px solid #2EE65C; cursor: pointer; background: transparent; color: #2EE65C;
 }
-.pagerBtn:hover:not(:disabled) { background: rgba(60,255,160,0.08); }
+.pagerBtn:hover:not(:disabled) { background: rgba(46,230,92,0.08); }
 .pagerBtn:disabled { opacity: 0.35; cursor: not-allowed; border-color: #444; color: #666; }
 .pagerInfo { font-size: 11px; letter-spacing: 1px; color: #aaa; white-space: nowrap; }
 
@@ -465,40 +542,40 @@ input:focus { border-color: #3CFFA0; }
   color: #fff; font-size: clamp(12px, 3.2vw, 18px); letter-spacing: 2px; font-weight: 700;
   margin-bottom: clamp(8px, 1.8vh, 16px); font-family: 'Silkscreen', monospace;
 }
-.profileHeading .bracket { color: #3CFFA0; font-size: clamp(14px, 3.6vw, 20px); }
+.profileHeading .bracket { color: #2EE65C; font-size: clamp(14px, 3.6vw, 20px); }
 .profileCard {
   width: 100%; max-width: 420px; flex-shrink: 0;
   display: flex; align-items: center; gap: 14px;
-  background: rgba(0,0,0,0.4); border: 1.5px solid #3CFFA0;
+  background: rgba(0,0,0,0.4); border: 1.5px solid #2EE65C;
   padding: clamp(10px, 2vh, 16px) 16px; margin-bottom: clamp(8px, 1.6vh, 14px);
 }
 .profileAvatar {
   width: 50px; height: 50px; flex-shrink: 0;
-  background: rgba(60,255,160,0.08); border: 1.5px solid #3CFFA0;
+  background: rgba(46,230,92,0.08); border: 1.5px solid #2EE65C;
   display: flex; align-items: center; justify-content: center;
-  font-weight: 700; color: #3CFFA0; font-size: 20px; font-family: 'Silkscreen', monospace;
+  font-weight: 700; color: #2EE65C; font-size: 20px; font-family: 'Silkscreen', monospace;
 }
 .profileInfo { flex: 1; min-width: 0; }
 .profileInfo .pname { font-size: 15px; color: #fff; font-family: 'Silkscreen', monospace; margin-bottom: 4px; letter-spacing: 1px; }
 .profileInfo .flevelRow { display: flex; gap: 18px; margin: 6px 0; }
-.profileInfo .flevelRow .k { font-size: 9px; letter-spacing: 1px; color: #3CFFA0; margin-bottom: 2px; }
+.profileInfo .flevelRow .k { font-size: 9px; letter-spacing: 1px; color: #2EE65C; margin-bottom: 2px; }
 .profileInfo .flevelRow .v { font-size: 13px; color: #fff; font-weight: 700; }
 
 .profileTabs { width: 100%; max-width: 420px; flex-shrink: 0; margin-bottom: clamp(6px, 1.4vh, 10px); }
 .profileBody { width: 100%; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
 .profilePanel {
   width: 100%; max-width: 420px;
-  background: rgba(0,0,0,0.4); border: 1.5px solid #3CFFA0;
+  background: rgba(0,0,0,0.4); border: 1.5px solid #2EE65C;
   padding: clamp(10px, 2vh, 16px) 16px; margin-bottom: clamp(8px, 1.6vh, 14px);
 }
-.profilePanel .panelLabel { color: #3CFFA0; font-size: 11px; letter-spacing: 2px; font-weight: 700; margin-bottom: clamp(6px, 1.4vh, 12px); }
+.profilePanel .panelLabel { color: #2EE65C; font-size: 11px; letter-spacing: 2px; font-weight: 700; margin-bottom: clamp(6px, 1.4vh, 12px); }
 .statRow {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
   padding: clamp(6px, 1.3vh, 10px) 0;
   border-bottom: 1px dashed rgba(255,255,255,0.18);
 }
 .statRow:last-child { border-bottom: none; }
-.statRow .sLeft { display: flex; align-items: center; gap: 10px; color: #3CFFA0; font-size: 10px; letter-spacing: 1px; }
+.statRow .sLeft { display: flex; align-items: center; gap: 10px; color: #2EE65C; font-size: 10px; letter-spacing: 1px; }
 .statRow .sLeft .icon { font-size: 14px; }
 .statRow .sVal { color: #fff; font-size: 13px; font-weight: 700; letter-spacing: 1px; }
 .profileEmpty { color: #666; font-size: 11px; letter-spacing: 1px; text-align: center; padding: 10px 0; line-height: 1.9; }
@@ -512,55 +589,81 @@ input:focus { border-color: #3CFFA0; }
 .profSkinSwatch.multiTone::before { background-color: transparent; background-image: var(--grad); }
 .profSkinSwatch.locked { filter: grayscale(1) brightness(0.4); }
 .profSkinSwatch.locked::after {
-  content: '\1F512'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  font-size: 13px; filter: none; z-index: 2;
+  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7'%3E%3Crect x='2' y='0' width='3' height='1' fill='white'/%3E%3Crect x='1' y='1' width='1' height='1' fill='white'/%3E%3Crect x='5' y='1' width='1' height='1' fill='white'/%3E%3Crect x='1' y='2' width='1' height='1' fill='white'/%3E%3Crect x='5' y='2' width='1' height='1' fill='white'/%3E%3Crect x='0' y='3' width='7' height='1' fill='white'/%3E%3Crect x='0' y='4' width='7' height='1' fill='white'/%3E%3Crect x='0' y='5' width='3' height='1' fill='white'/%3E%3Crect x='4' y='5' width='3' height='1' fill='white'/%3E%3Crect x='0' y='6' width='7' height='1' fill='white'/%3E%3C/svg%3E");
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  width: 15px; height: 15px; margin: auto; filter: none; z-index: 2; image-rendering: pixelated;
 }
 .profSkinLabel { font-size: 7px; color: #888; letter-spacing: 1px; }
 
 .achRow { display: flex; align-items: center; gap: 10px; padding: clamp(6px, 1.3vh, 10px) 0; border-bottom: 1px dashed rgba(255,255,255,0.18); }
 .achRow:last-child { border-bottom: none; }
-.achRow .achIcon { width: 26px; height: 26px; flex-shrink: 0; border: 1.5px solid #3CFFA0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #3CFFA0; }
+.achRow .achIcon { width: 26px; height: 26px; flex-shrink: 0; border: 1.5px solid #2EE65C; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #2EE65C; }
 .achRow.locked .achIcon { border-color: #444; color: #444; }
 .achRow .achText .achName { font-size: 11px; color: #fff; letter-spacing: 1px; margin-bottom: 2px; }
 .achRow.locked .achText .achName { color: #666; }
 .achRow .achText .achDesc { font-size: 8px; color: #888; letter-spacing: 1px; }
 
 .forgotLink {
-  margin-top: clamp(16px, 3vh, 26px); color: #3CFFA0; font-size: 11px; letter-spacing: 1px;
+  margin-top: clamp(16px, 3vh, 26px); color: #2EE65C; font-size: 11px; letter-spacing: 1px;
   display: flex; align-items: center; gap: 8px; cursor: pointer;
 }
 .forgotLink::before, .forgotLink::after { content: ''; width: 60px; height: 1px; background: rgba(255,255,255,0.15); }
 
 /* ---------- Lobby ---------- */
+/* Halaman lobby tidak boleh digulir — semua elemen mengecil otomatis
+   mengikuti tinggi layar (pakai satuan vh) supaya selalu muat, sama seperti
+   halaman player/profile/shop. */
+#lobbyScreen { overflow: hidden; justify-content: flex-start; padding-top: clamp(4px, 1vh, 20px); }
+#lobbyScreen .screenTopBar { flex-shrink: 0; padding: clamp(4px, 1.2vh, 18px) 0 clamp(3px, 0.8vh, 10px); }
+#lobbyScreen .screenBrandBox { padding: clamp(4px, 1vh, 8px) clamp(8px, 2vw, 14px); }
+#lobbyScreen .topIconBtn { width: clamp(24px, 4.4vh, 34px); height: clamp(24px, 4.4vh, 34px); font-size: clamp(10px, 2vh, 14px); }
+#lobbyScreen .screenBackBtn.wide { flex-shrink: 0; margin: clamp(2px, 0.8vh, 8px) 0 clamp(6px, 1.6vh, 14px); padding: clamp(5px, 1vh, 10px) 12px; font-size: clamp(8px, 1.6vh, 10px); }
+#lobbyScreen .logo { flex-shrink: 0; font-size: clamp(15px, 4.6vh, 46px); margin-bottom: 2px; }
+#lobbyScreen .logoWorm { flex-shrink: 0; margin-bottom: clamp(5px, 1.6vh, 20px); transform: scale(0.85); transform-origin: center; }
+#lobbyScreen .userBadge { flex-shrink: 0; padding: clamp(8px, 1.8vh, 20px) clamp(12px, 3vw, 18px); margin-bottom: clamp(6px, 1.6vh, 26px); gap: clamp(6px, 1.4vh, 14px); }
+#lobbyScreen .userAvatar { width: clamp(30px, 5.6vh, 46px); height: clamp(30px, 5.6vh, 46px); font-size: clamp(12px, 2.4vh, 18px); }
+#lobbyScreen .userBadgeTop { gap: clamp(8px, 1.8vw, 12px); }
+#lobbyScreen .plabel { font-size: clamp(8px, 1.6vh, 10px); margin-bottom: clamp(1px, 0.5vh, 4px); }
+#lobbyScreen .uname { font-size: clamp(12px, 2.6vh, 16px); }
+#lobbyScreen .friendViewBtn { padding: clamp(5px, 1vh, 8px) clamp(9px, 1.8vw, 14px); font-size: clamp(8px, 1.5vh, 10px); }
+#lobbyScreen .ulevelRow .stat .k { font-size: clamp(7px, 1.4vh, 9px); margin-bottom: clamp(1px, 0.4vh, 3px); }
+#lobbyScreen .expBar { height: clamp(5px, 1vh, 8px); }
+#lobbyScreen #lobbyMenu { flex-shrink: 0; }
+#lobbyScreen .btnPrimary, #lobbyScreen .btnWhite, #lobbyScreen .btnShop, #lobbyScreen .btnPlayer {
+  padding: clamp(8px, 1.8vh, 16px); font-size: clamp(10px, 2.2vh, 15px); margin-top: clamp(5px, 1.2vh, 10px); gap: clamp(6px, 1.4vw, 10px);
+}
+#lobbyScreen .footNote { flex-shrink: 0; margin-top: auto; padding: clamp(6px, 1.6vh, 30px) 0 clamp(4px, 1vh, 10px); font-size: clamp(8px, 1.6vh, 11px); }
 .userBadge {
   width: 100%; max-width: 380px;
   display: flex; flex-direction: column; gap: clamp(10px, 2vh, 14px);
-  background: rgba(0,0,0,0.4); border: 1.5px solid #3CFFA0;
+  background: rgba(0,0,0,0.4); border: 1.5px solid #2EE65C;
   padding: clamp(14px, 2.5vh, 20px) 18px; margin-bottom: clamp(16px, 3vh, 26px);
+  box-shadow: 0 0 5px rgba(46,230,92,0.4), inset 0 0 9px rgba(46,230,92,0.28);
 }
 .userBadgeTop { display: flex; align-items: center; gap: 12px; }
 .userAvatar {
   width: 46px; height: 46px; flex-shrink: 0;
-  background: rgba(60,255,160,0.08); border: 1.5px solid #3CFFA0;
+  background: rgba(46,230,92,0.08); border: 1.5px solid #2EE65C;
   display: flex; align-items: center; justify-content: center;
-  font-weight: 700; color: #3CFFA0; font-size: 18px; font-family: 'Silkscreen', monospace;
+  font-weight: 700; color: #2EE65C; font-size: 18px; font-family: 'Silkscreen', monospace;
 }
 .userNameWrap { flex: 1; min-width: 0; }
 .userInfo { flex: 1; min-width: 0; }
-.userInfo .plabel, .userNameWrap .plabel { font-size: 10px; letter-spacing: 2px; color: #3CFFA0; margin-bottom: 4px; }
+.userInfo .plabel, .userNameWrap .plabel { font-size: 10px; letter-spacing: 2px; color: #2EE65C; margin-bottom: 4px; }
 .userInfo .uname, .userNameWrap .uname {
   font-size: 16px; color: #fff; font-family: 'Silkscreen', monospace;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .userInfo .ulevelRow, .ulevelRow {
-  display: flex; gap: 8px;
+  display: flex; align-items: center; gap: 8px;
 }
+.statDivider { width: 1px; align-self: stretch; background: rgba(255,255,255,0.15); flex-shrink: 0; }
 .userInfo .ulevelRow .stat, .ulevelRow .stat { flex: 1; min-width: 0; }
 .userInfo .ulevelRow .stat:first-child, .ulevelRow .stat:first-child { text-align: left; }
-.userInfo .ulevelRow .stat:nth-child(2), .ulevelRow .stat:nth-child(2) { text-align: center; }
+.userInfo .ulevelRow .stat:nth-child(3), .ulevelRow .stat:nth-child(3) { text-align: center; }
 .userInfo .ulevelRow .stat:last-child, .ulevelRow .stat:last-child { text-align: right; }
 .userInfo .ulevelRow .stat .k, .ulevelRow .stat .k {
-  font-size: 9px; letter-spacing: 1px; color: #3CFFA0; margin-bottom: 3px;
+  font-size: 9px; letter-spacing: 1px; color: #2EE65C; margin-bottom: 3px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .userInfo .ulevelRow .stat .v, .ulevelRow .stat .v {
@@ -570,11 +673,11 @@ input:focus { border-color: #3CFFA0; }
 .userInfo .ulevelRow .stat.coinStat .k, .ulevelRow .stat.coinStat .k { color: #FFD23C; }
 .userInfo .ulevelRow .stat.coinStat .v, .ulevelRow .stat.coinStat .v { color: #FFD23C; }
 .expBar { width: 100%; height: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); overflow: hidden; }
-.expBar .fill { height: 100%; background: #3CFFA0; }
+.expBar .fill { height: 100%; background: #2EE65C; }
 
 .serverCard {
   width: 100%; max-width: 380px;
-  background: rgba(0,0,0,0.4); border: 1.5px solid #3CFFA0;
+  background: rgba(0,0,0,0.4); border: 1.5px solid #2EE65C;
   padding: clamp(12px, 2.5vh, 18px) 16px; margin-bottom: clamp(10px, 2vh, 14px);
   display: flex; align-items: center; justify-content: space-between;
 }
@@ -582,9 +685,9 @@ input:focus { border-color: #3CFFA0; }
 .serverCard .sSlot { font-size: 10px; color: #aaa; margin-top: 8px; font-family: 'Silkscreen', monospace; }
 .serverCard .sSlot.full { color: #FF5C7A; }
 .joinBtn {
-  padding: 10px 18px; border: 1.5px solid #3CFFA0;
+  padding: 10px 18px; border: 1.5px solid #2EE65C;
   background: transparent;
-  color: #3CFFA0; font-size: 11px; font-family: 'Silkscreen', monospace; font-weight: 700; cursor: pointer;
+  color: #2EE65C; font-size: 11px; font-family: 'Silkscreen', monospace; font-weight: 700; cursor: pointer;
   letter-spacing: 1px;
 }
 .joinBtn:disabled { background: transparent; border-color: #333; color: #555; cursor: not-allowed; }
@@ -602,15 +705,24 @@ input:focus { border-color: #3CFFA0; }
 }
 .footNote::before, .footNote::after { content: ''; flex: 1; max-width: 200px; height: 1px; background: rgba(255,255,255,0.15); }
 
+.miniToast {
+  position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px);
+  background: rgba(0,0,0,0.92); border: 1.5px solid #2EE65C; color: #2EE65C;
+  padding: 10px 18px; font-family: 'Silkscreen', monospace; font-size: 10px; letter-spacing: 1px;
+  text-align: center; z-index: 200; opacity: 0; pointer-events: none;
+  transition: opacity .2s, transform .2s; max-width: 86vw;
+}
+.miniToast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
 
 
 /* ---------- HUD ---------- */
 #hud {
-  position: fixed; top: 14px; left: 14px; color: #3CFFA0; z-index: 5; font-size: 20px; display: none;
+  position: fixed; top: 14px; left: 14px; color: #2EE65C; z-index: 5; font-size: 20px; display: none;
   font-family: 'Silkscreen', monospace; font-weight: 700;
   text-shadow: 2px 2px 0 #003318; letter-spacing: 1px; line-height: 1.6;
 }
-#hud .score { font-family: 'Silkscreen', monospace; font-size: 20px; color: #3CFFA0; }
+#hud .score { font-family: 'Silkscreen', monospace; font-size: 20px; color: #2EE65C; }
 #hud .coinRow { font-size: 15px; color: #FFD23C; display: none; }
 @media (max-width: 640px) { #hud .coinRow { font-size: 12px; } }
 
@@ -629,7 +741,7 @@ input:focus { border-color: #3CFFA0; }
   border-bottom: 2px solid #fff; padding-bottom: 4px; margin-bottom: 4px; letter-spacing: 1px; color: #fff;
 }
 #leaderboard div.row { display: flex; justify-content: space-between; padding: 2px 0; white-space: nowrap; color: #fff; }
-#leaderboard div.row.me { color: #3CFFA0; }
+#leaderboard div.row.me { color: #2EE65C; }
 
 #minimapWrap {
   position: fixed; top: 56px; left: 14px; z-index: 5;
@@ -643,7 +755,7 @@ input:focus { border-color: #3CFFA0; }
   border-radius: 0; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.4);
   z-index: 5; display: none; overflow: hidden;
 }
-#boostFill { height: 100%; width: 100%; background: #3CFFA0; }
+#boostFill { height: 100%; width: 100%; background: #2EE65C; }
 
 #boostBtn {
   position: fixed; right: 30px; bottom: calc(30px + env(safe-area-inset-bottom)); width: 88px; height: 88px; border-radius: 0;
@@ -657,17 +769,27 @@ input:focus { border-color: #3CFFA0; }
 #joystickZone { position: fixed; inset: 0; z-index: 5; touch-action: none; display: none; }
 #joyBase, #joyStick { position: fixed; display: none; border-radius: 0; pointer-events: none; z-index: 14; }
 #joyBase { width: 120px; height: 120px; background: rgba(255,255,255,0.06); border: 3px solid rgba(255,255,255,0.35); margin-left: -60px; margin-top: -60px; }
-#joyStick { width: 52px; height: 52px; background: #3CFFA0; box-shadow: 0 0 12px rgba(60,255,160,0.7); border: none; margin-left: -26px; margin-top: -26px; }
+#joyStick { width: 52px; height: 52px; background: #2EE65C; box-shadow: 0 0 12px rgba(46,230,92,0.7); border: none; margin-left: -26px; margin-top: -26px; }
 
 /* ---------- Chat ---------- */
 #chatToggleBtn {
   position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 8;
   width: 44px; height: 40px; display: none; align-items: center; justify-content: center;
-  background: rgba(0,0,0,0.55); border: 2px solid #3CFFA0; color: #3CFFA0;
+  background: rgba(0,0,0,0.55); border: 2px solid #2EE65C; color: #2EE65C;
   cursor: pointer; padding: 0;
 }
-#chatToggleBtn:active { background: rgba(60,255,160,0.15); }
+#chatToggleBtn:active { background: rgba(46,230,92,0.15); }
 #chatToggleBtn svg { image-rendering: pixelated; }
+
+#quitGameBtn {
+  position: fixed; top: 14px; left: 50%; margin-left: 30px; z-index: 8;
+  width: 40px; height: 40px; display: none; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.55); border: 2px solid #FF5C7A; color: #FF5C7A;
+  cursor: pointer; padding: 0;
+}
+#quitGameBtn:active { background: rgba(255,92,122,0.15); }
+#quitGameBtn svg { image-rendering: pixelated; }
+
 #chatBadge {
   position: absolute; top: -7px; right: -7px; min-width: 16px; height: 16px; padding: 0 3px;
   background: #FF5C7A; color: #000; border: 1.5px solid #050505;
@@ -678,7 +800,7 @@ input:focus { border-color: #3CFFA0; }
 #chatPanel {
   position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 8;
   width: min(280px, calc(100vw - 24px)); max-height: 46vh;
-  background: rgba(0,0,0,0.8); border: 2px solid #3CFFA0;
+  background: rgba(0,0,0,0.8); border: 2px solid #2EE65C;
   display: none; flex-direction: column;
   font-family: 'Silkscreen', monospace;
 }
@@ -686,7 +808,7 @@ input:focus { border-color: #3CFFA0; }
 #chatPanelHead {
   display: flex; align-items: center; justify-content: space-between;
   padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.2);
-  color: #3CFFA0; font-size: 10px; letter-spacing: 1px; font-weight: 700;
+  color: #2EE65C; font-size: 10px; letter-spacing: 1px; font-weight: 700;
 }
 #chatCloseBtn {
   background: transparent; border: none; color: #FF5C7A; font-size: 16px; line-height: 1;
@@ -697,7 +819,7 @@ input:focus { border-color: #3CFFA0; }
   padding: 6px 8px; display: flex; flex-direction: column; gap: 3px;
 }
 .chatMsgRow { font-size: 11px; line-height: 1.5; color: #ddd; word-break: break-word; }
-.chatMsgRow.me .chatMsgName { color: #3CFFA0; }
+.chatMsgRow.me .chatMsgName { color: #2EE65C; }
 .chatMsgName { color: #FFD23C; font-weight: 700; }
 .chatMsgText { color: #eee; }
 #chatInputRow {
@@ -710,12 +832,13 @@ input:focus { border-color: #3CFFA0; }
 #chatInput::placeholder { color: #555; }
 #chatSendBtn {
   flex-shrink: 0; width: 38px; background: transparent; border: none; border-left: 1px solid rgba(255,255,255,0.2);
-  color: #3CFFA0; font-size: 13px; cursor: pointer;
+  color: #2EE65C; font-size: 13px; cursor: pointer;
 }
-#chatSendBtn:active { background: rgba(60,255,160,0.15); }
+#chatSendBtn:active { background: rgba(46,230,92,0.15); }
 
 @media (max-width: 640px) {
   #chatToggleBtn { top: 10px; width: 38px; height: 34px; }
+  #quitGameBtn { top: 10px; width: 34px; height: 34px; margin-left: 25px; }
   #chatPanel { top: 50px; }
 }
 
@@ -733,10 +856,10 @@ input:focus { border-color: #3CFFA0; }
 }
 
 #deathScreen h2 {
-  font-family: 'Silkscreen', monospace; font-size: 26px; color: #3CFFA0; margin-bottom: 14px; text-align: center;
+  font-family: 'Silkscreen', monospace; font-size: 26px; color: #2EE65C; margin-bottom: 14px; text-align: center;
   text-shadow: 3px 3px 0 #003318; letter-spacing: 2px;
 }
-#deathScreen .expGain { color: #3CFFA0; font-size: 13px; margin-bottom: 10px; font-family: 'Silkscreen', monospace; }
+#deathScreen .expGain { color: #2EE65C; font-size: 13px; margin-bottom: 10px; font-family: 'Silkscreen', monospace; }
 #deathScreen p { color: #FF5C7A; margin-bottom: 22px; font-size: 13px; text-align: center; font-family: 'Silkscreen', monospace; line-height: 1.9; }
 #deathScreen .btnRow { display: flex; gap: 10px; width: 100%; max-width: 320px; }
 
@@ -771,7 +894,7 @@ input:focus { border-color: #3CFFA0; }
   </div>
 
   <div class="card">
-    <div class="cardHead"><span class="icon">&#128274;</span><span class="title" id="authCardTitle">LOGIN KE AKUN</span></div>
+    <div class="cardHead"><span class="icon"><svg viewBox="0 0 7 7" width="14" height="14" fill="currentColor" shape-rendering="crispEdges"><rect x="2" y="0" width="3" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="5" y="1" width="1" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="5" y="2" width="1" height="1"/><rect x="0" y="3" width="7" height="1"/><rect x="0" y="4" width="7" height="1"/><rect x="0" y="5" width="3" height="1"/><rect x="4" y="5" width="3" height="1"/><rect x="0" y="6" width="7" height="1"/></svg></span><span class="title" id="authCardTitle">LOGIN KE AKUN</span></div>
     <div class="tabs">
       <div class="tabBtn active" id="tabLogin">MASUK</div>
       <div class="tabBtn" id="tabRegister">DAFTAR</div>
@@ -789,10 +912,16 @@ input:focus { border-color: #3CFFA0; }
 <!-- LOBBY SCREEN -->
 <div class="screen" id="lobbyScreen">
   <div class="screenTopBar">
-    <div class="screenBrand">RETROSNAKE <span class="ver">v1.0.0</span></div>
-    <button class="screenBackBtn" id="logoutLink">&#8618; KELUAR AKUN</button>
+    <div class="screenBrandBox">
+      <div class="screenBrand">RETROSNAKE <span class="ver">v1.0.0</span></div>
+    </div>
+    <div class="topIconRow">
+      <button class="topIconBtn" id="achievementIconBtn" title="Achievement"><svg viewBox="0 0 8 8" class="pixIcon" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="0" width="6" height="1"/><rect x="0" y="1" width="8" height="1"/><rect x="1" y="2" width="6" height="1"/><rect x="2" y="3" width="4" height="1"/><rect x="3" y="4" width="2" height="1"/><rect x="3" y="5" width="2" height="1"/><rect x="2" y="6" width="4" height="1"/><rect x="1" y="7" width="6" height="1"/></svg></button>
+      <button class="topIconBtn" id="mailIconBtn" title="Pesan"><svg viewBox="0 0 8 6" class="pixIcon" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="8" height="1"/><rect x="0" y="1" width="1" height="1"/><rect x="3" y="1" width="2" height="1"/><rect x="7" y="1" width="1" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="5" y="2" width="1" height="1"/><rect x="7" y="2" width="1" height="1"/><rect x="0" y="3" width="2" height="1"/><rect x="6" y="3" width="2" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="7" y="4" width="1" height="1"/><rect x="0" y="5" width="8" height="1"/></svg></button>
+      <button class="topIconBtn" id="settingsIconBtn" title="Pengaturan"><svg viewBox="0 0 8 8" class="pixIcon" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="0" width="1" height="1"/><rect x="3" y="0" width="2" height="1"/><rect x="6" y="0" width="1" height="1"/><rect x="0" y="1" width="8" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="2" y="2" width="4" height="1"/><rect x="7" y="2" width="1" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="5" y="3" width="1" height="1"/><rect x="7" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="5" y="4" width="1" height="1"/><rect x="7" y="4" width="1" height="1"/><rect x="0" y="5" width="1" height="1"/><rect x="2" y="5" width="4" height="1"/><rect x="7" y="5" width="1" height="1"/><rect x="0" y="6" width="8" height="1"/><rect x="1" y="7" width="1" height="1"/><rect x="3" y="7" width="2" height="1"/><rect x="6" y="7" width="1" height="1"/></svg></button>
+    </div>
   </div>
-  <div class="screenDivider"></div>
+  <button class="screenBackBtn wide" id="logoutLink"><svg viewBox="0 0 7 7" width="11" height="11" fill="currentColor" shape-rendering="crispEdges" style="vertical-align:middle;margin-right:5px;"><rect x="3" y="0" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="0" y="3" width="7" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="2" y="5" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></svg>KELUAR AKUN</button>
 
   <div class="logo">RETRO<span class="accent">SNAKE</span></div>
   <div class="logoWorm">
@@ -810,7 +939,9 @@ input:focus { border-color: #3CFFA0; }
     </div>
     <div class="ulevelRow">
       <div class="stat"><div class="k">LEVEL</div><div class="v" id="lobbyLevelNum">1</div></div>
+      <div class="statDivider"></div>
       <div class="stat"><div class="k">EXP</div><div class="v" id="lobbyExpNum">0 / 100</div></div>
+      <div class="statDivider"></div>
       <div class="stat coinStat"><div class="k">COIN</div><div class="v" id="lobbyCoinNum">0</div></div>
     </div>
     <div class="expBar"><div class="fill" id="lobbyExpFill" style="width:0%"></div></div>
@@ -819,16 +950,16 @@ input:focus { border-color: #3CFFA0; }
 
   <div id="lobbyMenu" style="width:100%;max-width:380px;">
     <button class="btnPrimary" id="playMenuBtn">PLAY ONLINE</button>
-    <button class="btnWhite" id="changeSkinBtn">CHANGE SKIN</button>
-    <button class="btnShop" id="shopMenuBtn">SHOP</button>
-    <button class="btnPlayer" id="playerMenuBtn">PLAYER</button>
+    <button class="btnWhite" id="changeSkinBtn"><svg viewBox="0 0 10 7" class="pixIcon" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="3" height="1"/><rect x="1" y="1" width="2" height="1"/><rect x="2" y="2" width="2" height="1"/><rect x="3" y="3" width="3" height="1"/><rect x="5" y="4" width="2" height="1"/><rect x="6" y="5" width="2" height="1"/><rect x="7" y="6" width="3" height="1"/><rect x="10" y="6" width="1" height="1" fill="#FF5C7A"/></svg> CHANGE SKIN</button>
+    <button class="btnShop" id="shopMenuBtn"><svg viewBox="0 0 8 8" class="pixIcon" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="1" width="1" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="2" y="2" width="6" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="7" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="2" y="4" width="6" height="1"/><rect x="2" y="6" width="2" height="1"/><rect x="6" y="6" width="2" height="1"/><rect x="2" y="7" width="2" height="1"/><rect x="6" y="7" width="2" height="1"/></svg> SHOP</button>
+    <button class="btnPlayer" id="playerMenuBtn"><svg viewBox="0 0 8 4" class="pixIcon" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="0" width="2" height="1"/><rect x="5" y="0" width="2" height="1"/><rect x="1" y="1" width="2" height="1"/><rect x="5" y="1" width="2" height="1"/><rect x="0" y="2" width="4" height="1"/><rect x="5" y="2" width="3" height="1"/><rect x="0" y="3" width="4" height="1"/><rect x="5" y="3" width="3" height="1"/></svg> PLAYER</button>
   </div>
 
   <div id="serverListSection" style="width:100%;max-width:380px;display:none;">
     <div class="serverCard">
       <div>
         <div class="sName">Server 1</div>
-        <div class="sSlot" style="color:#3CFFA0;font-size:9px;letter-spacing:1px;margin-top:2px;">PLAYER ONLY &middot; EXP &middot; NO COIN</div>
+        <div class="sSlot" style="color:#2EE65C;font-size:9px;letter-spacing:1px;margin-top:2px;">PLAYER ONLY &middot; EXP &middot; NO COIN</div>
         <div class="sSlot" id="server1Slot">.../20</div>
       </div>
       <button class="joinBtn" id="joinServer1">MAIN</button>
@@ -850,7 +981,7 @@ input:focus { border-color: #3CFFA0; }
 <!-- SHOP SCREEN -->
 <div class="screen" id="shopScreen">
   <div class="screenTopBar">
-    <button class="screenBackBtn" id="shopBackBtn">&#8618; BACK</button>
+    <button class="screenBackBtn" id="shopBackBtn"><svg viewBox="0 0 7 7" width="11" height="11" fill="currentColor" shape-rendering="crispEdges" style="vertical-align:middle;margin-right:5px;"><rect x="3" y="0" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="0" y="3" width="7" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="2" y="5" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></svg>BACK</button>
     <div class="shopCoinBadge">
       <div class="lbl">COIN</div>
       <div class="val" id="shopCoinNum">0</div>
@@ -864,15 +995,15 @@ input:focus { border-color: #3CFFA0; }
 
   <div class="sectionLabel"><span class="sq"></span><span class="sq"></span> SKINS <span class="sq"></span><span class="sq"></span></div>
   <div class="shopTierNav">
-    <button class="tierArrowBtn" id="shopTierPrev">&#8249;</button>
+    <button class="tierArrowBtn" id="shopTierPrev"><svg viewBox="0 0 4 7" width="7" height="12" fill="currentColor" shape-rendering="crispEdges"><rect x="3" y="0" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="2" y="5" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></svg></button>
     <div class="sectionSubLabel" id="shopTierLabel">COMMON</div>
-    <button class="tierArrowBtn" id="shopTierNext">&#8250;</button>
+    <button class="tierArrowBtn" id="shopTierNext"><svg viewBox="0 0 4 7" width="7" height="12" fill="currentColor" shape-rendering="crispEdges"><rect x="0" y="0" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="1" y="5" width="1" height="1"/><rect x="0" y="6" width="1" height="1"/></svg></button>
   </div>
 
   <div class="skinShopGridWrap">
-    <button class="skinPageArrow left" id="skinPagePrev">&#8249;</button>
+    <button class="skinPageArrow left" id="skinPagePrev"><svg viewBox="0 0 4 7" width="7" height="12" fill="currentColor" shape-rendering="crispEdges"><rect x="3" y="0" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="2" y="5" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></svg></button>
     <div class="skinShopGrid" id="skinShopGrid"></div>
-    <button class="skinPageArrow right" id="skinPageNext">&#8250;</button>
+    <button class="skinPageArrow right" id="skinPageNext"><svg viewBox="0 0 4 7" width="7" height="12" fill="currentColor" shape-rendering="crispEdges"><rect x="0" y="0" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="3" y="3" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="1" y="5" width="1" height="1"/><rect x="0" y="6" width="1" height="1"/></svg></button>
   </div>
 
   <div class="footNote">HAVE FUN &amp; GOOD LUCK!</div>
@@ -882,7 +1013,7 @@ input:focus { border-color: #3CFFA0; }
 <div class="screen" id="playerScreen">
   <div class="screenTopBar">
     <div class="screenBrand">RETROSNAKE <span class="ver">v1.0.0</span></div>
-    <button class="screenBackBtn" id="playerBackBtn">&#8618; KEMBALI</button>
+    <button class="screenBackBtn" id="playerBackBtn"><svg viewBox="0 0 7 7" width="11" height="11" fill="currentColor" shape-rendering="crispEdges" style="vertical-align:middle;margin-right:5px;"><rect x="3" y="0" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="0" y="3" width="7" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="2" y="5" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></svg>KEMBALI</button>
   </div>
   <div class="screenDivider"></div>
 
@@ -894,9 +1025,9 @@ input:focus { border-color: #3CFFA0; }
   <div id="playerListRows" style="width:100%;display:flex;flex-direction:column;align-items:center;"></div>
 
   <div class="playerPagerRow" id="playerPagerRow">
-    <button class="pagerBtn" id="playerPrevBtn">&#8592; SEBELUMNYA</button>
+    <button class="pagerBtn" id="playerPrevBtn"><svg viewBox="0 0 7 7" width="10" height="10" fill="currentColor" shape-rendering="crispEdges" style="vertical-align:middle;margin-right:6px;"><rect x="3" y="0" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="0" y="3" width="7" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="2" y="5" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></svg>SEBELUMNYA</button>
     <div class="pagerInfo" id="playerPagerInfo">1 / 1</div>
-    <button class="pagerBtn" id="playerNextBtn">NEXT &#8594;</button>
+    <button class="pagerBtn" id="playerNextBtn">NEXT<svg viewBox="0 0 7 7" width="10" height="10" fill="currentColor" shape-rendering="crispEdges" style="vertical-align:middle;margin-left:6px;"><rect x="3" y="0" width="1" height="1"/><rect x="4" y="1" width="1" height="1"/><rect x="5" y="2" width="1" height="1"/><rect x="0" y="3" width="7" height="1"/><rect x="5" y="4" width="1" height="1"/><rect x="4" y="5" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></svg></button>
   </div>
 
   <div class="footNote">HAVE FUN &amp; GOOD LUCK!</div>
@@ -906,7 +1037,7 @@ input:focus { border-color: #3CFFA0; }
 <div class="screen" id="profileScreen">
   <div class="screenTopBar">
     <div class="screenBrand">RETROSNAKE <span class="ver">v1.0.0</span></div>
-    <button class="screenBackBtn" id="profileBackBtn">&#8618; KEMBALI</button>
+    <button class="screenBackBtn" id="profileBackBtn"><svg viewBox="0 0 7 7" width="11" height="11" fill="currentColor" shape-rendering="crispEdges" style="vertical-align:middle;margin-right:5px;"><rect x="3" y="0" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="0" y="3" width="7" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="2" y="5" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/></svg>KEMBALI</button>
   </div>
   <div class="screenDivider"></div>
 
@@ -934,11 +1065,11 @@ input:focus { border-color: #3CFFA0; }
   <div class="profileBody" id="profileBody">
   <div class="profilePanel" id="profPanelStat">
     <div class="panelLabel">STATISTIK</div>
-    <div class="statRow"><div class="sLeft"><span class="icon">&#127942;</span>TOTAL MATCH</div><div class="sVal" id="statMatch">0</div></div>
-    <div class="statRow"><div class="sLeft"><span class="icon">&#128207;</span>LONGEST LENGTH</div><div class="sVal" id="statLength">0</div></div>
-    <div class="statRow"><div class="sLeft"><span class="icon">&#9201;&#65039;</span>TOTAL PLAY TIME</div><div class="sVal" id="statTime">0H 0M</div></div>
-    <div class="statRow"><div class="sLeft"><span class="icon">&#129689;</span>TOTAL COIN</div><div class="sVal" id="statCoin">0</div></div>
-    <div class="statRow"><div class="sLeft"><span class="icon">&#128128;</span>TOTAL KILL</div><div class="sVal" id="statKill">0</div></div>
+    <div class="statRow"><div class="sLeft"><span class="icon"><svg viewBox="0 0 8 8" width="14" height="14" fill="currentColor" shape-rendering="crispEdges"><rect x="1" y="0" width="6" height="1"/><rect x="0" y="1" width="8" height="1"/><rect x="1" y="2" width="6" height="1"/><rect x="2" y="3" width="4" height="1"/><rect x="3" y="4" width="2" height="1"/><rect x="3" y="5" width="2" height="1"/><rect x="2" y="6" width="4" height="1"/><rect x="1" y="7" width="6" height="1"/></svg></span>TOTAL MATCH</div><div class="sVal" id="statMatch">0</div></div>
+    <div class="statRow"><div class="sLeft"><span class="icon"><svg viewBox="0 0 8 3" width="16" height="6" fill="currentColor" shape-rendering="crispEdges"><rect x="0" y="0" width="8" height="1"/><rect x="0" y="1" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="4" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="0" y="2" width="8" height="1"/></svg></span>LONGEST LENGTH</div><div class="sVal" id="statLength">0</div></div>
+    <div class="statRow"><div class="sLeft"><span class="icon"><svg viewBox="0 0 8 6" width="14" height="10" fill="currentColor" shape-rendering="crispEdges"><rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="6" y="2" width="1" height="1"/><rect x="1" y="3" width="1" height="1"/><rect x="6" y="3" width="1" height="1"/><rect x="2" y="4" width="4" height="1"/></svg></span>TOTAL PLAY TIME</div><div class="sVal" id="statTime">0H 0M</div></div>
+    <div class="statRow"><div class="sLeft"><span class="icon"><svg viewBox="0 0 8 6" width="14" height="10" fill="currentColor" shape-rendering="crispEdges"><rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="6" height="1"/><rect x="0" y="2" width="8" height="1"/><rect x="0" y="3" width="8" height="1"/><rect x="1" y="4" width="6" height="1"/><rect x="2" y="5" width="4" height="1"/></svg></span>TOTAL COIN</div><div class="sVal" id="statCoin">0</div></div>
+    <div class="statRow"><div class="sLeft"><span class="icon"><svg viewBox="0 0 7 5" width="14" height="10" fill="currentColor" shape-rendering="crispEdges"><rect x="2" y="0" width="3" height="1"/><rect x="1" y="1" width="5" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="3" y="2" width="1" height="1"/><rect x="5" y="2" width="1" height="1"/><rect x="1" y="3" width="5" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="3" y="4" width="1" height="1"/><rect x="5" y="4" width="1" height="1"/></svg></span>TOTAL KILL</div><div class="sVal" id="statKill">0</div></div>
   </div>
 
   <div class="profilePanel" id="profPanelSkin" style="display:none;">
@@ -981,6 +1112,17 @@ input:focus { border-color: #3CFFA0; }
   <span id="chatBadge"></span>
 </button>
 
+<button id="quitGameBtn" aria-label="Keluar">
+  <svg viewBox="0 0 21 18" width="20" height="17" shape-rendering="crispEdges">
+    <rect x="9" y="0" width="3" height="3" fill="currentColor"/>
+    <rect x="6" y="3" width="3" height="3" fill="currentColor"/><rect x="9" y="3" width="3" height="3" fill="currentColor"/><rect x="12" y="3" width="3" height="3" fill="currentColor"/>
+    <rect x="3" y="6" width="3" height="3" fill="currentColor"/><rect x="6" y="6" width="3" height="3" fill="currentColor"/><rect x="9" y="6" width="3" height="3" fill="currentColor"/><rect x="12" y="6" width="3" height="3" fill="currentColor"/><rect x="15" y="6" width="3" height="3" fill="currentColor"/>
+    <rect x="0" y="9" width="3" height="3" fill="currentColor"/><rect x="3" y="9" width="3" height="3" fill="currentColor"/><rect x="6" y="9" width="3" height="3" fill="currentColor"/><rect x="9" y="9" width="3" height="3" fill="currentColor"/><rect x="12" y="9" width="3" height="3" fill="currentColor"/><rect x="15" y="9" width="3" height="3" fill="currentColor"/><rect x="18" y="9" width="3" height="3" fill="currentColor"/>
+    <rect x="0" y="12" width="3" height="3" fill="currentColor"/><rect x="3" y="12" width="3" height="3" fill="currentColor"/><rect x="6" y="12" width="3" height="3" fill="currentColor"/><rect x="12" y="12" width="3" height="3" fill="currentColor"/><rect x="15" y="12" width="3" height="3" fill="currentColor"/><rect x="18" y="12" width="3" height="3" fill="currentColor"/>
+    <rect x="0" y="15" width="3" height="3" fill="currentColor"/><rect x="3" y="15" width="3" height="3" fill="currentColor"/><rect x="6" y="15" width="3" height="3" fill="currentColor"/><rect x="12" y="15" width="3" height="3" fill="currentColor"/><rect x="15" y="15" width="3" height="3" fill="currentColor"/><rect x="18" y="15" width="3" height="3" fill="currentColor"/>
+  </svg>
+</button>
+
 <div id="chatPanel">
   <div id="chatPanelHead">
     <span>CHAT SERVER</span>
@@ -989,7 +1131,7 @@ input:focus { border-color: #3CFFA0; }
   <div id="chatMessages"></div>
   <div id="chatInputRow">
     <input id="chatInput" type="text" placeholder="Ketik pesan..." maxlength="140" autocomplete="off" />
-    <button id="chatSendBtn">&#9658;</button>
+    <button id="chatSendBtn"><svg viewBox="0 0 3 5" width="9" height="15" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect x="0" y="0" width="1" height="1" fill="currentColor"/><rect x="0" y="1" width="2" height="1" fill="currentColor"/><rect x="0" y="2" width="3" height="1" fill="currentColor"/><rect x="0" y="3" width="2" height="1" fill="currentColor"/><rect x="0" y="4" width="1" height="1" fill="currentColor"/></svg></button>
   </div>
 </div>
 
@@ -1002,10 +1144,22 @@ input:focus { border-color: #3CFFA0; }
       <button class="skinCloseBtn" id="skinCloseBtn">TUTUP</button>
     </div>
     <div class="skinPreviewWrap">
-      <div class="skinPreview"><div class="body" id="skinPreviewBody" style="background:#3CFFA0;"></div></div>
+      <div class="skinPreview"><div class="body" id="skinPreviewBody" style="background:#2EE65C;"></div></div>
     </div>
     <div class="skinGrid" id="skinGrid"></div>
     <button class="skinConfirmBtn" id="skinConfirmBtn">SIMPAN SKIN</button>
+  </div>
+</div>
+
+<!-- QUIT CONFIRM MODAL -->
+<div class="quitOverlay" id="quitOverlay">
+  <div class="quitModal">
+    <div class="quitModalHead">KONFIRMASI KELUAR</div>
+    <p class="quitModalMsg">Yakin mau keluar? Match ini nggak akan dihitung ke Total Match kamu.</p>
+    <div class="quitModalBtnRow">
+      <button class="quitNoBtn" id="quitNoBtn">TIDAK</button>
+      <button class="quitYesBtn" id="quitYesBtn">YA, KELUAR</button>
+    </div>
   </div>
 </div>
 
@@ -1350,8 +1504,31 @@ input:focus { border-color: #3CFFA0; }
     document.getElementById('serverListSection').style.display = 'block';
   });
 
+  // ================= HEADER ICON BUTTONS (trophy/mail/gear) =================
+  let miniToastTimer = null;
+  function showMiniToast(text) {
+    let el = document.getElementById('miniToast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'miniToast';
+      el.className = 'miniToast';
+      document.body.appendChild(el);
+    }
+    el.textContent = text;
+    el.classList.add('show');
+    clearTimeout(miniToastTimer);
+    miniToastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+  }
+  document.getElementById('achievementIconBtn').addEventListener('click', () => {
+    if (!currentUser) return;
+    openProfileScreen(currentUser.uid, 'lobbyScreen');
+    switchProfileTab('ach');
+  });
+  document.getElementById('mailIconBtn').addEventListener('click', () => showMiniToast('FITUR PESAN SEGERA HADIR'));
+  document.getElementById('settingsIconBtn').addEventListener('click', () => showMiniToast('FITUR PENGATURAN SEGERA HADIR'));
+
   // ================= SKIN PICKER =================
-  const SKIN_COLORS = ['#3CFFA0', '#FF5C7A', '#FFD23C', '#a86bff', '#4FC3F7', '#FF9F43', '#ff5cf1', '#ffffff'];
+  const SKIN_COLORS = ['#2EE65C', '#FF5C7A', '#FFD23C', '#a86bff', '#4FC3F7', '#FF9F43', '#ff5cf1', '#ffffff'];
   const SKIN_STORAGE_KEY = 'retrosnake_skin_color';
   const SKIN_STORAGE_KEY_B = 'retrosnake_skin_color_b';
   const SKIN_STORAGE_KEY_COLORS = 'retrosnake_skin_colors';
@@ -1374,7 +1551,7 @@ input:focus { border-color: #3CFFA0; }
       skins: [
         { id: 'shop1', colorA: '#FF5C7A', colorB: '#4FC3F7', price: 100 },
         { id: 'shop2', colorA: '#FFD23C', colorB: '#2b2b2b', price: 100 },
-        { id: 'shop3', colorA: '#4FC3F7', colorB: '#3CFFA0', price: 100 },
+        { id: 'shop3', colorA: '#4FC3F7', colorB: '#2EE65C', price: 100 },
         { id: 'shop4', colorA: '#FF9F43', colorB: '#FFD23C', price: 100 }
       ]
     },
@@ -1776,16 +1953,22 @@ input:focus { border-color: #3CFFA0; }
 
     // ---- Achievement tab ----
     const achList = document.getElementById('profAchList');
+    const PIX_STAR = '<svg viewBox="0 0 7 7" width="14" height="14" fill="currentColor" shape-rendering="crispEdges"><rect x="3" y="0" width="1" height="2"/><rect x="1" y="2" width="5" height="1"/><rect x="0" y="3" width="7" height="1"/><rect x="1" y="4" width="5" height="1"/><rect x="2" y="5" width="1" height="1"/><rect x="4" y="5" width="1" height="1"/><rect x="1" y="6" width="1" height="1"/><rect x="5" y="6" width="1" height="1"/></svg>';
+    const PIX_TROPHY = '<svg viewBox="0 0 8 8" width="14" height="14" fill="currentColor" shape-rendering="crispEdges"><rect x="1" y="0" width="6" height="1"/><rect x="0" y="1" width="8" height="1"/><rect x="1" y="2" width="6" height="1"/><rect x="2" y="3" width="4" height="1"/><rect x="3" y="4" width="2" height="1"/><rect x="3" y="5" width="2" height="1"/><rect x="2" y="6" width="4" height="1"/><rect x="1" y="7" width="6" height="1"/></svg>';
+    const PIX_RULER = '<svg viewBox="0 0 8 3" width="16" height="6" fill="currentColor" shape-rendering="crispEdges"><rect x="0" y="0" width="8" height="1"/><rect x="0" y="1" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="4" y="1" width="1" height="1"/><rect x="6" y="1" width="1" height="1"/><rect x="0" y="2" width="8" height="1"/></svg>';
+    const PIX_SKULL = '<svg viewBox="0 0 7 5" width="14" height="10" fill="currentColor" shape-rendering="crispEdges"><rect x="2" y="0" width="3" height="1"/><rect x="1" y="1" width="5" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="3" y="2" width="1" height="1"/><rect x="5" y="2" width="1" height="1"/><rect x="1" y="3" width="5" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="3" y="4" width="1" height="1"/><rect x="5" y="4" width="1" height="1"/></svg>';
+    const PIX_COIN = '<svg viewBox="0 0 8 6" width="14" height="10" fill="currentColor" shape-rendering="crispEdges"><rect x="2" y="0" width="4" height="1"/><rect x="1" y="1" width="6" height="1"/><rect x="0" y="2" width="8" height="1"/><rect x="0" y="3" width="8" height="1"/><rect x="1" y="4" width="6" height="1"/><rect x="2" y="5" width="4" height="1"/></svg>';
+    const PIX_LOCK = '<svg viewBox="0 0 7 7" width="14" height="14" fill="currentColor" shape-rendering="crispEdges"><rect x="2" y="0" width="3" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="5" y="1" width="1" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="5" y="2" width="1" height="1"/><rect x="0" y="3" width="7" height="1"/><rect x="0" y="4" width="7" height="1"/><rect x="0" y="5" width="3" height="1"/><rect x="4" y="5" width="3" height="1"/><rect x="0" y="6" width="7" height="1"/></svg>';
     const achievements = [
-      { name: 'PEMULA', desc: 'Mainkan 1 pertandingan', done: st.totalMatch >= 1, icon: '&#9733;' },
-      { name: 'VETERAN', desc: 'Mainkan 50 pertandingan', done: st.totalMatch >= 50, icon: '&#127942;' },
-      { name: 'NAGA PANJANG', desc: 'Capai panjang 1.500', done: st.longestLength >= 1500, icon: '&#128207;' },
-      { name: 'PEMBUNUH ULUNG', desc: 'Raih 100 total kill', done: st.totalKill >= 100, icon: '&#128128;' },
-      { name: 'KOLEKTOR KOIN', desc: 'Kumpulkan 1.000 coin', done: (d.coin || 0) >= 1000, icon: '&#129689;' }
+      { name: 'PEMULA', desc: 'Mainkan 1 pertandingan', done: st.totalMatch >= 1, icon: PIX_STAR },
+      { name: 'VETERAN', desc: 'Mainkan 50 pertandingan', done: st.totalMatch >= 50, icon: PIX_TROPHY },
+      { name: 'NAGA PANJANG', desc: 'Capai panjang 1.500', done: st.longestLength >= 1500, icon: PIX_RULER },
+      { name: 'PEMBUNUH ULUNG', desc: 'Raih 100 total kill', done: st.totalKill >= 100, icon: PIX_SKULL },
+      { name: 'KOLEKTOR KOIN', desc: 'Kumpulkan 1.000 coin', done: (d.coin || 0) >= 1000, icon: PIX_COIN }
     ];
     achList.innerHTML = achievements.map(a => `
       <div class="achRow ${a.done ? '' : 'locked'}">
-        <div class="achIcon">${a.done ? a.icon : '&#128274;'}</div>
+        <div class="achIcon">${a.done ? a.icon : PIX_LOCK}</div>
         <div class="achText">
           <div class="achName">${a.name}</div>
           <div class="achDesc">${a.desc}</div>
@@ -1819,6 +2002,7 @@ input:focus { border-color: #3CFFA0; }
       if (snap.exists()) snap.forEach(c => { if (!c.val().isBot) n++; });
       if (n === 0) {
         await db.ref('servers/' + sid + '/food').remove();
+        await db.ref('servers/' + sid + '/chat').remove(); // player terakhir udah kabur, chat direset
       }
     } catch (e) {}
   }
@@ -1831,7 +2015,7 @@ input:focus { border-color: #3CFFA0; }
     if (n >= max) return;
     // fallback safety net: kalau ternyata server kosong (misal sesi sebelumnya
     // crash/nutup tab tanpa sempat cleanup), sekalian bersihkan food lama sebelum mulai
-    if (n === 0) { db.ref('servers/' + sid + '/food').remove(); }
+    if (n === 0) { cleanupServerIfEmpty(sid); }
     SERVER_ID = sid;
     document.getElementById('lobbyScreen').classList.remove('visible');
     startGame();
@@ -1917,7 +2101,7 @@ input:focus { border-color: #3CFFA0; }
   let playersRef = null, foodRef = null, myPlayerRef = null;
   let lastNetPush = 0;
 
-  const NEON = ['#FF5C7A', '#FFD23C', '#3C9CFF', '#C13CFF', '#FF8A3C', '#3CFFA0'];
+  const NEON = ['#FF5C7A', '#FFD23C', '#3C9CFF', '#C13CFF', '#FF8A3C', '#2EE65C'];
   function rand(a, b) { return a + Math.random() * (b - a); }
   function dist2(ax, ay, bx, by) { const dx = ax - bx, dy = ay - by; return dx * dx + dy * dy; }
   function angleDiff(a, b) { let d = (b - a) % (Math.PI * 2); if (d > Math.PI) d -= Math.PI * 2; if (d < -Math.PI) d += Math.PI * 2; return d; }
@@ -2284,8 +2468,47 @@ input:focus { border-color: #3CFFA0; }
     document.getElementById('joystickZone').style.display = 'none';
     boostBtn.style.display = 'none';
     document.getElementById('chatToggleBtn').style.display = 'none';
+    document.getElementById('quitGameBtn').style.display = 'none';
+    document.getElementById('quitOverlay').classList.remove('visible');
     setChatOpen(false);
   }
+
+  // keluar duluan dari match sebelum mati — beda dari killLocalPlayer, TIDAK dapat EXP
+  // dan hitungan "Total Match" dibatalkan lagi karena match ini dianggap belum selesai.
+  function quitGame() {
+    if (!running) return;
+    document.getElementById('quitOverlay').classList.add('visible');
+  }
+
+  async function confirmQuitGame() {
+    document.getElementById('quitOverlay').classList.remove('visible');
+    if (!running) return;
+    running = false;
+    cancelAnimationFrame(animFrame);
+
+    if (myPlayerRef) { await myPlayerRef.remove(); }
+    cleanupServerIfEmpty(SERVER_ID);
+
+    if (currentUser) {
+      try {
+        const st = userStats(currentUser);
+        st.totalMatch = Math.max(0, st.totalMatch - 1); // batalkan hitungan match yang ditambah pas startGame()
+        currentUser.stats = st;
+        await db.ref('users/' + currentUser.uid + '/stats/totalMatch').set(st.totalMatch);
+      } catch (e) {}
+      setPresenceStatus('online');
+    }
+
+    playTrack('lobby');
+    hideGameUI();
+    detachServerListeners();
+    document.getElementById('lobbyScreen').classList.add('visible');
+  }
+  document.getElementById('quitGameBtn').addEventListener('click', quitGame);
+  document.getElementById('quitYesBtn').addEventListener('click', confirmQuitGame);
+  document.getElementById('quitNoBtn').addEventListener('click', () => {
+    document.getElementById('quitOverlay').classList.remove('visible');
+  });
 
   // ---- rendering ----
   function drawGrid() {
@@ -2440,7 +2663,7 @@ input:focus { border-color: #3CFFA0; }
 
     ctx.globalAlpha = alpha;
     ctx.fillStyle = 'rgba(0,0,0,0.75)';
-    ctx.strokeStyle = w.id === playerId ? '#3CFFA0' : '#FFD23C';
+    ctx.strokeStyle = w.id === playerId ? '#2EE65C' : '#FFD23C';
     ctx.lineWidth = 1.5;
     ctx.fillRect(bx, by, boxW, boxH);
     ctx.strokeRect(bx, by, boxW, boxH);
@@ -2467,7 +2690,7 @@ input:focus { border-color: #3CFFA0; }
       const h = w.segs[0];
       const mx = h.x * scaleX, my = h.y * scaleY;
       if (w.id === playerId) {
-        mctx.fillStyle = '#3CFFA0';
+        mctx.fillStyle = '#2EE65C';
         mctx.fillRect(mx - 2.5, my - 2.5, 5, 5);
       } else {
         mctx.fillStyle = 'rgba(255,255,255,0.55)';
@@ -2615,7 +2838,7 @@ input:focus { border-color: #3CFFA0; }
       // Firebase Realtime Database untuk path servers/<id>/chat belum ngizinin read/write —
       // beda dari path players/food yang mungkin rules-nya lebih longgar.
       console.error('Gagal baca chat (cek Firebase Rules untuk path servers/' + SERVER_ID + '/chat):', err);
-      appendSystemChatMessage('⚠ Gagal memuat chat server (' + (err && err.code ? err.code : 'error') + '). Kemungkinan izin Firebase belum diatur untuk fitur chat.');
+      appendSystemChatMessage('Gagal memuat chat server (' + (err && err.code ? err.code : 'error') + '). Kemungkinan izin Firebase belum diatur untuk fitur chat.');
     });
     // pesan yang dihapus/diubah admin dari panel admin masuk lewat child_changed, bukan child_added lagi
     chatQueryRef.on('child_changed', snap => {
@@ -2623,12 +2846,21 @@ input:focus { border-color: #3CFFA0; }
     });
   }
 
+  // ikon pixel pengganti emoji ⚠ buat pesan sistem/peringatan di chat
+  function pixWarnIcon() {
+    const span = document.createElement('span');
+    span.className = 'pixWarnIcon';
+    span.innerHTML = "<svg viewBox='0 0 7 5' xmlns='http://www.w3.org/2000/svg' class='pixIcon'><rect x='3' y='0' width='1' height='1'/><rect x='2' y='1' width='3' height='1'/><rect x='1' y='2' width='5' height='1'/><rect x='1' y='3' width='5' height='1'/><rect x='0' y='4' width='7' height='1'/></svg>";
+    return span;
+  }
+
   function appendSystemChatMessage(text) {
     const messagesEl = document.getElementById('chatMessages');
     const row = document.createElement('div');
     row.className = 'chatMsgRow';
     row.style.color = '#FF5C7A';
-    row.textContent = text;
+    row.appendChild(pixWarnIcon());
+    row.appendChild(document.createTextNode(text));
     messagesEl.appendChild(row);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
@@ -2651,7 +2883,9 @@ input:focus { border-color: #3CFFA0; }
     const textSpan = document.createElement('span');
     textSpan.className = 'chatMsgText';
     if (isDeleted) {
-      textSpan.textContent = '⚠ Pesan telah dihapus sistem';
+      textSpan.textContent = '';
+      textSpan.appendChild(pixWarnIcon());
+      textSpan.appendChild(document.createTextNode('Pesan telah dihapus sistem'));
       textSpan.style.color = '#666';
       textSpan.style.fontStyle = 'italic';
     } else {
@@ -2684,7 +2918,9 @@ input:focus { border-color: #3CFFA0; }
     if (d.deleted) {
       const textSpan = row.querySelector('.chatMsgText');
       if (textSpan) {
-        textSpan.textContent = '⚠ Pesan telah dihapus sistem';
+        textSpan.textContent = '';
+        textSpan.appendChild(pixWarnIcon());
+        textSpan.appendChild(document.createTextNode('Pesan telah dihapus sistem'));
         textSpan.style.color = '#666';
         textSpan.style.fontStyle = 'italic';
       }
@@ -2806,6 +3042,7 @@ input:focus { border-color: #3CFFA0; }
     document.getElementById('boostBar').style.display = 'block';
     if (isTouch) { boostBtn.style.display = 'flex'; joystickZone.style.display = 'block'; }
     document.getElementById('chatToggleBtn').style.display = 'flex';
+    document.getElementById('quitGameBtn').style.display = 'flex';
 
     running = true;
     lastTime = 0;
