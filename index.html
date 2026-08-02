@@ -338,20 +338,22 @@ input:focus { border-color: #3CFFA0; }
 
 /* Halaman player tidak boleh digulir — semua elemen mengecil otomatis
    mengikuti tinggi layar (pakai satuan vh) supaya selalu muat. */
-#playerScreen { overflow-y: auto !important; overflow-x: hidden !important; padding-top: clamp(4px, 1.2vh, 12px); padding-bottom: 24px; -webkit-overflow-scrolling: touch; }
-#playerScreen .screenTopBar { padding: clamp(6px, 1.4vh, 14px) 0 clamp(4px, 1vh, 8px); }
-#playerScreen .screenDivider { margin-bottom: clamp(6px, 1.2vh, 14px); }
-#playerScreen .logo { font-size: clamp(15px, 4vh, 30px); }
-#playerScreen .logoWorm { margin-bottom: clamp(4px, 1vh, 10px); transform: scale(0.7); transform-origin: center; }
+#playerScreen { overflow-y: auto !important; overflow-x: hidden !important; padding-top: clamp(4px, 1vh, 10px); padding-bottom: 24px; -webkit-overflow-scrolling: touch; }
+#playerScreen .screenTopBar { padding: clamp(4px, 1.2vh, 12px) 0 clamp(3px, 0.8vh, 6px); }
+#playerScreen .screenDivider { margin-bottom: clamp(4px, 1vh, 10px); }
+#playerScreen .logo { font-size: clamp(13px, 3.4vh, 26px); }
+#playerScreen .logoWorm { margin-bottom: clamp(3px, 0.8vh, 8px); transform: scale(0.6); transform-origin: center; }
 #playerScreen #playerListRows { flex: 1 1 auto; min-height: 0; justify-content: center; }
-#playerScreen .friendCard { padding: clamp(5px, 1.1vh, 12px) clamp(8px, 2vw, 14px); margin-bottom: clamp(4px, 0.9vh, 10px); gap: clamp(3px, 0.7vh, 8px); }
-#playerScreen .friendAvatar { width: clamp(28px, 4.4vh, 42px); height: clamp(28px, 4.4vh, 42px); font-size: clamp(12px, 1.9vh, 18px); }
-#playerScreen .friendInfo .fname { font-size: clamp(10px, 1.5vh, 13px); margin-bottom: clamp(2px, 0.4vh, 6px); }
-#playerScreen .friendInfo .flevelRow { margin-bottom: clamp(2px, 0.4vh, 6px); }
+#playerScreen .friendCard { padding: clamp(4px, 0.9vh, 10px) clamp(8px, 2vw, 14px); margin-bottom: clamp(3px, 0.7vh, 8px); gap: clamp(2px, 0.5vh, 6px); }
+#playerScreen .friendAvatar { width: clamp(24px, 3.6vh, 36px); height: clamp(24px, 3.6vh, 36px); font-size: clamp(11px, 1.6vh, 16px); }
+#playerScreen .friendInfo .fname { font-size: clamp(9px, 1.3vh, 12px); margin-bottom: clamp(1px, 0.3vh, 4px); }
+#playerScreen .friendInfo .flevelRow { margin-bottom: clamp(1px, 0.3vh, 4px); }
 #playerScreen .friendInfo .flevelRow .k, #playerScreen .friendStatus { font-size: 8px; }
-#playerScreen .friendInfo .flevelRow .v { font-size: clamp(9px, 1.2vh, 11px); }
-#playerScreen .friendViewBtn { padding: clamp(4px, 0.9vh, 7px) clamp(10px, 2vw, 14px); font-size: 9px; }
-#playerScreen .playerPagerRow { margin-top: clamp(4px, 1vh, 8px); }
+#playerScreen .friendInfo .flevelRow .v { font-size: clamp(8px, 1.1vh, 10px); }
+#playerScreen .friendViewBtn { padding: clamp(3px, 0.7vh, 6px) clamp(9px, 1.8vw, 12px); font-size: 8px; }
+#playerScreen .playerPagerRow { margin-top: clamp(10px, 2.2vh, 16px); }
+#playerScreen .pagerBtn { padding: clamp(6px, 1.2vh, 9px) clamp(8px, 1.8vw, 11px); font-size: 9px; }
+#playerScreen .pagerInfo { font-size: 10px; }
 #playerScreen .footNote { display: none; }
 .friendCard {
   width: 100%; max-width: 380px;
@@ -1364,7 +1366,7 @@ input:focus { border-color: #3CFFA0; }
     return { cls: 'offline', label: 'OFFLINE' };
   }
 
-  const PLAYER_PAGE_SIZE = 5;
+  const PLAYER_PAGE_SIZE = 4;
   let playerUsersObj = {};
   let playerIdsAll = [];
   let playerCurrentPage = 0;
@@ -1556,12 +1558,28 @@ input:focus { border-color: #3CFFA0; }
     });
   }
 
+  // Bersihkan food yang menumpuk kalau server sudah tidak ada player manusianya sama sekali.
+  // Ini yang bikin "segmen"/item numpuk terus lama-lama jadi lag.
+  async function cleanupServerIfEmpty(sid) {
+    try {
+      const snap = await db.ref('servers/' + sid + '/players').once('value');
+      let n = 0;
+      if (snap.exists()) snap.forEach(c => { if (!c.val().isBot) n++; });
+      if (n === 0) {
+        await db.ref('servers/' + sid + '/food').remove();
+      }
+    } catch (e) {}
+  }
+
   async function joinServer(sid) {
     const max = SERVERS[sid].maxPlayers;
     const snap = await db.ref('servers/' + sid + '/players').once('value');
     let n = 0;
     if (snap.exists()) snap.forEach(c => { if (!c.val().isBot) n++; });
     if (n >= max) return;
+    // fallback safety net: kalau ternyata server kosong (misal sesi sebelumnya
+    // crash/nutup tab tanpa sempat cleanup), sekalian bersihkan food lama sebelum mulai
+    if (n === 0) { db.ref('servers/' + sid + '/food').remove(); }
     SERVER_ID = sid;
     document.getElementById('lobbyScreen').classList.remove('visible');
     startGame();
@@ -1953,7 +1971,8 @@ input:focus { border-color: #3CFFA0; }
       });
     }
 
-    if (myPlayerRef) myPlayerRef.remove();
+    if (myPlayerRef) { await myPlayerRef.remove(); }
+    cleanupServerIfEmpty(SERVER_ID);
 
     // update statistik: panjang terpanjang & total waktu main
     if (currentUser) {
