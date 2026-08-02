@@ -17,6 +17,7 @@ html, body {
   background: #000;
   font-family: 'Silkscreen', 'Courier New', monospace;
   -webkit-font-smoothing: none;
+  overscroll-behavior: none;
 }
 #game { display: block; background: #000; cursor: crosshair; image-rendering: pixelated; }
 
@@ -60,6 +61,7 @@ html, body {
   z-index: 20;
   padding: clamp(8px, 3vh, 20px) 20px;
   overflow-y: auto; overflow-x: hidden;
+  overscroll-behavior: contain;
   color: #3CFFA0;
 }
 .screen.visible { display: flex; }
@@ -209,6 +211,7 @@ input:focus { border-color: #3CFFA0; }
   border: 1.5px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.02);
 }
 .skinPreview .body { width: 40px; height: 40px; }
+.skinPreview .body.twoTone { background-image: linear-gradient(135deg, var(--sc) 50%, var(--scB) 50%) !important; }
 .skinGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
 .skinSwatch {
   width: 100%; aspect-ratio: 1; cursor: pointer;
@@ -220,6 +223,9 @@ input:focus { border-color: #3CFFA0; }
   content: ''; position: absolute; inset: 0;
   background-color: var(--sc);
 }
+.skinSwatch.twoTone::after {
+  background-image: linear-gradient(135deg, var(--sc) 50%, var(--scB) 50%);
+}
 .skinConfirmBtn {
   width: 100%; padding: 14px; font-size: 13px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 2px;
   border: 1.5px solid #3CFFA0; cursor: pointer;
@@ -229,6 +235,85 @@ input:focus { border-color: #3CFFA0; }
 
 .orDivider { display: flex; align-items: center; gap: 12px; margin: clamp(12px, 2.5vh, 18px) 0; color: #555; font-size: 10px; letter-spacing: 2px; }
 .orDivider::before, .orDivider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.15); }
+
+/* ---------- Shop button (border ijo sama kayak Play Online) ---------- */
+.btnShop {
+  width: 100%; padding: 16px; font-size: 15px; font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 2px;
+  border: 1.5px solid #3CFFA0; cursor: pointer;
+  background: transparent; color: #3CFFA0; margin-top: 10px;
+  transition: all .12s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.btnShop::before { content: '\25B6'; font-size: 12px; }
+.btnShop:hover { background: rgba(60,255,160,0.08); }
+.btnShop:active { transform: translate(1px, 1px); }
+
+/* ---------- Shop screen ---------- */
+.shopCoinBadge {
+  border: 1.5px solid #3CFFA0; background: rgba(0,0,0,0.4);
+  padding: 8px 16px; text-align: center;
+}
+.shopCoinBadge .lbl { font-size: 10px; letter-spacing: 2px; color: #3CFFA0; margin-bottom: 4px; }
+.shopCoinBadge .val { font-size: 18px; color: #FFD23C; font-weight: 700; }
+
+.sectionLabel {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  color: #3CFFA0; font-size: 15px; font-weight: 700; letter-spacing: 3px;
+  margin-bottom: clamp(14px, 3vh, 24px);
+}
+.sectionLabel .sq { width: 6px; height: 6px; border: 1.5px solid #3CFFA0; }
+
+#shopScreen { overflow: hidden; }
+#shopScreen .screenTopBar { flex-shrink: 0; padding: clamp(8px, 2vh, 18px) 0 clamp(4px, 1.5vh, 10px); }
+#shopScreen .screenDivider { flex-shrink: 0; margin-bottom: clamp(8px, 2vh, 20px); }
+#shopScreen .logo { flex-shrink: 0; font-size: clamp(18px, 5vh, 46px); margin-bottom: 2px; }
+#shopScreen .sectionLabel { flex-shrink: 0; margin-bottom: clamp(8px, 2vh, 24px); }
+
+.skinShopGrid {
+  width: 100%; max-width: 640px;
+  display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); grid-template-rows: repeat(2, minmax(0,1fr));
+  gap: clamp(6px, 1.6vh, 14px);
+  flex: 1 1 auto; min-height: 0;
+}
+@media (max-width: 340px) { .skinShopGrid { grid-template-columns: minmax(0,1fr); grid-template-rows: repeat(4, minmax(0,1fr)); } }
+.skinShopCard {
+  border: 1.5px solid #3CFFA0; background: rgba(0,0,0,0.4);
+  padding: clamp(4px, 1.5vh, 22px) clamp(8px, 3vw, 16px); text-align: center;
+  min-width: 0; min-height: 0; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.skinShopSwatches { display: flex; justify-content: center; gap: clamp(6px, 3vw, 12px); margin-bottom: clamp(4px, 1.6vh, 18px); flex-shrink: 0; }
+.skinShopSwatches .sw {
+  width: clamp(28px, min(8vh, 18vw), 78px); height: clamp(28px, min(8vh, 18vw), 78px); position: relative;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15);
+}
+.skinShopSwatches .sw.eyes::before, .skinShopSwatches .sw.eyes::after {
+  content: ''; position: absolute; top: 35%; width: 13%; height: 13%; background: #06110c;
+}
+.skinShopSwatches .sw.eyes::before { left: 24%; }
+.skinShopSwatches .sw.eyes::after { right: 24%; }
+.skinShopPrice { font-size: clamp(7px, 1.4vh, 10px); letter-spacing: 2px; color: #3CFFA0; margin-bottom: clamp(2px, 0.6vh, 4px); flex-shrink: 0; }
+.skinShopPriceVal { font-size: clamp(12px, 2.6vh, 20px); color: #fff; font-weight: 700; margin-bottom: clamp(4px, 1.6vh, 16px); flex-shrink: 0; }
+.skinShopPriceVal .coinWord { font-size: clamp(9px, 1.7vh, 13px); color: #FFD23C; margin-left: 4px; }
+.skinShopBuyBtn {
+  width: 100%; padding: clamp(6px, 1.4vh, 13px); font-size: clamp(9px, 1.7vh, 13px); font-family: 'Silkscreen', monospace; font-weight: 700; letter-spacing: 1px;
+  border: 1.5px solid #3CFFA0; cursor: pointer;
+  background: transparent; color: #3CFFA0;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: all .12s;
+  flex-shrink: 0;
+}
+.skinShopBuyBtn::before { content: '\25B6'; font-size: 10px; }
+.skinShopBuyBtn:hover { background: rgba(60,255,160,0.08); }
+.skinShopBuyBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+.skinShopBuyBtn.owned { border-color: #777; color: #999; cursor: default; }
+.skinShopBuyBtn.owned::before { content: '\2713'; }
+.skinShopBuyBtn.owned:hover { background: transparent; }
+.skinShopMsg {
+  color: #FF5C7A; font-size: clamp(7px, 1.3vh, 10px); text-align: center; min-height: clamp(8px, 1.4vh, 14px); margin-bottom: clamp(2px, 0.8vh, 8px);
+  font-family: 'Silkscreen', monospace; letter-spacing: 1px; flex-shrink: 0;
+}
 
 .errMsg {
   color: #FF5C7A; font-size: 11px; margin: -2px 0 12px 2px; min-height: 12px;
@@ -260,6 +345,8 @@ input:focus { border-color: #3CFFA0; }
 .userInfo .ulevelRow { display: flex; gap: 18px; margin-bottom: 8px; }
 .userInfo .ulevelRow .stat .k { font-size: 9px; letter-spacing: 1px; color: #3CFFA0; margin-bottom: 2px; }
 .userInfo .ulevelRow .stat .v { font-size: 14px; color: #fff; font-weight: 700; }
+.userInfo .ulevelRow .stat.coinStat .k { color: #FFD23C; }
+.userInfo .ulevelRow .stat.coinStat .v { color: #FFD23C; }
 .expBar { width: 100%; height: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); overflow: hidden; }
 .expBar .fill { height: 100%; background: #3CFFA0; }
 
@@ -302,6 +389,8 @@ input:focus { border-color: #3CFFA0; }
   text-shadow: 2px 2px 0 #003318; letter-spacing: 1px; line-height: 1.6;
 }
 #hud .score { font-family: 'Silkscreen', monospace; font-size: 20px; color: #3CFFA0; }
+#hud .coinRow { font-size: 15px; color: #FFD23C; display: none; }
+@media (max-width: 640px) { #hud .coinRow { font-size: 12px; } }
 
 #topRightPanel {
   position: fixed; top: 14px; right: 14px; z-index: 5;
@@ -384,6 +473,7 @@ input:focus { border-color: #3CFFA0; }
 <audio id="bgmLobby" src="assets/lobby.m4a" loop preload="auto"></audio>
 <audio id="bgmGame" src="assets/game.m4a" loop preload="auto"></audio>
 <audio id="sfxClick" src="assets/click.wav" preload="auto"></audio>
+<audio id="sfxCoin" src="assets/coin.wav" preload="auto"></audio>
 
 <!-- AUTH SCREEN -->
 <div class="screen visible" id="authScreen">
@@ -434,6 +524,7 @@ input:focus { border-color: #3CFFA0; }
       <div class="ulevelRow">
         <div class="stat"><div class="k">LEVEL</div><div class="v" id="lobbyLevelNum">1</div></div>
         <div class="stat"><div class="k">EXP</div><div class="v" id="lobbyExpNum">0 / 100</div></div>
+        <div class="stat coinStat"><div class="k">COIN</div><div class="v" id="lobbyCoinNum">0</div></div>
       </div>
       <div class="expBar"><div class="fill" id="lobbyExpFill" style="width:0%"></div></div>
       <div class="ulevel" id="lobbyLevel" style="display:none;">Level 1 • 0 EXP</div>
@@ -443,13 +534,14 @@ input:focus { border-color: #3CFFA0; }
   <div id="lobbyMenu" style="width:100%;max-width:380px;">
     <button class="btnPrimary" id="playMenuBtn">PLAY ONLINE</button>
     <button class="btnWhite" id="changeSkinBtn">CHANGE SKIN</button>
+    <button class="btnShop" id="shopMenuBtn">SHOP</button>
   </div>
 
   <div id="serverListSection" style="width:100%;max-width:380px;display:none;">
     <div class="serverCard">
       <div>
         <div class="sName">Server 1</div>
-        <div class="sSlot" style="color:#3CFFA0;font-size:9px;letter-spacing:1px;margin-top:2px;">PLAYER ONLY</div>
+        <div class="sSlot" style="color:#3CFFA0;font-size:9px;letter-spacing:1px;margin-top:2px;">PLAYER ONLY &middot; EXP &middot; NO COIN</div>
         <div class="sSlot" id="server1Slot">.../20</div>
       </div>
       <button class="joinBtn" id="joinServer1">MAIN</button>
@@ -457,7 +549,7 @@ input:focus { border-color: #3CFFA0; }
     <div class="serverCard">
       <div>
         <div class="sName">Server 2</div>
-        <div class="sSlot" style="color:#FFD23C;font-size:9px;letter-spacing:1px;margin-top:2px;">PLAYER + BOT &middot; NO EXP</div>
+        <div class="sSlot" style="color:#FFD23C;font-size:9px;letter-spacing:1px;margin-top:2px;">PLAYER + BOT &middot; NO EXP &middot; COIN</div>
         <div class="sSlot" id="server2Slot">.../20</div>
       </div>
       <button class="joinBtn" id="joinServer2">MAIN</button>
@@ -468,9 +560,30 @@ input:focus { border-color: #3CFFA0; }
   <div class="footNote">HAVE FUN &amp; GOOD LUCK!</div>
 </div>
 
-<!-- HUD -->
+<!-- SHOP SCREEN -->
+<div class="screen" id="shopScreen">
+  <div class="screenTopBar">
+    <button class="screenBackBtn" id="shopBackBtn">&#8618; BACK</button>
+    <div class="shopCoinBadge">
+      <div class="lbl">COIN</div>
+      <div class="val" id="shopCoinNum">0</div>
+    </div>
+  </div>
+  <div class="screenDivider"></div>
+
+  <div class="logo">SHO<span class="accent">P</span></div>
+
+  <div class="screenDivider" style="margin-top: clamp(14px, 3vh, 30px);"></div>
+
+  <div class="sectionLabel"><span class="sq"></span><span class="sq"></span> SKINS <span class="sq"></span><span class="sq"></span></div>
+
+  <div class="skinShopGrid" id="skinShopGrid"></div>
+
+  <div class="footNote">HAVE FUN &amp; GOOD LUCK!</div>
+</div>
 <div id="hud">
   Length: <span class="score">0</span>
+  <div class="coinRow" id="hudCoinRow">Coin: <span id="hudCoinNum">0</span></div>
 </div>
 <div id="topRightPanel">
   <div id="leaderboard"><h3>Papan Skor</h3><div id="lbRows"></div></div>
@@ -600,6 +713,17 @@ input:focus { border-color: #3CFFA0; }
     if (btn) playClick();
   });
 
+  // ---- SFX ambil coin ----
+  const sfxCoin = document.getElementById('sfxCoin');
+  sfxCoin.volume = 0.7;
+  sfxCoin.addEventListener('error', () => {
+    console.error('File audio tidak bisa dimuat:', sfxCoin.src, '- cek apakah path/nama file sudah benar di server.');
+  });
+  function playCoinSfx() {
+    sfxCoin.currentTime = 0;
+    sfxCoin.play().catch(err => console.error('Gagal memutar sfxCoin:', err.name, err.message));
+  }
+
   // Musik lobby mulai dari layar login/auth
   playTrack('lobby');
 
@@ -679,6 +803,8 @@ input:focus { border-color: #3CFFA0; }
           passHash: simpleHash(pass),
           exp: 0,
           level: 1,
+          coin: 0,
+          ownedSkins: {},
           createdAt: Date.now()
         };
         await db.ref('users/' + uid).set(userData);
@@ -705,9 +831,10 @@ input:focus { border-color: #3CFFA0; }
 
   // ================= LOBBY LOGIC =================
   const SERVERS = {
-    server1: { maxPlayers: 20, hasBots: false, givesXp: true },
-    server2: { maxPlayers: 20, hasBots: true, givesXp: false, botCount: 10 }
+    server1: { maxPlayers: 20, hasBots: false, givesXp: true, hasCoin: false },
+    server2: { maxPlayers: 20, hasBots: true, givesXp: false, botCount: 10, hasCoin: true }
   };
+  const COIN_CHANCE = 0.10;
   let SERVER_ID = 'server1';
   const MAX_PLAYERS = 20;
   let serverCountRef = null, serverCountRef2 = null;
@@ -720,6 +847,7 @@ input:focus { border-color: #3CFFA0; }
       const uName = (currentUser && currentUser.name) ? currentUser.name : '?';
       const uLevel = (currentUser && currentUser.level) ? currentUser.level : 1;
       const uExp = (currentUser && typeof currentUser.exp === 'number') ? currentUser.exp : 0;
+      const uCoin = (currentUser && typeof currentUser.coin === 'number') ? currentUser.coin : 0;
       document.getElementById('lobbyAvatar').textContent = uName.charAt(0).toUpperCase();
       document.getElementById('lobbyName').textContent = uName;
       document.getElementById('lobbyLevel').textContent = `Level ${uLevel} • ${uExp} EXP`;
@@ -727,6 +855,7 @@ input:focus { border-color: #3CFFA0; }
       document.getElementById('lobbyLevelNum').textContent = uLevel;
       document.getElementById('lobbyExpNum').textContent = `${expIntoLevel} / 100`;
       document.getElementById('lobbyExpFill').style.width = expIntoLevel + '%';
+      document.getElementById('lobbyCoinNum').textContent = uCoin;
       document.getElementById('lobbyMenu').style.display = 'block';
       document.getElementById('serverListSection').style.display = 'none';
     } catch (e) {
@@ -763,8 +892,7 @@ input:focus { border-color: #3CFFA0; }
       }, err => {
         console.error('watchServerCount listener error:', err);
         const el = document.getElementById(slotElId);
-        el.textContent = 'ERROR: ' + (err && err.code ? err.code : (err && err.message) || 'gagal baca');
-        el.style.color = '#FF5C7A';
+        el.textContent = '.../' + max;
         document.getElementById(btnElId).disabled = false;
       });
     } catch (e) {
@@ -786,24 +914,50 @@ input:focus { border-color: #3CFFA0; }
   // ================= SKIN PICKER =================
   const SKIN_COLORS = ['#3CFFA0', '#FF5C7A', '#FFD23C', '#a86bff', '#4FC3F7', '#FF9F43', '#ff5cf1', '#ffffff'];
   const SKIN_STORAGE_KEY = 'retrosnake_skin_color';
-  let selectedSkinColor = localStorage.getItem(SKIN_STORAGE_KEY) || SKIN_COLORS[0];
+  const SKIN_STORAGE_KEY_B = 'retrosnake_skin_color_b';
+  let selectedSkin = {
+    colorA: localStorage.getItem(SKIN_STORAGE_KEY) || SKIN_COLORS[0],
+    colorB: localStorage.getItem(SKIN_STORAGE_KEY_B) || null
+  };
+
+  // ================= SHOP =================
+  const SHOP_SKINS = [
+    { id: 'shop1', colorA: '#FF5C7A', colorB: '#4FC3F7', price: 100 },
+    { id: 'shop2', colorA: '#FFD23C', colorB: '#2b2b2b', price: 100 },
+    { id: 'shop3', colorA: '#4FC3F7', colorB: '#3CFFA0', price: 100 },
+    { id: 'shop4', colorA: '#FF9F43', colorB: '#FFD23C', price: 100 }
+  ];
+  function ownedSkins() { return (currentUser && currentUser.ownedSkins) || {}; }
+  function ownedShopSkins() { return SHOP_SKINS.filter(s => ownedSkins()[s.id]); }
+
+  function applySkinPreview(colorA, colorB) {
+    const body = document.getElementById('skinPreviewBody');
+    body.classList.toggle('twoTone', !!colorB);
+    body.style.setProperty('--sc', colorA);
+    body.style.setProperty('--scB', colorB || colorA);
+    if (!colorB) body.style.background = colorA;
+  }
 
   function buildSkinGrid() {
     const grid = document.getElementById('skinGrid');
     grid.innerHTML = '';
-    SKIN_COLORS.forEach(c => {
+    const allSkins = SKIN_COLORS.map(c => ({ colorA: c, colorB: null }))
+      .concat(ownedShopSkins().map(s => ({ colorA: s.colorA, colorB: s.colorB })));
+    allSkins.forEach(skin => {
+      const isSelected = skin.colorA === selectedSkin.colorA && (skin.colorB || null) === (selectedSkin.colorB || null);
       const sw = document.createElement('div');
-      sw.className = 'skinSwatch' + (c === selectedSkinColor ? ' selected' : '');
-      sw.style.setProperty('--sc', c);
+      sw.className = 'skinSwatch' + (skin.colorB ? ' twoTone' : '') + (isSelected ? ' selected' : '');
+      sw.style.setProperty('--sc', skin.colorA);
+      if (skin.colorB) sw.style.setProperty('--scB', skin.colorB);
       sw.addEventListener('click', () => {
-        selectedSkinColor = c;
-        document.getElementById('skinPreviewBody').style.background = c;
+        selectedSkin = { colorA: skin.colorA, colorB: skin.colorB || null };
+        applySkinPreview(skin.colorA, skin.colorB);
         document.querySelectorAll('.skinSwatch').forEach(el => el.classList.remove('selected'));
         sw.classList.add('selected');
       });
       grid.appendChild(sw);
     });
-    document.getElementById('skinPreviewBody').style.background = selectedSkinColor;
+    applySkinPreview(selectedSkin.colorA, selectedSkin.colorB);
   }
 
   document.getElementById('changeSkinBtn').addEventListener('click', () => {
@@ -816,7 +970,9 @@ input:focus { border-color: #3CFFA0; }
   });
 
   document.getElementById('skinConfirmBtn').addEventListener('click', () => {
-    localStorage.setItem(SKIN_STORAGE_KEY, selectedSkinColor);
+    localStorage.setItem(SKIN_STORAGE_KEY, selectedSkin.colorA);
+    if (selectedSkin.colorB) localStorage.setItem(SKIN_STORAGE_KEY_B, selectedSkin.colorB);
+    else localStorage.removeItem(SKIN_STORAGE_KEY_B);
     document.getElementById('skinOverlay').classList.remove('visible');
   });
 
@@ -825,20 +981,100 @@ input:focus { border-color: #3CFFA0; }
     document.getElementById('lobbyMenu').style.display = 'block';
   });
 
-  async function joinServer(sid) {
-    try {
-      const max = SERVERS[sid].maxPlayers;
-      const snap = await db.ref('servers/' + sid + '/players').once('value');
-      let n = 0;
-      if (snap.exists()) snap.forEach(c => { if (!c.val().isBot) n++; });
-      if (n >= max) { alert('Server penuh (' + n + '/' + max + ')'); return; }
-      SERVER_ID = sid;
-      document.getElementById('lobbyScreen').classList.remove('visible');
-      startGame();
-    } catch (e) {
-      console.error('joinServer gagal:', e);
-      alert('Gagal join server: ' + (e && e.code ? e.code : (e && e.message) || e));
+  // ---- buka/tutup halaman Shop ----
+  document.getElementById('shopMenuBtn').addEventListener('click', () => {
+    document.getElementById('lobbyScreen').classList.remove('visible');
+    document.getElementById('shopScreen').classList.add('visible');
+    updateShopCoinDisplay();
+    buildShopGrid();
+  });
+
+  document.getElementById('shopBackBtn').addEventListener('click', () => {
+    document.getElementById('shopScreen').classList.remove('visible');
+    document.getElementById('lobbyScreen').classList.add('visible');
+    const uCoin = (currentUser && typeof currentUser.coin === 'number') ? currentUser.coin : 0;
+    document.getElementById('lobbyCoinNum').textContent = uCoin;
+  });
+
+  function updateShopCoinDisplay() {
+    const uCoin = (currentUser && typeof currentUser.coin === 'number') ? currentUser.coin : 0;
+    document.getElementById('shopCoinNum').textContent = uCoin;
+  }
+
+  function buildShopGrid() {
+    const grid = document.getElementById('skinShopGrid');
+    grid.innerHTML = '';
+    SHOP_SKINS.forEach(skin => {
+      const isOwned = !!ownedSkins()[skin.id];
+      const card = document.createElement('div');
+      card.className = 'skinShopCard';
+      card.innerHTML = `
+        <div class="skinShopSwatches">
+          <div class="sw" style="background:${skin.colorA};"></div>
+          <div class="sw eyes" style="background:${skin.colorB};"></div>
+        </div>
+        <div class="skinShopPrice">PRICE</div>
+        <div class="skinShopPriceVal">${skin.price}<span class="coinWord">COIN</span></div>
+        <div class="skinShopMsg"></div>
+        <button class="skinShopBuyBtn ${isOwned ? 'owned' : ''}" ${isOwned ? 'disabled' : ''}>${isOwned ? 'DIMILIKI' : 'BUY'}</button>
+      `;
+      const btn = card.querySelector('.skinShopBuyBtn');
+      const msg = card.querySelector('.skinShopMsg');
+      if (!isOwned) {
+        btn.addEventListener('click', () => buySkin(skin, msg, card));
+      }
+      grid.appendChild(card);
+    });
+  }
+
+  async function buySkin(skin, msg, card) {
+    if (!currentUser) return;
+    const balance = currentUser.coin || 0;
+    if (balance < skin.price) {
+      msg.style.color = '#FF5C7A';
+      msg.textContent = 'COIN TIDAK CUKUP';
+      return;
     }
+    try {
+      const uref = db.ref('users/' + currentUser.uid);
+      const snap = await uref.once('value');
+      const u = snap.val() || currentUser;
+      const curCoin = u.coin || 0;
+      if (curCoin < skin.price) {
+        msg.style.color = '#FF5C7A';
+        msg.textContent = 'COIN TIDAK CUKUP';
+        return;
+      }
+      const newCoin = curCoin - skin.price;
+      await uref.update({ coin: newCoin, ['ownedSkins/' + skin.id]: true });
+      currentUser.coin = newCoin;
+      if (!currentUser.ownedSkins) currentUser.ownedSkins = {};
+      currentUser.ownedSkins[skin.id] = true;
+
+      selectedSkin = { colorA: skin.colorA, colorB: skin.colorB };
+      localStorage.setItem(SKIN_STORAGE_KEY, skin.colorA);
+      localStorage.setItem(SKIN_STORAGE_KEY_B, skin.colorB);
+
+      updateShopCoinDisplay();
+      document.getElementById('lobbyCoinNum').textContent = newCoin;
+      const hudCoinNum = document.getElementById('hudCoinNum');
+      if (hudCoinNum) hudCoinNum.textContent = newCoin;
+      buildShopGrid();
+    } catch (e) {
+      msg.style.color = '#FF5C7A';
+      msg.textContent = 'GAGAL MEMBELI';
+    }
+  }
+
+  async function joinServer(sid) {
+    const max = SERVERS[sid].maxPlayers;
+    const snap = await db.ref('servers/' + sid + '/players').once('value');
+    let n = 0;
+    if (snap.exists()) snap.forEach(c => { if (!c.val().isBot) n++; });
+    if (n >= max) return;
+    SERVER_ID = sid;
+    document.getElementById('lobbyScreen').classList.remove('visible');
+    startGame();
   }
 
   document.getElementById('joinServer1').addEventListener('click', () => joinServer('server1'));
@@ -897,7 +1133,7 @@ input:focus { border-color: #3CFFA0; }
   resize();
 
   const WORLD = { w: 4200, h: 4200 };
-  const FOOD_TARGET = 260;
+  const FOOD_TARGET = 140;
   const START_LEN = 10;
 
   let food = {}; // keyed by firebase id
@@ -920,12 +1156,13 @@ input:focus { border-color: #3CFFA0; }
   function dist2(ax, ay, bx, by) { const dx = ax - bx, dy = ay - by; return dx * dx + dy * dy; }
   function angleDiff(a, b) { let d = (b - a) % (Math.PI * 2); if (d > Math.PI) d -= Math.PI * 2; if (d < -Math.PI) d += Math.PI * 2; return d; }
 
-  function makeWormObj(id, name, isRemote, x, y, color, isBot) {
+  function makeWormObj(id, name, isRemote, x, y, color, isBot, colorB) {
     const segs = [];
     for (let i = 0; i < START_LEN; i++) segs.push({ x: x - i * 6, y: y });
     return {
       id, name, isRemote, isBot: !!isBot,
       color: color || NEON[Math.floor(Math.random() * NEON.length)],
+      colorB: colorB || null,
       segs, angle: 0, targetAngle: 0, speed: 2.4,
       boosting: false, alive: true, len: START_LEN, boostFuel: 100,
       lastPos: { x, y }, targetPos: { x, y }, lastUpdateT: performance.now(), updateInterval: 100
@@ -942,7 +1179,7 @@ input:focus { border-color: #3CFFA0; }
     const color = NEON[Math.floor(Math.random() * NEON.length)];
     const id = 'bot_' + Math.random().toString(36).slice(2, 10);
     const w = makeWormObj(id, name, false, x, y, color, true);
-    w.speed = rand(1.9, 2.4);
+    w.speed = rand(2.1, 2.7);
     w.botTurnCooldown = 0;
     worms.push(w);
     return w;
@@ -957,7 +1194,7 @@ input:focus { border-color: #3CFFA0; }
 
     // cari makanan terdekat dalam radius pandang
     let targetX = null, targetY = null, bestD = Infinity;
-    const SIGHT2 = 500 * 500;
+    const SIGHT2 = 620 * 620;
     for (const fid in food) {
       const f = food[fid];
       const d = dist2(w.segs[0].x, w.segs[0].y, f.x, f.y);
@@ -970,7 +1207,7 @@ input:focus { border-color: #3CFFA0; }
     } else if (w.botTurnCooldown <= 0) {
       // jalan acak kalau tidak ada makanan terlihat
       w.targetAngle += rand(-1.2, 1.2);
-      w.botTurnCooldown = rand(800, 2200);
+      w.botTurnCooldown = rand(500, 1400);
     }
 
     // hindari tembok dunia
@@ -982,7 +1219,7 @@ input:focus { border-color: #3CFFA0; }
     else if (head.y > WORLD.h - margin) w.targetAngle = -Math.PI / 2;
 
     let diff = angleDiff(w.angle, w.targetAngle);
-    const maxTurn = 0.07 * dtScale;
+    const maxTurn = 0.09 * dtScale;
     diff = Math.max(-maxTurn, Math.min(maxTurn, diff));
     w.angle += diff;
 
@@ -1137,16 +1374,32 @@ input:focus { border-color: #3CFFA0; }
       if (d < (f.r + 10) * (f.r + 10) && d < closestD) { closestD = d; closestFid = fid; }
     }
     if (closestFid) {
+      const eaten = food[closestFid];
       w.len += 1;
       db.ref('servers/' + SERVER_ID + '/food/' + closestFid).remove();
       delete food[closestFid];
       spawnFoodIfNeeded(1);
+      if (eaten && eaten.isCoin) gainCoin(1);
     }
   }
 
+  function gainCoin(amount) {
+    if (!currentUser) return;
+    currentUser.coin = (currentUser.coin || 0) + amount;
+    const hudCoinNum = document.getElementById('hudCoinNum');
+    if (hudCoinNum) hudCoinNum.textContent = currentUser.coin;
+    db.ref('users/' + currentUser.uid + '/coin').set(currentUser.coin).catch(() => {});
+    playCoinSfx();
+  }
+
   function spawnFoodIfNeeded(n) {
+    const sconf = SERVERS[SERVER_ID];
+    const canCoin = !!(sconf && sconf.hasCoin);
     for (let i = 0; i < n; i++) {
-      const nf = { x: rand(40, WORLD.w - 40), y: rand(40, WORLD.h - 40), r: rand(3, 6), color: NEON[Math.floor(Math.random() * NEON.length)] };
+      const isCoin = canCoin && Math.random() < COIN_CHANCE;
+      const nf = isCoin
+        ? { x: rand(40, WORLD.w - 40), y: rand(40, WORLD.h - 40), r: rand(4, 6), color: '#FFD23C', isCoin: true }
+        : { x: rand(40, WORLD.w - 40), y: rand(40, WORLD.h - 40), r: rand(3, 6), color: NEON[Math.floor(Math.random() * NEON.length)] };
       db.ref('servers/' + SERVER_ID + '/food').push(nf);
     }
   }
@@ -1260,13 +1513,54 @@ input:focus { border-color: #3CFFA0; }
   function worldToScreen(x, y) { return { x: (x - camera.x) * zoom + W / 2, y: (y - camera.y) * zoom + H / 2 }; }
 
   function drawFood() {
+    const now = performance.now();
     for (const fid in food) {
       const f = food[fid];
       const s = worldToScreen(f.x, f.y);
-      if (s.x < -20 || s.x > W + 20 || s.y < -20 || s.y > H + 20) continue;
-      const r = f.r * zoom;
-      ctx.fillStyle = f.color;
-      ctx.fillRect(Math.round(s.x - r), Math.round(s.y - r), Math.round(r * 2), Math.round(r * 2));
+      if (s.x < -30 || s.x > W + 30 || s.y < -30 || s.y > H + 30) continue;
+      if (f.isCoin) {
+        const seed = f.x * 0.07 + f.y * 0.03;
+        const blink = 0.6 + 0.4 * Math.sin(now / 180 + seed);
+        const pulse = 0.85 + 0.25 * Math.sin(now / 260 + seed);
+        const r = f.r * zoom * pulse;
+
+        // glow lembut di belakang koin
+        ctx.globalAlpha = 0.22 * blink;
+        ctx.fillStyle = '#FFD23C';
+        const gr = r * 2.4;
+        ctx.fillRect(Math.round(s.x - gr), Math.round(s.y - gr), Math.round(gr * 2), Math.round(gr * 2));
+
+        // sparkle kecil berputar mengelilingi koin
+        ctx.globalAlpha = 0.85 * blink;
+        ctx.fillStyle = '#fff6cc';
+        const spinR = r * 2.1;
+        for (let i = 0; i < 3; i++) {
+          const ang = now / 500 + (i * Math.PI * 2 / 3);
+          const sx = s.x + Math.cos(ang) * spinR, sy = s.y + Math.sin(ang) * spinR;
+          const sp = Math.max(1, Math.round(1.5 * zoom));
+          ctx.fillRect(Math.round(sx - sp / 2), Math.round(sy - sp / 2), sp, sp);
+        }
+
+        // rim luar koin (emas gelap) lalu badan koin (emas terang) -> efek pixel-coin
+        ctx.globalAlpha = 1;
+        const rimC = shadeColor('#FFD23C', -60);
+        ctx.fillStyle = rimC;
+        ctx.fillRect(Math.round(s.x - r), Math.round(s.y - r), Math.round(r * 2), Math.round(r * 2));
+        const innerR = r * 0.72;
+        ctx.fillStyle = '#FFD23C';
+        ctx.fillRect(Math.round(s.x - innerR), Math.round(s.y - innerR), Math.round(innerR * 2), Math.round(innerR * 2));
+
+        // kilau highlight yang berkedip di sudut koin
+        ctx.globalAlpha = blink;
+        ctx.fillStyle = '#fffde8';
+        const hr = innerR * 0.4;
+        ctx.fillRect(Math.round(s.x - innerR * 0.35 - hr), Math.round(s.y - innerR * 0.35 - hr), Math.round(hr * 1.6), Math.round(hr * 1.6));
+        ctx.globalAlpha = 1;
+      } else {
+        const r = f.r * zoom;
+        ctx.fillStyle = f.color;
+        ctx.fillRect(Math.round(s.x - r), Math.round(s.y - r), Math.round(r * 2), Math.round(r * 2));
+      }
     }
   }
   function drawParticles() {
@@ -1294,7 +1588,7 @@ input:focus { border-color: #3CFFA0; }
   function drawWorm(w) {
     if (!w.alive) return;
     const segR = wormRadius(w) * zoom;
-    const darkC = shadeColor(w.color, -55);
+    const darkC = w.colorB || shadeColor(w.color, -55);
     for (let i = w.segs.length - 1; i >= 0; i--) {
       const seg = w.segs[i]; const s = worldToScreen(seg.x, seg.y);
       if (s.x < -40 || s.x > W + 40 || s.y < -40 || s.y > H + 40) continue;
@@ -1404,7 +1698,7 @@ input:focus { border-color: #3CFFA0; }
     playersRef.on('child_added', snap => {
       if (snap.key === playerId) return;
       const d = snap.val();
-      const w = makeWormObj(snap.key, d.name, true, d.x, d.y, d.color);
+      const w = makeWormObj(snap.key, d.name, true, d.x, d.y, d.color, false, d.colorB);
       w.angle = d.angle || 0; w.len = d.len || START_LEN;
       w.targetPos = { x: d.x, y: d.y }; w.lastPos = { x: d.x, y: d.y }; w.lastUpdateT = performance.now();
       worms.push(w);
@@ -1439,15 +1733,12 @@ input:focus { border-color: #3CFFA0; }
     playerId = currentUser.uid;
     const px = rand(WORLD.w * 0.3, WORLD.w * 0.7), py = rand(WORLD.h * 0.3, WORLD.h * 0.7);
     const myColor = localStorage.getItem(SKIN_STORAGE_KEY) || SKIN_COLORS[0];
-    const me = makeWormObj(playerId, currentUser.name, false, px, py, myColor);
+    const myColorB = localStorage.getItem(SKIN_STORAGE_KEY_B) || null;
+    const me = makeWormObj(playerId, currentUser.name, false, px, py, myColor, false, myColorB);
     worms.push(me);
 
     myPlayerRef = db.ref('servers/' + SERVER_ID + '/players/' + playerId);
-    myPlayerRef.set({ name: currentUser.name, x: px, y: py, angle: 0, len: START_LEN, color: myColor, alive: true, isBot: false, updatedAt: firebase.database.ServerValue.TIMESTAMP })
-      .catch(e => {
-        console.error('Gagal set player:', e);
-        alert('Gagal masuk server: ' + (e && e.code ? e.code : (e && e.message) || e));
-      });
+    myPlayerRef.set({ name: currentUser.name, x: px, y: py, angle: 0, len: START_LEN, color: myColor, colorB: myColorB, alive: true, isBot: false, updatedAt: firebase.database.ServerValue.TIMESTAMP });
     myPlayerRef.onDisconnect().remove();
 
     attachServerListeners();
@@ -1457,6 +1748,9 @@ input:focus { border-color: #3CFFA0; }
     if (sconf && sconf.hasBots) spawnInitialBots(sconf.botCount);
 
     document.getElementById('hud').style.display = 'block';
+    const hudCoinRow = document.getElementById('hudCoinRow');
+    if (hudCoinRow) hudCoinRow.style.display = (sconf && sconf.hasCoin) ? 'block' : 'none';
+    document.getElementById('hudCoinNum').textContent = (currentUser && currentUser.coin) || 0;
     document.getElementById('leaderboard').style.display = 'block';
     document.getElementById('minimapWrap').style.display = 'block';
     resizeMinimap();
