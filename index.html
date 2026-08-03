@@ -2003,6 +2003,8 @@ input:focus { border-color: #2EE65C; }
       if (n === 0) {
         await db.ref('servers/' + sid + '/food').remove();
         await db.ref('servers/' + sid + '/chat').remove(); // player terakhir udah kabur, chat direset
+        await db.ref('servers/' + sid + '/bots').remove();
+        await db.ref('servers/' + sid + '/botHost').remove();
       }
     } catch (e) {}
   }
@@ -2124,6 +2126,146 @@ input:focus { border-color: #2EE65C; }
   const BOT_NAMES = ['Cacink', 'Bobi', 'Ular99', 'Slither_X', 'Krisu', 'Zonk', 'Wormo', 'Tobi', 'Kece', 'Nano', 'Gepeng', 'Rambo'];
   let botRespawnQueue = [];
 
+  // ================= BOT HOST SYNC (fix: bot dulu cuma disimulasikan lokal per
+  // browser & gak pernah ditulis ke Firebase, jadi tiap akun lihat bot yang beda
+  // -sendiri-sendiri. Sekarang satu client di-elect jadi "bot host": dia yang
+  // jalanin AI bot & nulis posisinya ke servers/{id}/bots, client lain tinggal
+  // baca & interpolasi kayak player remote biasa — jadi semua orang di server
+  // yang sama lihat bot yang SAMA persis. =================
+  let isBotHost = false;
+  let botsRef = null;
+  let botHostRef = null;
+  let lastBotNetPush = 0;
+
+  function watchBotHost() {
+    const sconf = SERVERS[SERVER_ID];
+    if (!sconf || !sconf.hasBots) return;
+    botHostRef = db.ref('servers/' + SERVER_ID + '/botHost');
+    botHostRef.on('value', snap => {
+      const d = snap.val();
+      if (!d || !d.uid) {
+        // slot host kosong
+        if (!isBotHost && running) {
+          // delay acak biar client yang lagi rame di server yang sama gak transaction bareng
+          setTimeout(() => { if (running && !isBotHost) tryClaimBotHost(false); }, rand(150, 650));
+        }
+        return;
+      }
+      if (isBotHost && d.uid !== playerId) {
+        // status host kita udah kepindah ke client lain (misal race waktu klaim,
+        // atau reconnect kita sempat dianggap disconnect) — mundur jadi client
+        // biasa, JANGAN terus simulasi+tulis bot sendiri, biar gak ada 2 host
+        // bareng yang bikin jumlah bot numpuk & tiap browser lihat versi beda.
+        demoteBotHost();
+        return;
+      }
+      if (!isBotHost && d.uid !== playerId) {
+        // host yang tercatat mungkin sebenarnya udah mati tanpa sempat
+        // ke-onDisconnect (tab di-minimize/network putus-nyambung dll) —
+        // kalau heartbeat-nya udah lama gak update, anggap macet & rebut paksa.
+        const stale = !d.updatedAt || (Date.now() - d.updatedAt > 10000);
+        if (stale && running) {
+          setTimeout(() => { if (running && !isBotHost) tryClaimBotHost(true); }, rand(150, 650));
+        }
+      }
+    });
+  }
+
+  function tryClaimBotHost(force) {
+    const sconf = SERVERS[SERVER_ID];
+    if (!sconf || !sconf.hasBots || !botHostRef || isBotHost) return;
+    botHostRef.transaction(current => {
+      if (!current || !current.uid) return { uid: playerId, updatedAt: Date.now() };
+      if (force && (!current.updatedAt || Date.now() - current.updatedAt > 10000)) {
+        return { uid: playerId, updatedAt: Date.now() }; // host lama macet/hilang, ambil alih
+      }
+      return; // masih ada host lain yang aktif, batal
+    }, (err, committed, snap) => {
+      if (err) { console.error('Gagal klaim bot host (cek Firebase Rules untuk path servers/' + SERVER_ID + '/botHost):', err); return; }
+      if (committed && snap && snap.val() && snap.val().uid === playerId) becomeBotHost();
+    });
+  }
+
+  function becomeBotHost() {
+    isBotHost = true;
+    botsRef = db.ref('servers/' + SERVER_ID + '/bots');
+    // kalau host ini disconnect/nutup tab, langsung lepas klaim host biar
+    // client lain bisa segera ambil alih simulasi bot tanpa nunggu lama
+    botHostRef.onDisconnect().remove();
+    botHostRef.child('updatedAt').set(firebase.database.ServerValue.TIMESTAMP).catch(() => {});
+    // adopsi bot yang sudah ada (peninggalan host sebelumnya) biar gak spawn dobel
+    // dan bot yang lagi jalan gak "reset" pas host-nya pindah tangan
+    botsRef.once('value', snap => {
+      let existingCount = 0;
+      if (snap.exists()) {
+        snap.forEach(c => {
+          if (worms.find(w => w.id === c.key)) return; // jaga-jaga biar gak dobel
+          const d = c.val();
+          const w = makeWormObj(c.key, d.name, false, d.x, d.y, d.color, true, d.colorB, d.colors || null);
+          w.angle = d.angle || 0; w.len = d.len || START_LEN;
+          w.botTurnCooldown = 0;
+          worms.push(w);
+          existingCount++;
+        });
+      }
+      const sconf = SERVERS[SERVER_ID];
+      const need = (sconf && sconf.botCount || 0) - existingCount;
+      if (need > 0) spawnInitialBots(need);
+    }, err => {
+      console.error('Gagal baca data bot (cek Firebase Rules untuk path servers/' + SERVER_ID + '/bots):', err);
+    });
+  }
+
+  // dipanggil kalau ternyata status host kita udah "direbut" client lain (lihat
+  // watchBotHost) — buang bot yang tadinya kita simulasikan sendiri, lalu tarik
+  // ulang daftar bot yang berlaku sekarang (punya host baru) biar tetap sinkron
+  function demoteBotHost() {
+    worms = worms.filter(w => !(w.isBot && !w.isRemote));
+    isBotHost = false;
+    botsRef = null;
+    const bRef = db.ref('servers/' + SERVER_ID + '/bots');
+    bRef.once('value', snap => {
+      if (!snap.exists()) return;
+      snap.forEach(c => {
+        if (worms.find(w => w.id === c.key)) return;
+        const d = c.val();
+        const w = makeWormObj(c.key, d.name, true, d.x, d.y, d.color, true, d.colorB, d.colors || null);
+        w.angle = d.angle || 0; w.len = d.len || START_LEN;
+        w.targetPos = { x: d.x, y: d.y }; w.lastPos = { x: d.x, y: d.y }; w.lastUpdateT = performance.now();
+        worms.push(w);
+      });
+    });
+  }
+
+  function releaseBotHost() {
+    if (isBotHost && botHostRef) {
+      botHostRef.onDisconnect().cancel();
+      botHostRef.remove().catch(() => {});
+    }
+    if (botHostRef) botHostRef.off();
+    isBotHost = false;
+    botHostRef = null;
+    botsRef = null;
+  }
+
+  function pushBotStateToFirebase(now) {
+    if (!isBotHost || !botsRef) return;
+    if (now - lastBotNetPush < 120) return;
+    lastBotNetPush = now;
+    const updates = {};
+    for (const w of worms) {
+      if (!w.isBot || w.isRemote) continue; // cuma bot yang kita host & simulasikan lokal
+      updates[w.id + '/x'] = w.segs[0].x;
+      updates[w.id + '/y'] = w.segs[0].y;
+      updates[w.id + '/angle'] = w.angle;
+      updates[w.id + '/len'] = w.len;
+    }
+    if (Object.keys(updates).length) botsRef.update(updates);
+    // heartbeat: bukti ke client lain bahwa host ini masih hidup & aktif,
+    // jadi mereka gak salah anggap kita macet terus rebut status host
+    if (botHostRef) botHostRef.child('updatedAt').set(firebase.database.ServerValue.TIMESTAMP).catch(() => {});
+  }
+
   function spawnBot() {
     const x = rand(WORLD.w * 0.2, WORLD.w * 0.8), y = rand(WORLD.h * 0.2, WORLD.h * 0.8);
     const name = BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
@@ -2133,6 +2275,12 @@ input:focus { border-color: #2EE65C; }
     w.speed = rand(2.1, 2.7);
     w.botTurnCooldown = 0;
     worms.push(w);
+    if (isBotHost && botsRef) {
+      botsRef.child(id).set({
+        name, x, y, angle: 0, len: START_LEN, color,
+        updatedAt: firebase.database.ServerValue.TIMESTAMP
+      }).catch(err => console.error('Gagal simpan bot (cek Firebase Rules untuk path servers/' + SERVER_ID + '/bots):', err));
+    }
     return w;
   }
 
@@ -2202,17 +2350,14 @@ input:focus { border-color: #2EE65C; }
       spawnFoodIfNeeded(1);
     }
 
-    // tabrakan bot dengan worm lain (termasuk pemain)
-    const headR = wormRadius(w) * 0.7;
+    // tabrakan bot dengan worm lain (termasuk pemain) — hanya dijalankan host
+    const headR = wormRadius(w) * HIT_R_COEF;
+    const prevHead = w.segs[1] || { x: nx, y: ny };
     for (const other of worms) {
       if (!other.alive || other === w) continue;
-      const otherR = wormRadius(other) * 0.65;
-      for (let i = 0; i < other.segs.length; i++) {
-        const s = other.segs[i];
-        if (dist2(nx, ny, s.x, s.y) < (headR + otherR) * (headR + otherR)) {
-          killBot(w, other);
-          return;
-        }
+      if (headHitsWorm(prevHead.x, prevHead.y, nx, ny, headR, other, HIT_R_COEF)) {
+        killBot(w, other);
+        return;
       }
     }
   }
@@ -2233,12 +2378,13 @@ input:focus { border-color: #2EE65C; }
       });
     }
     worms = worms.filter(x => x !== w);
+    if (isBotHost && botsRef) botsRef.child(w.id).remove().catch(() => {});
     // respawn setelah jeda singkat
     botRespawnQueue.push(performance.now() + rand(2000, 5000));
   }
 
   function processBotRespawns() {
-    if (!botRespawnQueue.length) return;
+    if (!isBotHost || !botRespawnQueue.length) return;
     const now = performance.now();
     botRespawnQueue = botRespawnQueue.filter(t => {
       if (now >= t) { spawnBot(); return false; }
@@ -2384,18 +2530,59 @@ input:focus { border-color: #2EE65C; }
     }
   }
 
+  // ---- collision helpers ----
+  // Koefisien radius hitbox. Dulu 0.7/0.65 — jauh lebih kecil dari radius yang
+  // kelihatan di layar (segmen digambar dengan radius ~0.9x wormRadius), jadi
+  // kepala kelihatan udah nabrak tapi gak kedeteksi mati -> kesannya nembus/cheat.
+  // Dinaikkan biar match sama visualnya.
+  const HIT_R_COEF = 0.82;
+
+  function pointSegDist2(px, py, ax, ay, bx, by) {
+    const abx = bx - ax, aby = by - ay;
+    const apx = px - ax, apy = py - ay;
+    const lenSq = abx * abx + aby * aby;
+    let t = lenSq > 1e-9 ? (apx * abx + apy * aby) / lenSq : 0;
+    if (t < 0) t = 0; else if (t > 1) t = 1;
+    const cx = ax + abx * t, cy = ay + aby * t;
+    const dx = px - cx, dy = py - cy;
+    return dx * dx + dy * dy;
+  }
+
+  // Cek apakah kepala (yang barusan gerak dari prev ke cur) nabrak badan worm
+  // lain. Dulu cuma dicek posisi akhir kepala vs titik-titik sambungan body
+  // (dist2 ke tiap segs[i]) — kalau gerakan 1 frame (apalagi pas boost / lag
+  // spike, dtScale bisa sampai 2.2x) lebih jauh dari jarak antar titik body
+  // lawan, kepala bisa "loncat" ngelewatin celah tanpa pernah kedeteksi.
+  // Sekarang: (1) body lawan dicek sebagai garis/ruas (bukan cuma titik), dan
+  // (2) lintasan gerak kepala di-sample beberapa titik, bukan cuma titik akhir.
+  function headHitsWorm(prevX, prevY, curX, curY, headR, other, otherRCoef) {
+    const otherR = wormRadius(other) * otherRCoef;
+    const rSum2 = (headR + otherR) * (headR + otherR);
+    const dx = curX - prevX, dy = curY - prevY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const steps = Math.max(1, Math.ceil(dist / 6));
+    for (let s = 1; s <= steps; s++) {
+      const t = s / steps;
+      const hx = prevX + dx * t, hy = prevY + dy * t;
+      for (let i = 0; i < other.segs.length - 1; i++) {
+        const a = other.segs[i], b = other.segs[i + 1];
+        if (pointSegDist2(hx, hy, a.x, a.y, b.x, b.y) < rSum2) return true;
+      }
+      const last = other.segs[other.segs.length - 1];
+      if (dist2(hx, hy, last.x, last.y) < rSum2) return true;
+    }
+    return false;
+  }
+
   // ---- collisions (local player only checks itself) ----
   function checkCollisions() {
     const p = getPlayer();
     if (!p || !p.alive) return;
-    const head = p.segs[0], headR = wormRadius(p) * 0.7;
+    const head = p.segs[0], prev = p.segs[1] || head;
+    const headR = wormRadius(p) * HIT_R_COEF;
     for (const other of worms) {
       if (!other.alive || other === p) continue; // self-collision disabled — melingkar aman
-      const otherR = wormRadius(other) * 0.65;
-      for (let i = 0; i < other.segs.length; i++) {
-        const s = other.segs[i];
-        if (dist2(head.x, head.y, s.x, s.y) < (headR + otherR) * (headR + otherR)) { killLocalPlayer(); return; }
-      }
+      if (headHitsWorm(prev.x, prev.y, head.x, head.y, headR, other, HIT_R_COEF)) { killLocalPlayer(); return; }
     }
   }
 
@@ -2734,6 +2921,7 @@ input:focus { border-color: #2EE65C; }
     processBotRespawns();
     checkCollisions();
     pushLocalStateToFirebase(performance.now());
+    pushBotStateToFirebase(performance.now());
 
     if (p && p.alive) {
       camera.x += (p.segs[0].x - camera.x) * 0.12;
@@ -2800,13 +2988,49 @@ input:focus { border-color: #2EE65C; }
       worms = worms.filter(w => w.id !== snap.key);
     });
 
+    // ---- sinkronisasi bot (server yang punya bot saja) ----
+    // client yang BUKAN bot host cuma baca & interpolasi data bot dari sini,
+    // sama persis kayak dia baca posisi player remote lain. Client yang jadi
+    // host udah punya bot-nya di array `worms` lokal (lihat becomeBotHost/
+    // spawnBot), makanya di sini selalu di-skip kalau isBotHost true supaya
+    // gak dobel.
+    const sconf = SERVERS[SERVER_ID];
+    if (sconf && sconf.hasBots) {
+      const bRef = db.ref('servers/' + SERVER_ID + '/bots');
+      bRef.on('child_added', snap => {
+        if (isBotHost) return;
+        const d = snap.val();
+        const w = makeWormObj(snap.key, d.name, true, d.x, d.y, d.color, true, d.colorB, d.colors || null);
+        w.angle = d.angle || 0; w.len = d.len || START_LEN;
+        w.targetPos = { x: d.x, y: d.y }; w.lastPos = { x: d.x, y: d.y }; w.lastUpdateT = performance.now();
+        worms.push(w);
+      });
+      bRef.on('child_changed', snap => {
+        if (isBotHost) return;
+        const d = snap.val();
+        const w = worms.find(x => x.id === snap.key);
+        if (!w) return;
+        w.lastPos = { x: w.segs[0].x, y: w.segs[0].y };
+        w.targetPos = { x: d.x, y: d.y };
+        w.lastUpdateT = performance.now();
+        w.angle = d.angle;
+        w.len = d.len;
+      });
+      bRef.on('child_removed', snap => {
+        if (isBotHost) return;
+        worms = worms.filter(w => w.id !== snap.key);
+      });
+    }
+
     attachChatListener();
   }
 
   function detachServerListeners() {
     if (playersRef) playersRef.off();
     if (foodRef) foodRef.off();
+    db.ref('servers/' + SERVER_ID + '/bots').off();
     detachChatListener();
+    releaseBotHost();
     botRespawnQueue = [];
   }
 
@@ -3029,8 +3253,12 @@ input:focus { border-color: #2EE65C; }
     attachServerListeners();
 
     botRespawnQueue = [];
+    isBotHost = false;
     const sconf = SERVERS[SERVER_ID];
-    if (sconf && sconf.hasBots) spawnInitialBots(sconf.botCount);
+    if (sconf && sconf.hasBots) {
+      watchBotHost();
+      tryClaimBotHost();
+    }
 
     document.getElementById('hud').style.display = 'block';
     const hudCoinRow = document.getElementById('hudCoinRow');
